@@ -1,0 +1,562 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Central ESL subcommands &mdash; ESL  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="_static/tabs.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+  <script type="text/javascript" src="_static/js/ncs.js"></script>
+
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+  <link rel="shortcut icon" href="_static/images/favicon.ico"/>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ESL
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div id="searchbox" role="search">
+  <div class="searchformwrapper">
+    <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Subpages:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Requirements and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="samples.html">Samples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services.html">Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="additional_resources.html">Additional resources</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ESL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Central ESL subcommands</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/esl_ap_subcommands.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="central-esl-subcommands">
+<span id="id1"></span><h1>Central ESL subcommands<a class="headerlink" href="#central-esl-subcommands" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#esl-client-subcommands" id="id12">ESL Client subcommands</a></p></li>
+<li><p><a class="reference internal" href="#ots-client-subcommands" id="id13">OTS Client subcommands</a></p></li>
+<li><p><a class="reference internal" href="#acl-subcommands" id="id14">ACL subcommands</a></p></li>
+<li><p><a class="reference internal" href="#pawr-subcommands" id="id15">PAWR subcommands</a></p></li>
+<li><p><a class="reference internal" href="#predefined-esl-sync-packet" id="id16">Predefined ESL sync packet</a></p></li>
+</ul>
+</div>
+<p id="esl-c-subcmds"><code class="docutils literal notranslate"><span class="pre">esl_c</span></code> is the ESL Access Point client shell command and it supports the following subcommands.</p>
+<section id="esl-client-subcommands">
+<h2><a class="toc-backref" href="#id12">ESL Client subcommands</a><a class="headerlink" href="#esl-client-subcommands" title="Permalink to this headline">¶</a></h2>
+<table class="docutils align-default" id="id7">
+<caption><span class="caption-text">ESL Client subcommands</span><a class="headerlink" href="#id7" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Subcommand</p></th>
+<th class="head"><p>Argument</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>state</p></td>
+<td><p>N/A</p></td>
+<td><p>Show current AP state machine.</p></td>
+</tr>
+<tr class="row-odd"><td><p>unassociated</p></td>
+<td><p>connection index (0~CONFIG_BT_MAX_CONN)</p></td>
+<td><p>Unassociate connected tag</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="ots-client-subcommands">
+<span id="obj-c-subcmds"></span><h2><a class="toc-backref" href="#id13">OTS Client subcommands</a><a class="headerlink" href="#ots-client-subcommands" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">esl_c</span> <span class="pre">obj_c</span></code> is the Object Transfer client shell command and it supports the following subcommands.</p>
+<table class="docutils align-default" id="id8">
+<caption><span class="caption-text">Object Transfer client commands</span><a class="headerlink" href="#id8" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Subcommand</p></th>
+<th class="head"><p>Argument</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>select</p></td>
+<td><p>&lt;idx&gt; - (Min: 0, Max:Max image index of ESL tag)</p></td>
+<td><p>Select Object on ESL tag with image index.</p></td>
+</tr>
+<tr class="row-odd"><td><p>read_meta</p></td>
+<td><p>&lt;idx&gt; - (Min: 0, Max:Max image index of ESL tag)</p></td>
+<td><p>Read metadata of Object.</p></td>
+</tr>
+<tr class="row-even"><td><p>write</p></td>
+<td><div class="line-block">
+<div class="line">&lt;connection index&gt;  (0 ~ CONFIG_BT_MAX_CONN)</div>
+<div class="line">&lt;tag_img_idx&gt; (0 ~ Max image index of ESL tag)</div>
+<div class="line">&lt;AP Image idx&gt; (0 ~ Max image stored in AP)</div>
+</div>
+</td>
+<td><p>Write image with index on AP. The images stored in AP with filename pattern <strong>ots_image_XX</strong>. <strong>XX</strong> refers to hexdecimal index.</p></td>
+</tr>
+<tr class="row-odd"><td><p>write_filename</p></td>
+<td><div class="line-block">
+<div class="line">&lt;connection index&gt;  (0 ~ CONFIG_BT_MAX_CONN)</div>
+<div class="line">&lt;tag_img_idx&gt; (0 ~ Max image index of ESL tag)</div>
+<div class="line">&lt;AP Image filename&gt;</div>
+</div>
+</td>
+<td><p>Write Image with filename on AP. The filename could be anything transferred from SMP.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="acl-subcommands">
+<span id="acl-subcmds"></span><h2><a class="toc-backref" href="#id14">ACL subcommands</a><a class="headerlink" href="#acl-subcommands" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">esl_c</span> <span class="pre">acl</span></code> shell command is related to the ESL Access Point ACL and it supports the following subcommands.</p>
+<table class="docutils align-default" id="id9">
+<caption><span class="caption-text">ACL commands</span><a class="headerlink" href="#id9" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Subcommand</p></th>
+<th class="head"><p>Argument</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>disconnect</p></td>
+<td><p>&lt;connection index&gt;  (0 ~ CONFIG_BT_MAX_CONN)</p></td>
+<td><p>Disconnect TAG</p></td>
+</tr>
+<tr class="row-odd"><td><p>security</p></td>
+<td><div class="line-block">
+<div class="line">&lt;connection index&gt;  (0 ~ CONFIG_BT_MAX_CONN)</div>
+<div class="line">&lt;security level&gt; (0 ~ 4)</div>
+</div>
+</td>
+<td><p>Change ACL security level for development.</p></td>
+</tr>
+<tr class="row-even"><td><p>write_wo_rsp</p></td>
+<td><p>&lt;on/off&gt;  (0 = GATT use write procedure, 1 = GATT uses write without response)</p></td>
+<td><p>Set write characteristics without response.</p></td>
+</tr>
+<tr class="row-odd"><td><p>read_chrc</p></td>
+<td><p>&lt;connection index&gt;  (0 ~ CONFIG_BT_MAX_CONN)</p></td>
+<td><p>Read information characteristics from connected ESL Tag.</p></td>
+</tr>
+<tr class="row-even"><td><p>scan</p></td>
+<td><div class="line-block">
+<div class="line">&lt;on/off&gt;  (1/0)</div>
+<div class="line">&lt;oneshot&gt; (1 = scan for one device, 0 = scan continuously)</div>
+</div>
+</td>
+<td><p>Scan ESL service.</p></td>
+</tr>
+<tr class="row-odd"><td><p>list_scanned</p></td>
+<td><p>N/A</p></td>
+<td><p>Dump scanned BLE address of ESL device.</p></td>
+</tr>
+<tr class="row-even"><td><p>list_conn</p></td>
+<td><p>N/A</p></td>
+<td><p>Dump connected ESL device.</p></td>
+</tr>
+<tr class="row-odd"><td><p>connect</p></td>
+<td><p>&lt;tag idx&gt; (0 ~ Max scanned tag)</p></td>
+<td><p>Connect ESL tag by scanned list.</p></td>
+</tr>
+<tr class="row-even"><td><p>connect_addr</p></td>
+<td><div class="line-block">
+<div class="line">&lt;address type&gt; (0 = public, 1 = random, 2 = public_id, 3 = private_id)</div>
+<div class="line">&lt;ble address&gt; (xx:xx:xx:xx:xx:xx)</div>
+</div>
+</td>
+<td><p>Connect ESL tag by BLE address.(No need to be scanned).</p></td>
+</tr>
+<tr class="row-odd"><td><p>bt_key_import</p></td>
+<td><div class="line-block">
+<div class="line">&lt;ble address&gt; (xx:xx:xx:xx:xx:xx)</div>
+<div class="line">&lt;hex_string&gt;</div>
+</div>
+</td>
+<td><p>Import serialized BT bonding key runtime.</p></td>
+</tr>
+<tr class="row-even"><td><p>bt_key_export</p></td>
+<td><p>N/A</p></td>
+<td><p>Export serialized BT bonding key.</p></td>
+</tr>
+<tr class="row-odd"><td><p>connect_esl</p></td>
+<td><p>&lt;esl_addr&gt;</p></td>
+<td><p>Connect ESL service tag with esl addr.</p></td>
+</tr>
+<tr class="row-even"><td><p>configure</p></td>
+<td><div class="line-block">
+<div class="line">&lt;connection index&gt;  (0 ~ CONFIG_BT_MAX_CONN)</div>
+<div class="line">&lt;esl_addr&gt;</div>
+</div>
+</td>
+<td><p>Configure connected tag manually.</p></td>
+</tr>
+<tr class="row-odd"><td><p>discovery</p></td>
+<td><p>&lt;connection index&gt;  (0 ~ CONFIG_BT_MAX_CONN)</p></td>
+<td><p>Discovery connected tag manually.</p></td>
+</tr>
+<tr class="row-even"><td><p>write_esl_addr</p></td>
+<td><div class="line-block">
+<div class="line">&lt;connection index&gt;  (0 ~ CONFIG_BT_MAX_CONN)</div>
+<div class="line">&lt;esl_addr&gt;</div>
+<div class="line">&lt;local only&gt; (0 = only change esl addr on AP, 1 = change esl addr on AP and connecte ESL tag)</div>
+</div>
+</td>
+<td><p>Write ESL address characteristic.</p></td>
+</tr>
+<tr class="row-odd"><td><p>subscribe</p></td>
+<td><p>&lt;connection index&gt;  (0 ~ CONFIG_BT_MAX_CONN)</p></td>
+<td><p>Subscribe ECP notifiy manually.</p></td>
+</tr>
+<tr class="row-even"><td><p>past</p></td>
+<td><p>&lt;connection index&gt;  (0 ~ CONFIG_BT_MAX_CONN)</p></td>
+<td><p>Commence PAST(Periodic Advertising Sync Transfer) to connected ESL tag .</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="pawr-subcommands">
+<span id="pawr-subcmds"></span><h2><a class="toc-backref" href="#id15">PAWR subcommands</a><a class="headerlink" href="#pawr-subcommands" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">esl_c</span> <span class="pre">pawr</span></code> shell command is related to the ESL Access Point periodic advertising with respones (PAwR) and it supports the following subcommands.</p>
+<table class="docutils align-default" id="id10">
+<caption><span class="caption-text">PAWR commands</span><a class="headerlink" href="#id10" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Subcommand</p></th>
+<th class="head"><p>Argument</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>sync_buf_status</p></td>
+<td><p>&lt;esl group index&gt;(optional) (0 ~ CONFIG_ESL_CLIENT_MAX_GROUP)</p></td>
+<td><p>Dump ESL sync packet buffer status.</p></td>
+</tr>
+<tr class="row-odd"><td><p>push_sync_buf</p></td>
+<td><div class="line-block">
+<div class="line">&lt;esl group index&gt; (0 ~ CONFIG_ESL_CLIENT_MAX_GROUP)</div>
+<div class="line">&lt;payload_hex_string&gt;</div>
+</div>
+</td>
+<td><p>Push ESL sync packet to buffer. AP will send packet in next subevent.</p></td>
+</tr>
+<tr class="row-even"><td><p>dump_sync_buf</p></td>
+<td><p>&lt;esl group index&gt; (0 ~ CONFIG_ESL_CLIENT_MAX_GROUP)</p></td>
+<td><p>Dump ESL sync buffer content.</p></td>
+</tr>
+<tr class="row-odd"><td><p>dump_resp_buf</p></td>
+<td><p>&lt;esl group index&gt; (0 ~ CONFIG_ESL_CLIENT_MAX_GROUP)</p></td>
+<td><p>Dump ESL response buffer content.</p></td>
+</tr>
+<tr class="row-even"><td><p>start_pawr</p></td>
+<td><p>N/A</p></td>
+<td><p>Start pawr manually for development.</p></td>
+</tr>
+<tr class="row-odd"><td><p>stop_pawr</p></td>
+<td><p>N/A</p></td>
+<td><p>Stop pawr manually for development.</p></td>
+</tr>
+<tr class="row-even"><td><p>update_pawr</p></td>
+<td><div class="line-block">
+<div class="line">&lt;sync_packet type&gt; (See predefined table)</div>
+<div class="line">&lt;esl group index&gt; (0 ~ CONFIG_ESL_CLIENT_MAX_GROUP)</div>
+</div>
+</td>
+<td><p>Send predefined ESL packet.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="predefined-esl-sync-packet">
+<span id="predefined-esl-packet"></span><h2><a class="toc-backref" href="#id16">Predefined ESL sync packet</a><a class="headerlink" href="#predefined-esl-sync-packet" title="Permalink to this headline">¶</a></h2>
+<p>This sample contains a few predefined ESL sync packets.
+The following table shows their content.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Index of elements in ESL starts with 0 which means 0 is the first instance of elements (display/LED/sensor).</p>
+</div>
+<table class="docutils align-default" id="id11">
+<caption><span class="caption-text">ESL Sync TLV commands</span><a class="headerlink" href="#id11" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Sync packet type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0x0</p></td>
+<td><p>Broadcast Ping.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x1</p></td>
+<td><p>LED 0 flashing broadcast.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x2</p></td>
+<td><p>LED 1 flashing broadcast.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x3</p></td>
+<td><p>LED 1 on broadcast.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x4</p></td>
+<td><p>LED 0 off broadcast.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x5</p></td>
+<td><p>LED 1 on broadcast.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x6</p></td>
+<td><p>LED 0 off broadcast.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x7</p></td>
+<td><p>Display 0 image 0 broadcast.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x8</p></td>
+<td><p>Display 0 image 1 broadcast.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x9</p></td>
+<td><p>Read sensor 0 broadcast.</p></td>
+</tr>
+<tr class="row-even"><td><p>0xA</p></td>
+<td><p>Ping default ESL_ID ~ ESL_ID + 4.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0xB</p></td>
+<td><p>LED 0 flashing default ESL_ID ~ ESL_ID + 2.</p></td>
+</tr>
+<tr class="row-even"><td><p>0xC</p></td>
+<td><p>LED 0 flashing default ESL_ID + 3, ESL_ID + 4. Fill first 2 slots with broadcast ping to make response slot begin with 2.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0xD</p></td>
+<td><p>Led 1 flashing default ESL_ID ~ ESL_ID + 2.</p></td>
+</tr>
+<tr class="row-even"><td><p>0xE</p></td>
+<td><p>LED 1 flashing default ESL_ID + 3, ESL_ID + 4. Fill first 2 slots with broadcast ping to make response slot begin with 2.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0xF</p></td>
+<td><p>Read sensor 0 default ESL_ID ~ ESL_ID + 4.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x10</p></td>
+<td><p>ESLP/ESL/SYNC/BI-03-I [Response TLV Too Long]. Send 17 TLVs to default ESL_ID</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x11</p></td>
+<td><p>Send 22 Pings to default ESL_ID + 1 and 1 for ESL_ID at TLVs slot 11.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x12</p></td>
+<td><p>Tag default ESL_ID ~ ESL_ID + 10 Display Img 0.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x13</p></td>
+<td><p>Tag default ESL_ID ~ ESL_ID + 10 Display img 1.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x14</p></td>
+<td><p>Tag default ESL_ID ~ ESL_ID + 10 Display img 2</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+
+<table>
+<tr>
+<td>
+    <p>
+        &copy; Copyright 2023, Nordic Semiconductor.
+
+    </p>
+</td>
+<td id="nordiclogo">
+  <a href="https://www.nordicsemi.com/"><img src="_static/images/nordic.svg" border="0"/></a>
+</td>
+</tr>
+</table>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

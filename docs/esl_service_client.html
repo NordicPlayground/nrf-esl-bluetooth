@@ -1,0 +1,354 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Electronic Shelf Label Service (ESLS) client &mdash; ESL  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="_static/tabs.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+  <script type="text/javascript" src="_static/js/ncs.js"></script>
+
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+  <link rel="shortcut icon" href="_static/images/favicon.ico"/>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ESL
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div id="searchbox" role="search">
+  <div class="searchformwrapper">
+    <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Subpages:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Requirements and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="samples.html">Samples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services.html">Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="additional_resources.html">Additional resources</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ESL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Electronic Shelf Label Service (ESLS) client</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/esl_service_client.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="electronic-shelf-label-service-esls-client">
+<span id="esl-service-client-readme"></span><h1>Electronic Shelf Label Service (ESLS) client<a class="headerlink" href="#electronic-shelf-label-service-esls-client" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#configuration" id="id7">Configuration</a></p>
+<ul>
+<li><p><a class="reference internal" href="#periodic-advertising-with-response-pawr" id="id8">Periodic Advertising with Response (PAwR)</a></p></li>
+<li><p><a class="reference internal" href="#other-configuration-options" id="id9">Other configuration options</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#usage" id="id10">Usage</a></p></li>
+<li><p><a class="reference internal" href="#application-integration" id="id11">Application integration</a></p>
+<ul>
+<li><p><a class="reference internal" href="#callbacks" id="id12">Callbacks</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#api-documentation" id="id13">API documentation</a></p></li>
+</ul>
+</div>
+<p>The Electronic Shelf Label Service client library acts as an access point (AP) for using the ESL Service exposed by an ESL device.
+It defines how the central AP communicates with ESLs when one or more ESLs are in synchronized state.
+The ESLS client is needed to interact with the ESLS server and perform various functions.
+The ESLS client allows users or systems to discover the capabilities of the Electronic Shelf Labels (ESL) and configure them accordingly.</p>
+<p>The ESL Service client is used in the <a class="reference internal" href="esl_ap.html#central-esl"><span class="std std-ref">Bluetooth: Central ESL</span></a> sample.</p>
+<section id="configuration">
+<span id="esls-client-config"></span><h2><a class="toc-backref" href="#id7">Configuration</a><a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>ESLS client provides the configurations described in the following sections.</p>
+<section id="periodic-advertising-with-response-pawr">
+<span id="esls-client-pawr-config"></span><h3><a class="toc-backref" href="#id8">Periodic Advertising with Response (PAwR)</a><a class="headerlink" href="#periodic-advertising-with-response-pawr" title="Permalink to this headline">¶</a></h3>
+<p>The AP shall support the PAwR feature specified in section 5.4 of the <a class="reference external" href="https://www.bluetooth.com/specifications/specs/">Bluetooth Core Specification</a> as a Central device.
+The length of the Periodic Advertising Interval and Periodic Advertising Subevent Interval, as well as the number of subevents are left to the implementation.
+After the AP has been configured for a given installation, the timing information shall remain constant.
+ESLS client configures the timing compile time using Kconfig options.
+The AP should select values for subeventInterval, responseSlotDelay, and responseSlotSpacing, which result in sufficient response slots to service the maximum demand.
+The maximum possible demand for response slots occurs when each command present in the ESL payload requires a response from a different ESL, and the number of commands contained in the ESL payload is the highest possible.</p>
+<p>Use the following Kconfig options to set the timing intervals and response slots:</p>
+<ul>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_PAWR_INTERVAL_MIN</span></code> sets the minimum advertising interval for periodic advertising.</p></li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_PAWR_INTERVAL_MAX</span></code> sets the maximum advertising interval for periodic advertising.</p></li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_SUBEVENT_INTERVAL</span></code> sets the interval between PAwR subevents.</p>
+<p>This is the interval between each ESL Group receiving a ESL ECP command and responding.</p>
+</li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_RESPONSE_SLOT_DELAY</span></code> sets the time between the AP advertising ESL payload packet in a subevent and the first response slot.</p></li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_RESPONSE_SLOT_SPACING</span></code> sets the time between each response slot.</p></li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_NUM_RESPONSE_SLOTS</span></code> sets the number of response slots.</p></li>
+</ul>
+<p>An ESL payload typically includes multiple commands as described in section 5.3.1.3. of the <a class="reference external" href="https://www.bluetooth.com/specifications/specs/electronic-shelf-label-profile-1-0/">Electronic Shelf Label Profile 1.0</a> specification.
+It specifies the number of response slots available for the access point to receive responses from the Electronic Shelf Labels during each subevent.
+The more response slots, the more ESLs can be controlled in a single subevent.
+However, more response slots also means longer subevent interval and more memory is required.
+The AP should select values for <code class="docutils literal notranslate"><span class="pre">subeventInterval</span></code>, <code class="docutils literal notranslate"><span class="pre">responseSlotDelay</span></code>, and <code class="docutils literal notranslate"><span class="pre">responseSlotSpacing</span></code> that result in sufficient response slots to serve the maximum demand.
+The maximum possible demand for response slots occurs when each command present in the ESL payload requires a response from a different ESL, and the number of commands contained in the ESL payload is the highest possible.</p>
+<p>Use the following Kconfig options to set the <a class="reference internal" href="esl_ap_sample_description.html#central-esl-auto-onboarding-and-auto-past"><span class="std std-ref">Auto Onboarding and Auto PAST</span></a> features:</p>
+<ul>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER</span></code> sets the maximum number of response slots that can be buffered in ESLS client.</p>
+<p>This value should be equal to or less than the number of response slots.</p>
+</li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_CLIENT_MAX_GROUP</span></code> sets the maximum number of ESL groups that can be controlled.</p></li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_CLIENT_DEFAULT_ESL_ID</span></code> sets the default ESL ID to start with.</p></li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_CLIENT_DEFAULT_GROUP_ID</span></code> sets the default group ID to start with.</p></li>
+</ul>
+</section>
+<section id="other-configuration-options">
+<span id="esls-client-other-config"></span><h3><a class="toc-backref" href="#id9">Other configuration options</a><a class="headerlink" href="#other-configuration-options" title="Permalink to this headline">¶</a></h3>
+<p>You can also use the following Kconfig options for reporting, storage, and debugging:</p>
+<ul>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_BT_ESL_SCAN_REPORT_INTERVAL</span></code> option defines how often the AP will report the Bluetooth Low Energy address of Electronic Shelf Label tags that match a ESL service UUID during a scan.</p>
+<p>This report is sent periodically after the scanning begins.</p>
+</li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_BT_ESL_TAG_STORAGE</span></code> sets the tag information storage to non-volatile memory so that AP can retrieve the information when connected to the tag without prompting in a shell command.</p>
+<p>You can use this option along with <a class="reference internal" href="esl_ap_sample_description.html#central-esl-auto-onboarding-and-auto-past"><span class="std std-ref">Auto Onboarding and Auto PAST</span></a>.
+The information saved to non-volatile memory includes the following:</p>
+<ul class="simple">
+<li><p>ESL address</p></li>
+<li><p>BLE address</p></li>
+<li><p>Bond Key</p></li>
+<li><p>Response key material</p></li>
+</ul>
+</li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_BT_ESL_DEMO_SECURITY</span></code> is an option for debugging.</p>
+<p>If this option is enabled, the bonding data will be removed after the tag device has been disconnected from the AP.</p>
+</li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_BT_ESL_LED_INDICATION</span></code> is an option for debugging.</p>
+<p>If this option is enabled, the LED will be turned on or flashing when the tag device is in the corresponding state.</p>
+</li>
+</ul>
+</section>
+</section>
+<section id="usage">
+<span id="esls-client-usage"></span><h2><a class="toc-backref" href="#id10">Usage</a><a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>To use ESL client in your application, complete the following steps:</p>
+<ol class="arabic simple">
+<li><p>Configure the APs.</p></li>
+<li><p>Declare he <code class="xref c c-struct docutils literal notranslate"><span class="pre">bt_esl_client_init_param</span></code> structure.</p></li>
+<li><p>Implement the storage callback functions required.</p></li>
+<li><p>Call the <code class="xref c c-func docutils literal notranslate"><span class="pre">bt_esl_client_init()</span></code> function.</p></li>
+</ol>
+</section>
+<section id="application-integration">
+<h2><a class="toc-backref" href="#id11">Application integration</a><a class="headerlink" href="#application-integration" title="Permalink to this headline">¶</a></h2>
+<p>The following sections explain how you can integrate the service in your application.</p>
+<section id="callbacks">
+<span id="esls-client-callbacks"></span><h3><a class="toc-backref" href="#id12">Callbacks</a><a class="headerlink" href="#callbacks" title="Permalink to this headline">¶</a></h3>
+<p>ESLS client requires a number of callback functions to control the storing of image files and manage tag information.
+These callbacks are used to control non-volatile storage.
+This section explains why these callbacks are needed and how to implement them.</p>
+<section id="storage-callbacks">
+<span id="esls-client-cb-storage"></span><h4>Storage callbacks<a class="headerlink" href="#storage-callbacks" title="Permalink to this headline">¶</a></h4>
+<p>The AP requires storage for the image and tag information.
+One of the mandatory features of the AP is to transfter image data to the tag device through Object Transfer Service (OTS).</p>
+<p>You need to implement the following callbacks for the storage:</p>
+<ul>
+<li><p>The <code class="xref c c-func docutils literal notranslate"><span class="pre">ap_image_storage_init()</span></code> function is used to initialize the storage and filesystem for image files.</p>
+<p>The storage is used to store the image files that will be transferred to the tag device.</p>
+</li>
+<li><p>The <code class="xref c c-func docutils literal notranslate"><span class="pre">ap_read_img_from_storage()</span></code> function is used to read the image data to <code class="xref c c-member docutils literal notranslate"><span class="pre">img_obj_buf</span></code> from the storage.</p>
+<p>The image data will be transferred to the tag device through OTS.</p>
+</li>
+<li><p>The <code class="xref c c-func docutils literal notranslate"><span class="pre">ap_read_img_size_from_storage()</span></code> function is used to read the image size from the storage.</p>
+<p>The image size is used to calculate the checksum of the image.</p>
+</li>
+</ul>
+</section>
+</section>
+</section>
+<section id="api-documentation">
+<h2><a class="toc-backref" href="#id13">API documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Header file: <code class="file docutils literal notranslate"><span class="pre">../service/esl_client.h</span></code></div>
+<div class="line">Source file: <code class="file docutils literal notranslate"><span class="pre">../service/esl/esl_client.c</span></code></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+
+<table>
+<tr>
+<td>
+    <p>
+        &copy; Copyright 2023, Nordic Semiconductor.
+
+    </p>
+</td>
+<td id="nordiclogo">
+  <a href="https://www.nordicsemi.com/"><img src="_static/images/nordic.svg" border="0"/></a>
+</td>
+</tr>
+</table>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

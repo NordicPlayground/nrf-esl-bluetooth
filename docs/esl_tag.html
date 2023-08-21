@@ -1,0 +1,553 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Bluetooth: Peripheral ESL &mdash; ESL  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="_static/tabs.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+  <script type="text/javascript" src="_static/js/ncs.js"></script>
+
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+  <link rel="shortcut icon" href="_static/images/favicon.ico"/>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ESL
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div id="searchbox" role="search">
+  <div class="searchformwrapper">
+    <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Subpages:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Requirements and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="samples.html">Samples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services.html">Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="additional_resources.html">Additional resources</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ESL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Bluetooth: Peripheral ESL</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/esl_tag.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="bluetooth-peripheral-esl">
+<span id="peripheral-esl"></span><h1>Bluetooth: Peripheral ESL<a class="headerlink" href="#bluetooth-peripheral-esl" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#requirements" id="id24">Requirements</a></p></li>
+<li><p><a class="reference internal" href="#overview" id="id25">Overview</a></p></li>
+<li><p><a class="reference internal" href="#user-interface" id="id26">User interface</a></p>
+<ul>
+<li><p><a class="reference internal" href="#development-kits" id="id27">Development kits</a></p></li>
+<li><p><a class="reference internal" href="#thingy-52" id="id28">Thingy:52</a></p></li>
+<li><p><a class="reference internal" href="#epd-variant" id="id29">EPD variant</a></p></li>
+<li><p><a class="reference internal" href="#power-profiling-variant" id="id30">Power Profiling variant</a></p></li>
+<li><p><a class="reference internal" href="#power-consumption-measurement" id="id31">Power Consumption Measurement</a></p></li>
+<li><p><a class="reference internal" href="#configuration-options" id="id32">Configuration options</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#building-and-running" id="id33">Building and running</a></p>
+<ul>
+<li><p><a class="reference internal" href="#testing" id="id34">Testing</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#dependencies" id="id35">Dependencies</a></p></li>
+<li><p><a class="reference internal" href="#references" id="id36">References</a></p></li>
+</ul>
+</div>
+<p>The Peripheral ESL sample acts as an ESL(Electronic Shelf Label) tag to work with ESL Access Point between a Bluetooth® LE connection and Periodic Advertising with Response synchronization.
+It uses <a class="reference internal" href="esl_service.html#esl-service-readme"><span class="std std-ref">Electronic Shelf Label Service (ESLS)</span></a> and implement callbacks for the service.</p>
+<section id="requirements">
+<h2><a class="toc-backref" href="#id24">Requirements</a><a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>The sample supports the following development kits:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 12%" />
+<col style="width: 30%" />
+<col style="width: 35%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Hardware platforms</p></th>
+<th class="head"><p>PCA</p></th>
+<th class="head"><p>Board name</p></th>
+<th class="head"><p>Build target</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>nRF52 DK</p></td>
+<td><p>PCA10040</p></td>
+<td><p>nrf52dk_nrf52832</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">nrf52dk_nrf52832</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>nRF52833 DK</p></td>
+<td><p>PCA10100</p></td>
+<td><p>nrf52833dk_nrf52833</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">nrf52833dk_nrf52833</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>nRF52840 DK</p></td>
+<td><p>PCA10056</p></td>
+<td><p>nrf52840dk_nrf52840</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">nrf52840dk_nrf52840</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>nRF21540 DK</p></td>
+<td><p>PCA10112</p></td>
+<td><p>nrf21540dk_nrf52840</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">nrf21540dk_nrf52840</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>nRF52840 Dongle</p></td>
+<td><p>PCA10059</p></td>
+<td><p>nrf52840dongle_nrf52840</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">nrf52840dongle_nrf52840</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Thingy:52</p></td>
+<td><p>PCA20020</p></td>
+<td><p>thingy52_nrf52832</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">thingy52_nrf52832</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="overview">
+<h2><a class="toc-backref" href="#id25">Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>You can use this sample as an ESL tag defined in <a class="reference external" href="https://www.bluetooth.com/specifications/specs/electronic-shelf-label-profile-1-0/">Electronic Shelf Label Profile</a> and <a class="reference external" href="https://www.bluetooth.com/specifications/specs/electronic-shelf-label-service-1-0/">Electronic Shelf Label Service</a> to work with the ESL Access Point.
+This sample uses <strong>LED</strong> on DK to simulate display on ESL tag. It also contains EPD variant to demonstrate how to work with real (E-Paper display) with shield board.</p>
+<p>The sample uses the <a class="reference internal" href="esl_service.html#esl-service-readme"><span class="std std-ref">Electronic Shelf Label Service (ESLS)</span></a> library to implement the Electronic Shelf Label Service which allows electronic shelf labels (ESLs) to be controlled and updated using Bluetooth wireless technology.
+The sample implements callbacks for the ESL service to handle events from the ESL service.
+Once the Tag is associated to an AP, it stores in internal non-volatile memory relevant parameters (e.g. ESL ID, bonding / key material, etc). Such material is kept after power cycle.</p>
+</section>
+<section id="user-interface">
+<h2><a class="toc-backref" href="#id26">User interface</a><a class="headerlink" href="#user-interface" title="Permalink to this headline">¶</a></h2>
+<p>The user interface of the sample depends on the hardware platform you are using.</p>
+<section id="development-kits">
+<h3><a class="toc-backref" href="#id27">Development kits</a><a class="headerlink" href="#development-kits" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>LED 1:</dt><dd><p>ESL LED 1: Flashing with specified pattern when received ESL LED control OP code.</p>
+</dd>
+<dt>LED 2:</dt><dd><p>ESL LED 2: Flashing with specified pattern when received ESL LED control OP code.</p>
+</dd>
+<dt>LED 3:</dt><dd><p>Simulated Display: Blinks 5 times when receiving ESL display image OP code. (Deactivated when using a real display in the EPD variant)</p>
+</dd>
+<dt>LED 4:</dt><dd><p>Status LED: Blinks fast (10hz) when advertising ESL service.
+Blinks slow (PAwR interval) when being synchronized.
+Stable ON when connected with Access Point.</p>
+</dd>
+<dt>Button 1:</dt><dd><p>Debug button to unassociate the tag from Access Point. Remove all stored images and configured ESL addr and key materials.</p>
+</dd>
+</dl>
+</section>
+<section id="thingy-52">
+<h3><a class="toc-backref" href="#id28">Thingy:52</a><a class="headerlink" href="#thingy-52" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>RGB LED:</dt><dd><p>The RGB LED channels are used independently to display the following information:</p>
+<ul class="simple">
+<li><p>Red channel (ESL LED) flashing when specified pattern when received ESL LED control OP code..</p></li>
+<li><p>Green channel (Simulated Display) blinks 5 times when receiving ESL display image OP code.</p></li>
+<li><p>Blue channel (Status LED) blinks fast (10hz) when advertising ESL service.
+Blinks slow (PAwR interval) when being synchronized.
+Stable ON when connected with Access Point.</p></li>
+</ul>
+</dd>
+<dt>Button:</dt><dd><p>Debug button to unassociate the tag from Access Point. Remove all stored images and configured ESL addr and key materials including bonding keys</p>
+</dd>
+</dl>
+</section>
+<section id="epd-variant">
+<span id="peripheral-esl-sample-activating-epd-variants"></span><h3><a class="toc-backref" href="#id29">EPD variant</a><a class="headerlink" href="#epd-variant" title="Permalink to this headline">¶</a></h3>
+<p>This sample uses <a class="reference external" href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/boards/shields/waveshare_epaper/doc/index.html">WAVESHARE e-Paper Raw Panel Shield</a> <a class="footnote-reference brackets" href="#id12" id="id13">4</a> , <a class="reference external" href="https://www.waveshare.com/2.13inch-e-paper.htm">WAVESHARE 250x122, 2.13inch E-Ink raw display panel</a> <a class="footnote-reference brackets" href="#id14" id="id15">5</a> and Zephyr out-of-box display driver <a class="reference external" href="https://docs.zephyrproject.org/latest/build/dts/api/bindings/display/solomon%2Cssd1675a.html#dtbinding-solomon-ssd1675a">ssd1675a EPD display controller</a> <a class="footnote-reference brackets" href="#id20" id="id21">7</a> as reference to demonstrate how to display image on ESL.
+For now, only <span class="xref std std-ref">nrf52dk_nrf52832</span> and <span class="xref std std-ref">nrf52833dk_nrf52833</span> support this optional feature.
+In VS Code with nRF Extension, select prj_release.conf and select “nrf52833dk_nrf52833_power_profiler_epd.conf” as Kconfig fragments. And add <code class="docutils literal notranslate"><span class="pre">-DDTC_OVERLAY_FILE=&quot;conf/nrf52833dk_nrf52833/nrf52833dk_nrf52833_release_epd.overlay&quot;</span></code> to <strong>Extra Cmake arguments</strong>.
+As alternative, using terminal, to activate the optional feature supported by this sample, use the following build command:</p>
+<blockquote>
+<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">west build -p -b nrf52833dk_nrf52833 -- -DOVERLAY_CONFIG=&quot;nrf52833dk_nrf52833_power_profiler_release_epd.conf&quot; -DDTC_OVERLAY_FILE=&quot;conf/nrf52833dk_nrf52833/nrf52833dk_nrf52833_release_epd.overlay&quot;</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>See <span class="xref std std-ref">cmake_options</span> for instructions on how to add this option.
+For more information about using configuration overlay files, see <span class="xref std std-ref">zephyr:important-build-vars</span> in the Zephyr documentation.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please refer to the original manufacturer’s documentation of the panel for selecting the shield board switch positions. For example, adjust to A0 for <a class="reference external" href="https://www.waveshare.com/2.13inch-e-paper.htm">WAVESHARE 250x122, 2.13inch E-Ink raw display panel</a> <a class="footnote-reference brackets" href="#id14" id="id16">5</a>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To use EPD other than reference <a class="reference external" href="https://www.waveshare.com/2.13inch-e-paper.htm">WAVESHARE 250x122, 2.13inch E-Ink raw display panel</a> <a class="footnote-reference brackets" href="#id14" id="id17">5</a> , please use display driver provided by manafacturer.</p>
+</div>
+</section>
+<section id="power-profiling-variant">
+<span id="peripheral-esl-power-profiling-variant"></span><h3><a class="toc-backref" href="#id30">Power Profiling variant</a><a class="headerlink" href="#power-profiling-variant" title="Permalink to this headline">¶</a></h3>
+<p>Power optimized overlay disables all of unnecessary peripheral to minimize power consumption. You can use power profiler overlay for <span class="xref std std-ref">nrf52833dk_nrf52833</span> to measure current. In VS Code with nRF Extension, select prj_release.conf and select “nrf52833dk_nrf52833_power_profiler_release_led.conf” as Kconfig fragments.
+As alternative, using terminal, use the following build command:</p>
+<blockquote>
+<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">west build -p -b nrf52833dk_nrf52833 -- -DCONF_FILE=prj_release.conf -DOVERLAY_CONFIG=&quot;nrf52833dk_nrf52833_power_profiler_release_led.conf&quot; -DDTC_OVERLAY_FILE=&quot;conf/nrf52833dk_nrf52833/nrf52833dk_nrf52833_power_profiler_release.overlay&quot;</span>
+</pre></div>
+</div>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Due to limitation of <a class="reference external" href="https://github.com/zephyrproject-rtos/zephyr/blob/main/drivers/display/ssd16xx.c">ssd16xx EPD display driver</a> <a class="footnote-reference brackets" href="#id22" id="id23">8</a> , user needs to modify the driver to make it able to re-initialize the display controller run-time. Please modify the file <code class="docutils literal notranslate"><span class="pre">zephyr/drivers/display/ssd16xx/ssd16xx.c</span></code>: from <code class="docutils literal notranslate"><span class="pre">static</span> <span class="pre">int</span> <span class="pre">ssd16xx_init(const</span> <span class="pre">struct</span> <span class="pre">device</span> <span class="pre">*dev)</span></code> to <code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">ssd16xx_init(const</span> <span class="pre">struct</span> <span class="pre">device</span> <span class="pre">*dev)</span></code>.</p>
+</div>
+<p>Please follow  <a class="reference internal" href="#peripheral-esl-power-measure"><span class="std std-ref">Power Consumption Measurement</span></a> to measure currents.</p>
+</section>
+<section id="power-consumption-measurement">
+<span id="peripheral-esl-power-measure"></span><h3><a class="toc-backref" href="#id31">Power Consumption Measurement</a><a class="headerlink" href="#power-consumption-measurement" title="Permalink to this headline">¶</a></h3>
+<p>Prerequisite: Read <a class="reference external" href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/nrf/app_dev/optimizing/power.html">Power optimization</a> and get <a class="reference external" href="https://infocenter.nordicsemi.com/topic/ug_ppk2/UG/ppk/PPK_user_guide_Intro.html">Power Profiler Kit II (PPK2)</a> <a class="footnote-reference brackets" href="#id8" id="id9">2</a></p>
+<ol class="arabic">
+<li><p>Build and program the Tag (nRF52833DK) Power Profiling configuration by following <a class="reference internal" href="#peripheral-esl-build-and-program"><span class="std std-ref">Building and running</span></a> and <a class="reference internal" href="#peripheral-esl-power-profiling-variant"><span class="std std-ref">Power Profiling variant</span></a></p></li>
+<li><p>Follow <a class="reference external" href="https://infocenter.nordicsemi.com/topic/ug_nrf52833_dk/UG/dk/prepare_board.html">Preparing a DK for current measurement</a> <a class="footnote-reference brackets" href="#id18" id="id19">6</a> to prepare 52833DK for Power Consumption measurements</p>
+<ol class="loweralpha simple">
+<li><p>Cut SB40.</p></li>
+<li><p>Connect VOUT of PPK2 to nRF current Measurement on DK, connect GND of PPK2 to External supply negative polarity pin (<cite>-</cite>). By doing so, PPK2 will provide power to only the nRF52 SoC.</p></li>
+<li><p>Connect the PPK2 (powered ON) in “Source Meter” mode to the <span class="xref std std-ref">nrf52833dk_nrf52833</span> (turned ON) and enable power output 3000mV on the Power Profiler GUI and start measurement. Power the rest of the ESL Tag DevKit via USB (same as programming USB port), and keep the DevKit turned ON.</p></li>
+</ol>
+<figure class="align-default">
+<img alt="_images/esl_power_measure_unsynced.png" src="_images/esl_power_measure_unsynced.png" />
+</figure>
+</li>
+<li><p>If previously associated to the AP, wait the <span class="xref std std-ref">nrf52833dk_nrf52833</span> to get synched. <strong>LED 4</strong> on the ESL Tag should be blinking slowly (PAwR interval); otherwise follow the instructions above to associate the Tag to an AP and to test basic functionalities.</p></li>
+<li><p>Measure nRF52833 current while synchronized</p>
+<ol class="loweralpha simple">
+<li><p>On <span class="xref std std-ref">nrf52833dk_nrf52833</span>, set the SW6 switch to “nRF Only”. This will further isolate the nRF52 from some DK components wich may be causes of leakages(i.e. Interface MCU, LED and Buttons). LEDs will stop blinking.</p></li>
+<li><p>Current consumption should now be less than 5uA.</p></li>
+</ol>
+<figure class="align-default">
+<img alt="_images/esl_power_measure_synced.png" src="_images/esl_power_measure_synced.png" />
+</figure>
+</li>
+</ol>
+<p>Once completed this procedure (i.e. if you don’t need to use the PPK2 and you want to power the ESL Tag DevKit from the same USB port as used for programming), put Jumper back on SB40.</p>
+</section>
+<section id="configuration-options">
+<span id="peripheral-esl-config-options"></span><h3><a class="toc-backref" href="#id32">Configuration options</a><a class="headerlink" href="#configuration-options" title="Permalink to this headline">¶</a></h3>
+<p>Check and configure the following Kconfig options:</p>
+<dl class="simple" id="bt-esl-security-enabled">
+<dt>BT_ESL_SECURITY_ENABLED</dt><dd><p>This enables BT SMP and bonding which are security requirement of ESL Profile. Disable BLE security of the ESL service for debugging purposes.</p>
+</dd>
+</dl>
+<dl class="simple" id="esl-simulate-display">
+<dt>ESL_SIMULATE_DISPLAY</dt><dd><p>This enable simulated display feature which uses <strong>LED 2</strong> on DK to simulate E-Paper display. DK will blinks few times times(<code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_SIMULATE_DISPLAY_BLINK_TIMES</span></code> + Image index from Display Control OPcode) when receiving valid Display Control OPcode. This could be useful for those developers without real E-Paper display.</p>
+</dd>
+</dl>
+<dl class="simple" id="esl-simulate-display-blink-times">
+<dt>ESL_SIMULATE_DISPLAY_BLINK_TIMES</dt><dd><p>This configuration option specifies how many basic times to blink when receiving Display Control OPcode with <code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_SIMULATE_DISPLAY</span></code> enabled.</p>
+</dd>
+</dl>
+<dl class="simple" id="bt-esl-pts">
+<dt>BT_ESL_PTS</dt><dd><p>Enable PTS feature. With this feature ESL Tag will uses static BLE address. This feature is used for PTS test only.</p>
+</dd>
+</dl>
+<dl class="simple" id="bt-esl-shipping-mode">
+<dt>ESL_SHIPPING_MODE</dt><dd><p>This enables shipping mode feature. With this feature ESL Tag will enter system off mode right after everytime power cycle which keeps ESL Tag in very low power consumption. The ESL Tag could be waken up by selected method, e.g. NFC, button.</p>
+</dd>
+</dl>
+<dl class="simple" id="bt-esl-shipping-wake-by-nfc">
+<dt>ESL_SHIPPING_WAKE_BY_NFC</dt><dd><p>This enables feature to wake up the ESL Tag by NFC. This feature could cooperate with <code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_SHIPPING_MODE</span></code> to provide a way to wake the ESL Tag up.</p>
+</dd>
+</dl>
+<dl class="simple" id="bt-esl-shipping-wake-by-button">
+<dt>ESL_SHIPPING_WAKE_BY_BUTTON</dt><dd><p>This enables feature to wake up the ESL Tag by button. This feature could cooperate with <code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_SHIPPING_MODE</span></code> to provide a way to wake the ESL Tag up.</p>
+</dd>
+</dl>
+<dl class="simple" id="bt-shipping-wake-by-both">
+<dt>ESL_SHIPPING_WAKE_BY_BOTH</dt><dd><p>This enables featrue to wake up the ESL Tag by both NFC and button. This feature could cooperate with <code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_SHIPPING_MODE</span></code> to provide a way to wake the ESL Tag up.</p>
+</dd>
+</dl>
+<dl class="simple" id="bt-esl-nfc">
+<dt>ESL_NFC_SUPPORT</dt><dd><p>Enable NFC feature. With this feature NFC Tag will add BLE address when unassociated, or ESL address when associated. User could use NFC card read to read information from NFC antenna. This feature could cooperate with <code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_SHIPPING_MODE</span></code> to provide a way to wake the ESL Tag up.</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="building-and-running">
+<span id="peripheral-esl-build-and-program"></span><h2><a class="toc-backref" href="#id33">Building and running</a><a class="headerlink" href="#building-and-running" title="Permalink to this headline">¶</a></h2>
+<p>To build the sample with Visual Studio Code, follow the steps listed on the <a class="reference external" href="https://nrfconnect.github.io/vscode-nrf-connect/get_started/build_app_ncs.html">How to build an application</a> <a class="footnote-reference brackets" href="#id6" id="id7">1</a> page in the nRF Connect for VS Code extension documentation. See <a class="reference external" href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/nrf/getting_started/programming.html#gs-programming">Building and programming an application</a> for other building and programming scenarios and <a class="reference external" href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/nrf/getting_started/testing.html">Testing and debugging an application</a> for general information about testing and debugging in the nRF Connect SDK.</p>
+<section id="testing">
+<span id="peripheral-esl-testing"></span><h3><a class="toc-backref" href="#id34">Testing</a><a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h3>
+<p>After programming the sample to your development kit, you can test it in combination with a <a class="reference external" href="nrf5340dk_nrf5340">nRF5340 DevKit</a> running the ESL Access Point (<a class="reference internal" href="esl_ap.html#central-esl"><span class="std std-ref">Bluetooth: Central ESL</span></a>) by performing the following steps:</p>
+<ol class="arabic simple">
+<li><p>Turn on the ESL Tag power.</p></li>
+<li><p>Optionally, Push <strong>Button 1</strong> to erase possible previous stored parameters and start from scratch.</p></li>
+<li><p>Connect to the kit that runs this sample with a terminal emulator (for example, PuTTY or the Serial Terminal in nRF Connect for Desktop). Connect with the following settings:</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>Baud rate: 115200</p></li>
+<li><p>8 data bits</p></li>
+<li><p>1 stop bit</p></li>
+<li><p>No parity</p></li>
+<li><p>HW flow control: None</p></li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To know if the right port is selected, enter new line and “ESL_TAG:~$” should show up.</p>
+</div>
+<ol class="arabic">
+<li><p>Optionally, you can display debug messages.
+ESL Shell command on UART console could be used to debug.</p></li>
+<li><p>Observe that <strong>LED 4</strong> is blinking with 10hz frequency and the device is advertising with the ESL UUID (<code class="docutils literal notranslate"><span class="pre">0x1857</span></code>). The Tag is ready for being associated by an ESL AP.</p></li>
+<li><p>Use the ESL Access Point( <a class="reference internal" href="esl_ap.html#central-esl"><span class="std std-ref">Bluetooth: Central ESL</span></a>) on the other DK <a class="reference external" href="https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK">nRF5340 DK</a> <a class="footnote-reference brackets" href="#id10" id="id11">3</a> to connect to the ESL tag and configure mandatory characteristic by:
+#. Using the automatic onboarding feature in the ESL Access Point.
+#. Using the shell commands in the ESL Access Point.
+Observe that <strong>LED 4</strong> is on while connected to the Access Point.</p></li>
+<li><p>After ESL Tag is being configured with mandatory characteristic and receives PAST (Periodic Advertising Sync Transfer) from the Access Point, the ESL device disconnects the connection.
+Observe that <strong>LED 4</strong> is off for a short time and then. <strong>LED 4</strong> starts blinking with PAwR (Periodic Advertising with Responses) interval which set by ESL Access Point, signaling that the ESL Tag has been associated and it is now synchronized to the AP.</p></li>
+<li><p>Use the AP <a class="reference internal" href="esl_ap_sample_description.html#central-esl-user-interface"><span class="std std-ref">User interface</span></a> to send command to the ESL TAG:
+a. You can use <a class="reference internal" href="esl_ap_subcommands.html#central-esl-subcommands"><span class="std std-ref">Central ESL subcommands</span></a> or,
+b. if auto onboarding feature has been already activated on the AP to assoicate the tag, you can try to:</p>
+<p>Flash an LED: Push <strong>Button 4</strong> on the AP; Observes that <strong>LED 1</strong> on the Tag is now flashing with specified pattern.</p>
+<p>Change ESL Display Image: push <strong>Button 3</strong> on the AP; Observe that <strong>LED 3</strong> on the Tag is now blinking 5 times to simulate image changed. If EPD is enabled, observe new image displayed on the EPD.</p>
+</li>
+<li><p>Use AP shell command interface to send a predefined ESL Sync Packet:
+| example: send sync packet type 0x7 (broadcast command to display image <strong>0</strong>) to Group <strong>0</strong>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">esl_c pawr update_pawr 7 0</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+</section>
+<section id="dependencies">
+<h2><a class="toc-backref" href="#id35">Dependencies</a><a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>This sample uses the following nRF Connect SDK libraries:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="esl_service.html#esl-service-readme"><span class="std std-ref">Electronic Shelf Label Service (ESLS)</span></a></p></li>
+</ul>
+<p>In addition, it uses the following Zephyr libraries:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">include/zephyr/types.h</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">boards/arm/nrf*/board.h</span></code></p></li>
+<li><p><a class="reference external" href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/zephyr/kernel/services/index.html">Kernel Services</a></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">include/kernel.h</span></code></p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/zephyr/connectivity/bluetooth/api/index.html">Bluetooth APIs</a>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">include/bluetooth/bluetooth.h</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">include/bluetooth/gatt.h</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">include/bluetooth/hci.h</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">include/bluetooth/uuid.h</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="references">
+<h2><a class="toc-backref" href="#id36">References</a><a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<dl class="footnote brackets">
+<dt class="label" id="id6"><span class="brackets"><a class="fn-backref" href="#id7">1</a></span></dt>
+<dd><p><a class="reference external" href="https://nrfconnect.github.io/vscode-nrf-connect/get_started/build_app_ncs.html">https://nrfconnect.github.io/vscode-nrf-connect/get_started/build_app_ncs.html</a></p>
+</dd>
+<dt class="label" id="id8"><span class="brackets"><a class="fn-backref" href="#id9">2</a></span></dt>
+<dd><p><a class="reference external" href="https://infocenter.nordicsemi.com/topic/ug_ppk2/UG/ppk/PPK_user_guide_Intro.html">https://infocenter.nordicsemi.com/topic/ug_ppk2/UG/ppk/PPK_user_guide_Intro.html</a></p>
+</dd>
+<dt class="label" id="id10"><span class="brackets"><a class="fn-backref" href="#id11">3</a></span></dt>
+<dd><p><a class="reference external" href="https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK">https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK</a></p>
+</dd>
+<dt class="label" id="id12"><span class="brackets"><a class="fn-backref" href="#id13">4</a></span></dt>
+<dd><p><a class="reference external" href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/boards/shields/waveshare_epaper/doc/index.html">https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/boards/shields/waveshare_epaper/doc/index.html</a></p>
+</dd>
+<dt class="label" id="id14"><span class="brackets">5</span><span class="fn-backref">(<a href="#id15">1</a>,<a href="#id16">2</a>,<a href="#id17">3</a>)</span></dt>
+<dd><p><a class="reference external" href="https://www.waveshare.com/2.13inch-e-paper.htm">https://www.waveshare.com/2.13inch-e-paper.htm</a></p>
+</dd>
+<dt class="label" id="id18"><span class="brackets"><a class="fn-backref" href="#id19">6</a></span></dt>
+<dd><p><a class="reference external" href="https://infocenter.nordicsemi.com/topic/ug_nrf52833_dk/UG/dk/prepare_board.html">https://infocenter.nordicsemi.com/topic/ug_nrf52833_dk/UG/dk/prepare_board.html</a></p>
+</dd>
+<dt class="label" id="id20"><span class="brackets"><a class="fn-backref" href="#id21">7</a></span></dt>
+<dd><p><a class="reference external" href="https://docs.zephyrproject.org/latest/build/dts/api/bindings/display/solomon%2Cssd1675a.html#dtbinding-solomon-ssd1675a">https://docs.zephyrproject.org/latest/build/dts/api/bindings/display/solomon%2Cssd1675a.html#dtbinding-solomon-ssd1675a</a></p>
+</dd>
+<dt class="label" id="id22"><span class="brackets"><a class="fn-backref" href="#id23">8</a></span></dt>
+<dd><p><a class="reference external" href="https://github.com/zephyrproject-rtos/zephyr/blob/main/drivers/display/ssd16xx.c">https://github.com/zephyrproject-rtos/zephyr/blob/main/drivers/display/ssd16xx.c</a></p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+
+<table>
+<tr>
+<td>
+    <p>
+        &copy; Copyright 2023, Nordic Semiconductor.
+
+    </p>
+</td>
+<td id="nordiclogo">
+  <a href="https://www.nordicsemi.com/"><img src="_static/images/nordic.svg" border="0"/></a>
+</td>
+</tr>
+</table>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,561 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Electronic Shelf Label Service (ESLS) &mdash; ESL  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="_static/tabs.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+  <script type="text/javascript" src="_static/js/ncs.js"></script>
+
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+  <link rel="shortcut icon" href="_static/images/favicon.ico"/>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ESL
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div id="searchbox" role="search">
+  <div class="searchformwrapper">
+    <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Subpages:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Requirements and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="samples.html">Samples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services.html">Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="additional_resources.html">Additional resources</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ESL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Electronic Shelf Label Service (ESLS)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/esl_service.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="electronic-shelf-label-service-esls">
+<span id="esl-service-readme"></span><h1>Electronic Shelf Label Service (ESLS)<a class="headerlink" href="#electronic-shelf-label-service-esls" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#service-uuid" id="id7">Service UUID</a></p></li>
+<li><p><a class="reference internal" href="#characteristics" id="id8">Characteristics</a></p>
+<ul>
+<li><p><a class="reference internal" href="#esl-address-characteristic-0x2bf6" id="id9">ESL Address Characteristic (<code class="docutils literal notranslate"><span class="pre">0x2BF6</span></code>)</a></p></li>
+<li><p><a class="reference internal" href="#ap-sync-key-material-characteristic-0x2bf7" id="id10">AP Sync Key Material Characteristic (<code class="docutils literal notranslate"><span class="pre">0x2BF7</span></code>)</a></p></li>
+<li><p><a class="reference internal" href="#esl-response-key-material-characteristic-0x2bf8" id="id11">ESL Response Key Material Characteristic (<code class="docutils literal notranslate"><span class="pre">0x2BF8</span></code>)</a></p></li>
+<li><p><a class="reference internal" href="#esl-current-absolute-time-characteristic-0x2bf9" id="id12">ESL Current Absolute Time Characteristic (<code class="docutils literal notranslate"><span class="pre">0x2BF9</span></code>)</a></p></li>
+<li><p><a class="reference internal" href="#esl-display-information-characteristic-0x2bfa" id="id13">ESL Display Information Characteristic (<code class="docutils literal notranslate"><span class="pre">0x2BFA</span></code>)</a></p></li>
+<li><p><a class="reference internal" href="#esl-image-information-characteristic-0x2bfb" id="id14">ESL Image Information Characteristic (<code class="docutils literal notranslate"><span class="pre">0x2BFB</span></code>)</a></p></li>
+<li><p><a class="reference internal" href="#esl-sensor-information-characteristic-0x2bfc" id="id15">ESL Sensor Information Characteristic (<code class="docutils literal notranslate"><span class="pre">0x2BFC</span></code>)</a></p></li>
+<li><p><a class="reference internal" href="#esl-led-information-characteristic-0x2bfd" id="id16">ESL LED Information Characteristic (<code class="docutils literal notranslate"><span class="pre">0x2BFD</span></code>)</a></p></li>
+<li><p><a class="reference internal" href="#esl-control-point-characteristic-0x2bfe" id="id17">ESL Control Point Characteristic (<code class="docutils literal notranslate"><span class="pre">0x2BFE</span></code>)</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#configuration" id="id18">Configuration</a></p>
+<ul>
+<li><p><a class="reference internal" href="#led-configuration" id="id19">LED configuration</a></p></li>
+<li><p><a class="reference internal" href="#display-configuration" id="id20">Display configuration</a></p></li>
+<li><p><a class="reference internal" href="#sensor-configuration" id="id21">Sensor configuration</a></p></li>
+<li><p><a class="reference internal" href="#debugging-configuration" id="id22">Debugging configuration</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#usage" id="id23">Usage</a></p></li>
+<li><p><a class="reference internal" href="#application-integration" id="id24">Application integration</a></p>
+<ul>
+<li><p><a class="reference internal" href="#callbacks" id="id25">Callbacks</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#api-documentation" id="id26">API documentation</a></p></li>
+</ul>
+</div>
+<p>The Electronic Shelf Label Service allows you to control and update electronic shelf labels (ESL) using Bluetooth® wireless technology.
+The purpose of the ESL Service is to enable communication and control between a central access point (AP) and tag devices.
+This service implements a complete state machine and control point command handler for ESL.
+The ESL Service is used in the <a class="reference internal" href="esl_tag.html#peripheral-esl"><span class="std std-ref">Bluetooth: Peripheral ESL</span></a> sample.</p>
+<section id="service-uuid">
+<span id="esl-service-uuid"></span><h2><a class="toc-backref" href="#id7">Service UUID</a><a class="headerlink" href="#service-uuid" title="Permalink to this headline">¶</a></h2>
+<p>The 16-bit vendor-specific service UUID is <code class="docutils literal notranslate"><span class="pre">0x1857</span></code>.</p>
+</section>
+<section id="characteristics">
+<span id="esl-service-characteristics"></span><h2><a class="toc-backref" href="#id8">Characteristics</a><a class="headerlink" href="#characteristics" title="Permalink to this headline">¶</a></h2>
+<p>This service has the following nine characteristics.</p>
+<section id="esl-address-characteristic-0x2bf6">
+<h3><a class="toc-backref" href="#id9">ESL Address Characteristic (<code class="docutils literal notranslate"><span class="pre">0x2BF6</span></code>)</a><a class="headerlink" href="#esl-address-characteristic-0x2bf6" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>Write</dt><dd><p>Write data to the ESL Address Characteristic to configure a unique address for an ESL device.</p>
+</dd>
+</dl>
+</section>
+<section id="ap-sync-key-material-characteristic-0x2bf7">
+<h3><a class="toc-backref" href="#id10">AP Sync Key Material Characteristic (<code class="docutils literal notranslate"><span class="pre">0x2BF7</span></code>)</a><a class="headerlink" href="#ap-sync-key-material-characteristic-0x2bf7" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>Write</dt><dd><p>The AP Sync Key Material is configured when an AP, acting as a client, writes its AP Sync Key Material value to the AP Sync Key Material characteristic.</p>
+</dd>
+</dl>
+</section>
+<section id="esl-response-key-material-characteristic-0x2bf8">
+<h3><a class="toc-backref" href="#id11">ESL Response Key Material Characteristic (<code class="docutils literal notranslate"><span class="pre">0x2BF8</span></code>)</a><a class="headerlink" href="#esl-response-key-material-characteristic-0x2bf8" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>Write</dt><dd><p>The ESL Response Key Material is configured when an AP, acting as a client, writes a value to the ESL Response Key Material characteristic.</p>
+</dd>
+</dl>
+</section>
+<section id="esl-current-absolute-time-characteristic-0x2bf9">
+<h3><a class="toc-backref" href="#id12">ESL Current Absolute Time Characteristic (<code class="docutils literal notranslate"><span class="pre">0x2BF9</span></code>)</a><a class="headerlink" href="#esl-current-absolute-time-characteristic-0x2bf9" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>Write</dt><dd><p>When a value is written to the ESL Current Absolute Time characteristic, the server sets its current system time to the value.</p>
+</dd>
+</dl>
+</section>
+<section id="esl-display-information-characteristic-0x2bfa">
+<h3><a class="toc-backref" href="#id13">ESL Display Information Characteristic (<code class="docutils literal notranslate"><span class="pre">0x2BFA</span></code>)</a><a class="headerlink" href="#esl-display-information-characteristic-0x2bfa" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>Read</dt><dd><p>The ESL Display Information characteristic returns an array of one or more Display Data Structures when read by a client.</p>
+</dd>
+</dl>
+</section>
+<section id="esl-image-information-characteristic-0x2bfb">
+<h3><a class="toc-backref" href="#id14">ESL Image Information Characteristic (<code class="docutils literal notranslate"><span class="pre">0x2BFB</span></code>)</a><a class="headerlink" href="#esl-image-information-characteristic-0x2bfb" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>Read</dt><dd><p>When read, the ESL Image Information characteristic returns the Max_Image_Index value equal to the highest Image_Index value supported by the ESL.</p>
+</dd>
+</dl>
+</section>
+<section id="esl-sensor-information-characteristic-0x2bfc">
+<h3><a class="toc-backref" href="#id15">ESL Sensor Information Characteristic (<code class="docutils literal notranslate"><span class="pre">0x2BFC</span></code>)</a><a class="headerlink" href="#esl-sensor-information-characteristic-0x2bfc" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>Read</dt><dd><p>The ESL Sensor Information characteristic returns an array of one or more Sensor Information Structures when read by a client.</p>
+</dd>
+</dl>
+</section>
+<section id="esl-led-information-characteristic-0x2bfd">
+<h3><a class="toc-backref" href="#id16">ESL LED Information Characteristic (<code class="docutils literal notranslate"><span class="pre">0x2BFD</span></code>)</a><a class="headerlink" href="#esl-led-information-characteristic-0x2bfd" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>Read</dt><dd><p>The ESL LED Information characteristic returns an array of one or more octets when read by a client.</p>
+</dd>
+</dl>
+</section>
+<section id="esl-control-point-characteristic-0x2bfe">
+<h3><a class="toc-backref" href="#id17">ESL Control Point Characteristic (<code class="docutils literal notranslate"><span class="pre">0x2BFE</span></code>)</a><a class="headerlink" href="#esl-control-point-characteristic-0x2bfe" title="Permalink to this headline">¶</a></h3>
+<dl class="simple">
+<dt>Write Without Response, Write, Notify</dt><dd><p>The ESL Control Point characteristic allows a client to write commands to an ESL while connected.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The command includes an opcode and parameters.
+The ESL Control Point command applies to both GATT ECP characteristic and PAwR.</p>
+</div>
+</section>
+</section>
+<section id="configuration">
+<span id="esls-config"></span><h2><a class="toc-backref" href="#id18">Configuration</a><a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>An ESL is composed of three types of independent, optional elements (a display, an LED, and a sensor).
+You first need to set the values of the ESL tag elements as described in the following sections.</p>
+<section id="led-configuration">
+<span id="esls-config-led"></span><h3><a class="toc-backref" href="#id19">LED configuration</a><a class="headerlink" href="#led-configuration" title="Permalink to this headline">¶</a></h3>
+<p>Use the following Kconfig options to set the LED configuration:</p>
+<ul>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_BT_ESL_LED_MAX</span></code> sets the maximum number of LEDs available on the tag device.</p>
+<p>The default value is <code class="docutils literal notranslate"><span class="pre">0</span></code>, which means there is no LED on the tag device.
+If there is an LED, the application must implement the functions <code class="xref c c-func docutils literal notranslate"><span class="pre">led_init()</span></code> and <code class="xref c c-func docutils literal notranslate"><span class="pre">led_control()</span></code> to control the LED.
+The ESL Service generates LED information in the GATT characteristic and a LED work item in the work queue.</p>
+</li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_BT_ESL_LED_INDICATION</span></code> is an option for debugging.</p>
+<p>If this option is enabled, the LED is lit or flashing when the tag device is in the corresponding state.</p>
+</li>
+</ul>
+</section>
+<section id="display-configuration">
+<span id="esls-config-display"></span><h3><a class="toc-backref" href="#id20">Display configuration</a><a class="headerlink" href="#display-configuration" title="Permalink to this headline">¶</a></h3>
+<p>Use the following Kconfig options to set the display configuration:</p>
+<ul>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_BT_ESL_DISPLAY_MAX</span></code> sets the maximum number of displays available on the tag device.</p>
+<p>The default value is <code class="docutils literal notranslate"><span class="pre">0</span></code>, which means there is no display on the tag device.
+If there is display, the application must implement the functions <code class="xref c c-func docutils literal notranslate"><span class="pre">display_init()</span></code> and <code class="xref c c-func docutils literal notranslate"><span class="pre">display_control()</span></code> to control the display.
+The ESL Service generates display information in the GATT characteristic and a display work item in the work queue.</p>
+</li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_DISPLAY_WIDTH</span></code> and <code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_DISPLAY_HEIGHT</span></code> set the display resolution of the tag device.</p>
+<p>These values can be acquired by the devicetree if the tag device has a display with a Zephyr driver.
+However, some tag devices use their own driver.
+You need to set these values accordingly.</p>
+</li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_DISPLAY_TYPE</span></code> sets the display type that is defined by Bluetooth SIG assigned number.</p></li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_IMAGE_FILE_SIZE</span></code> sets the file size reserved for Object Transfer Service (OTS) storage backend.</p>
+<p>In general, the size is the width x height x bit depth plus image header.</p>
+</li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_IMAGE_BUFFER_SIZE</span></code> sets the size of memory reserved for display framebuffer.</p>
+<p>In general, the size is the width x height x bit depth plus image header.
+For some display IC and storage backends, this memory size can be smaller than the image file.</p>
+</li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_BT_ESL_IMAGE_MAX</span></code> sets the number of images that can be stored in an tag device.</p>
+<p>This value is a trade-off between power consumption and need for non-volatile memory.
+The image is stored in the non-volatile memory of tag device.
+The more images can be stored, the less often the tag device needs to be in updating state to receive new images.
+The less images can be stored, the less non-volatile memory is required by the tag device.</p>
+</li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_BT_ESL_STORAGE_BACKEND</span></code> sets the storage backend for the image from the AP.</p>
+<p>The possible storage backend values are:</p>
+<ul class="simple">
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_OTS_NVS</span></code> - a lightweight key-value store optimized for small data reads and writes, not supporting the seek feature.</p></li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_OTS_LFS</span></code> - a full-featured filesystem optimized for larger data reads and writes, supports the seek feature.</p></li>
+</ul>
+<p>The choice between the two depends on the specific requirements of your application and the hardware (MCU, external flash or not) you are using.</p>
+</li>
+</ul>
+</section>
+<section id="sensor-configuration">
+<span id="esls-config-sensor"></span><h3><a class="toc-backref" href="#id21">Sensor configuration</a><a class="headerlink" href="#sensor-configuration" title="Permalink to this headline">¶</a></h3>
+<p>Use the following Kconfig option to set the sensor configuration:</p>
+<ul>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_BT_ESL_SENSOR_MAX</span></code> sets the maximum number of sensors available on the tag device.</p>
+<p>The default value is <code class="docutils literal notranslate"><span class="pre">0</span></code>, which means there is no sensor on the tag device.
+If the tag device has a sensor, the application must implement the functions <code class="xref c c-func docutils literal notranslate"><span class="pre">sensor_init()</span></code> and <code class="xref c c-func docutils literal notranslate"><span class="pre">sensor_control()</span></code> to read the sensor.</p>
+</li>
+</ul>
+</section>
+<section id="debugging-configuration">
+<span id="esls-config-optionals"></span><h3><a class="toc-backref" href="#id22">Debugging configuration</a><a class="headerlink" href="#debugging-configuration" title="Permalink to this headline">¶</a></h3>
+<p>You can also use the following Kconfig options for debugging purposes:</p>
+<ul class="simple">
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_SHELL</span></code> enables the shell command for controlling the tag device.</p></li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_BT_ESL_DEMO_SECURITY</span></code> enables removal of bonding data after the tag device is disconnected.</p></li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_BT_ESL_FORGET_PROVISION_DATA</span></code> enables removal of provisioning data after the tag device is disconnected.</p></li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_BT_ESL_UNSYNCHRONIZED_TIMEOUT</span></code> enables overriding the mandatory 60 minutes unsynchronized timeout value defined by Bluetooth SIG.</p></li>
+<li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_BT_ESL_UNASSOCIATED_TIMEOUT</span></code> enables overriding the mandatory 60 minutes unassociated timeout value defined by Bluetooth SIG.</p></li>
+</ul>
+</section>
+</section>
+<section id="usage">
+<span id="esls-usage"></span><h2><a class="toc-backref" href="#id23">Usage</a><a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>To use ESL Service in your application, complete the following steps:</p>
+<ol class="arabic simple">
+<li><p>Configure all elements of your ESL tag devices.</p></li>
+<li><p>Declare the <code class="xref c c-struct docutils literal notranslate"><span class="pre">bt_esl_init_param</span></code> structure.</p></li>
+<li><p>Fill in the element information to the members of the structure.</p></li>
+<li><p>Implement all required callback functions.</p></li>
+<li><p>Implement the <code class="xref c c-func docutils literal notranslate"><span class="pre">ots_storage_init()</span></code> function.</p></li>
+<li><p>Call the <code class="xref c c-func docutils literal notranslate"><span class="pre">bt_esl_init()</span></code> function.</p></li>
+</ol>
+</section>
+<section id="application-integration">
+<h2><a class="toc-backref" href="#id24">Application integration</a><a class="headerlink" href="#application-integration" title="Permalink to this headline">¶</a></h2>
+<section id="callbacks">
+<span id="esls-callbacks"></span><h3><a class="toc-backref" href="#id25">Callbacks</a><a class="headerlink" href="#callbacks" title="Permalink to this headline">¶</a></h3>
+<p>The ESL Service requires a number of callback functions to control the hardware.
+Your application must implement callback functions depending on the hardware used on the tag device.
+To implement the tag device functionality, several callback functions are needed.
+These callbacks are used to control the display, LEDs, and sensors, as well as to buffer and write image data to storage.
+This section explains why these callbacks are needed and how to implement them.</p>
+<section id="led-callbacks">
+<span id="esls-cb-led"></span><h4>LED Callbacks<a class="headerlink" href="#led-callbacks" title="Permalink to this headline">¶</a></h4>
+<p>You need to implement the following callbacks for the LEDs:</p>
+<ul>
+<li><p>The <code class="xref c c-func docutils literal notranslate"><span class="pre">led_init()</span></code> callback is used to initialize the LEDs on the tag device.</p>
+<p>To implement this callback, you need to write a function that calls it.</p>
+</li>
+<li><p>The <code class="xref c c-func docutils literal notranslate"><span class="pre">led_control()</span></code> callback is used to change the LED state, for example on/off, brightness, or color (if an SRGB is LED used).</p>
+<p>This function is called when the ESL tag device decides to change the LED flashing pattern.
+The function takes the following three arguments:</p>
+<ul class="simple">
+<li><p>LED index</p></li>
+<li><p>Color and brightness to be controlled</p></li>
+<li><p>A boolean value indicating whether to turn on or off the LED</p></li>
+</ul>
+<p>To implement this callback, you need to write a function that takes these arguments and performs the necessary operations to change the LED state.</p>
+</li>
+</ul>
+</section>
+<section id="display-callbacks">
+<span id="esls-cb-display"></span><h4>Display Callbacks<a class="headerlink" href="#display-callbacks" title="Permalink to this headline">¶</a></h4>
+<p>You need to implement the following callbacks if the tag device has a display:</p>
+<ul>
+<li><p>The <code class="xref c c-func docutils literal notranslate"><span class="pre">display_init()</span></code> callback is used to initialize the display device unless the display driver does that (for example initializes the memory region for framebuffer or sets the font type).</p>
+<p>To implement this callback, you need to write a function that initializes the display device.</p>
+</li>
+<li><p>The <code class="xref c c-func docutils literal notranslate"><span class="pre">display_control()</span></code> callback is used to change the image displayed on the tag device.</p>
+<p>This function is called when the tag device decides to change the image.
+The function takes the following three arguments:</p>
+<ul class="simple">
+<li><p>The index of the display device</p></li>
+<li><p>The index of the image</p></li>
+<li><p>A boolean value indicating whether to turn on or off the display</p></li>
+</ul>
+<p>To implement this callback, you need to write a function that takes these arguments and performs the necessary operations to change the image on the display device.</p>
+</li>
+<li><p>The <code class="xref c c-func docutils literal notranslate"><span class="pre">display_unassociated()</span></code> callback is used to show information on the display device to help the user inspect the tag device to be associated.</p>
+<p>This function is called when the tag device is booting up and unassociated.
+To implement this callback, you need to write a function that takes the index of the display device and displays the necessary information on the device.</p>
+</li>
+<li><p>The <code class="xref c c-func docutils literal notranslate"><span class="pre">display_associated()</span></code> callback is used to show information on the display device to indicate that the tag device has been associated.</p>
+<p>This function is called when the tag device is booting up and associated but not synced or commanded to display an image.
+To implement this callback, you need to write a function that takes the index of the display device and displays the necessary information on the device.</p>
+</li>
+</ul>
+<p>If you want to use a font library to print text on the display, you need to implement the following callbacks:</p>
+<ul>
+<li><p>The <code class="xref c c-func docutils literal notranslate"><span class="pre">display_clear_font()</span></code> callback is used to clear the framebuffer allocated by the font library for a specified display.</p>
+<p>This function is a callback for the font library and clears the framebuffer allocated by the font library for the specified display.
+The function disables all images on the display by clearing the framebuffer.
+To implement this callback, you need to write a function that takes the index of the display device and clears the framebuffer.</p>
+</li>
+<li><p>The <code class="xref c c-func docutils literal notranslate"><span class="pre">display_print_font()</span></code> callback is used to print text on the specified display using the font library.</p>
+<p>This function is a callback for the font library and prints text on the specified display using the font library.
+The text is printed at the specified position with the specified font.
+To implement this callback, you need to write a function that takes the index of the display device, the text to print, and the position to print the text.
+This callback should only change framebuffer and not update the display.</p>
+</li>
+<li><p>The <code class="xref c c-func docutils literal notranslate"><span class="pre">display_update_font()</span></code> callback is used to finalize the Character Framebuffer (CFB) or font library and check if the Electronic Paper Display (EPD) needs to be re-initialized.</p>
+<p>This function updates the display by flushing any pending updates to the display buffer and checks if the EPD needs to be re-initialized.
+To implement this callback, you need to write a function that takes the index of the display device and write font framebuffer to display.</p>
+</li>
+</ul>
+</section>
+<section id="sensor-callbacks">
+<span id="esls-cb-sensor"></span><h4>Sensor Callbacks<a class="headerlink" href="#sensor-callbacks" title="Permalink to this headline">¶</a></h4>
+<p>You need to implement the following callbacks if the tag device has a sensor:</p>
+<ul>
+<li><p>The <code class="xref c c-func docutils literal notranslate"><span class="pre">sensor_init()</span></code> callback is used to initialize the sensor device.</p>
+<p>To implement this callback, you need to write a function that initializes the sensor device.</p>
+</li>
+<li><p>The <code class="xref c c-func docutils literal notranslate"><span class="pre">sensor_control()</span></code> callback is used to read sensor data when requested by the tag device.</p>
+<p>This function takes the following two output arguments:</p>
+<ul class="simple">
+<li><p>The length of the sensor data</p></li>
+<li><p>A pointer to the sensor data reading</p></li>
+</ul>
+<p>To implement this callback, you need to write a function that takes the index of the sensor and stores the sensor data to the <code class="xref c c-struct docutils literal notranslate"><span class="pre">sensor_data</span></code> structure.
+If the sensor reading is successful, value <code class="docutils literal notranslate"><span class="pre">0</span></code> is returned.
+If the sensor reading is not fast enough or fails, value <code class="docutils literal notranslate"><span class="pre">-EBUSY</span></code> is returned.
+The ESL Service will generate a response based on the return value of this function.</p>
+</li>
+</ul>
+</section>
+<section id="image-storage-callbacks">
+<span id="esls-cb-image-storage"></span><h4>Image storage callbacks<a class="headerlink" href="#image-storage-callbacks" title="Permalink to this headline">¶</a></h4>
+<p>The tag device with a display requires several callbacks to be implemented.
+One of the mandatory features of the tag devices is to receive and store image data from the AP through OTS (Object Transfer Service), and to read image data to the framebuffer from storage when the image on the display needs to be changed.
+You need to implement the following callbacks if the tag device has a display.
+The implementation varies depending on the storage backend (NVS or LittleFS).</p>
+<ul>
+<li><p>The <code class="xref c c-func docutils literal notranslate"><span class="pre">buffer_img()</span></code> callback is used to buffer image data from AP when OTS (Object Transfer Service) write operation callback called.</p>
+<p>Image data from OTS may come in fragments, and some filesystems support seek while others do not.
+This callback should either buffer all fragments into <code class="xref c c-member docutils literal notranslate"><span class="pre">img_obj_buf</span></code> and write them once for a storage backend not supporting the seek feature, or write chunck by chunk to a storage backend supporting the seek feature.</p>
+</li>
+<li><p>The <code class="xref c c-func docutils literal notranslate"><span class="pre">write_img_to_storage()</span></code> callback is used to write image data to the storage backend when a chunk of image or all of the fragments from OTS are received.</p>
+<p>To implement this callback, you need to write a function that takes the image index, length, and offset and writes the image data to the storage backend.</p>
+</li>
+<li><p>The <code class="xref c c-func docutils literal notranslate"><span class="pre">read_img_from_storage()</span></code> callback is used to read image data from the storage backend to framebuffer when the tag device needs to change the image on the display.</p>
+<p>To implement this callback, you need to write a function that takes the image index, data pointer, length, and offset and reads the image data from the storage backend.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For a storage backend supporting the seek feature and a display driver IC supporting partial update, the <code class="xref c c-func docutils literal notranslate"><span class="pre">read_img_from_storage()</span></code> callback can only read the changed part of the image from the storage backend to the framebuffer.
+The display driver IC will only update the changed part of the image on the display.</p>
+<p>For a storage backend that does not support the seek feature, the <code class="xref c c-func docutils literal notranslate"><span class="pre">read_img_from_storage()</span></code> callback can only read the whole image from the storage backend to the framebuffer.
+The display driver IC will update the whole image on the display.</p>
+</div>
+</li>
+<li><p>The <code class="xref c c-func docutils literal notranslate"><span class="pre">read_img_size_from_storage()</span></code> callback is used to read the image size from the storage backend when the tag device needs to change the image on the display.</p>
+<p>To implement this callback, you need to write a function that takes the image index and returns the image size.</p>
+</li>
+<li><p>The <code class="xref c c-func docutils literal notranslate"><span class="pre">delete_imgs()</span></code> callback is used to remove all images from the storage backend when received factory reset op code.</p>
+<p>To implement this callback, you need to write a function that removes all images from the storage backend.</p>
+</li>
+</ul>
+</section>
+</section>
+</section>
+<section id="api-documentation">
+<h2><a class="toc-backref" href="#id26">API documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Header file: <code class="file docutils literal notranslate"><span class="pre">../services/esl.h</span></code></div>
+<div class="line">Source files: <code class="file docutils literal notranslate"><span class="pre">../services/esl.c</span></code></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+
+<table>
+<tr>
+<td>
+    <p>
+        &copy; Copyright 2023, Nordic Semiconductor.
+
+    </p>
+</td>
+<td id="nordiclogo">
+  <a href="https://www.nordicsemi.com/"><img src="_static/images/nordic.svg" border="0"/></a>
+</td>
+</tr>
+</table>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
