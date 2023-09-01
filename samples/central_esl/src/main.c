@@ -32,6 +32,17 @@ LOG_MODULE_REGISTER(central_esl, CONFIG_CENTRAL_ESL_LOG_LEVEL);
 
 static struct bt_esl_client esl_client;
 
+#if defined(CONFIG_BT_ESL_AP_AUTO_PING)
+/** Thread for Configuring Tag **/
+#define AP_PING_PRIORITY (K_LOWEST_APPLICATION_THREAD_PRIO + 1)
+static K_THREAD_STACK_DEFINE(ap_ping_wq_stack_area, 1536);
+struct k_work_q ap_ping_work_q;
+
+static struct esl_ap_ping_work_info {
+	struct k_work_delayable work;
+} esl_ap_ping_work;
+#endif /* CONFIG_BT_ESL_AP_AUTO_PING */
+
 #ifdef CONFIG_MCUMGR_GRP_FS
 #include <zephyr/device.h>
 #include <zephyr/fs/fs.h>
@@ -303,6 +314,19 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 	}
 }
 
+#if defined(CONFIG_BT_ESL_AP_AUTO_PING)
+static void esl_ap_ping_work_fn(struct k_work *work)
+{
+	for (size_t idx = 0; idx < CONFIG_ESL_CLIENT_MAX_GROUP; idx++) {
+		esl_client.sync_buf[idx].status = SYNC_EMPTY;
+		esl_dummy_ap_ad_data(0, idx);
+	}
+
+	k_work_reschedule_for_queue(&ap_ping_work_q, &esl_ap_ping_work.work,
+				    K_SECONDS(CONFIG_BT_ESL_AP_PING_INTERVAL));
+}
+#endif /* CONFIG_BT_ESL_AP_AUTO_PING */
+
 int main(void)
 {
 	int err;
@@ -362,6 +386,21 @@ int main(void)
 	}
 
 	LOG_INF("Starting Bluetooth Central ESL example\n");
+
+#if defined(CONFIG_BT_ESL_AP_AUTO_PING)
+	struct k_work_queue_config ap_ping_q_config = {
+		.name = "ap_ping_workq",
+	};
+
+	k_work_queue_start(&ap_ping_work_q, ap_ping_wq_stack_area,
+			   K_THREAD_STACK_SIZEOF(ap_ping_wq_stack_area), AP_PING_PRIORITY,
+			   &ap_ping_q_config);
+	k_work_init_delayable(&esl_ap_ping_work.work, esl_ap_ping_work_fn);
+	k_work_reschedule_for_queue(&ap_ping_work_q, &esl_ap_ping_work.work,
+				    K_SECONDS(CONFIG_BT_ESL_AP_PING_INTERVAL));
+
+#endif /* CONFIG_BT_ESL_AP_AUTO_PING */
+
 	for (;;) {
 		/* Wait infinitely */
 		k_sleep(K_FOREVER);

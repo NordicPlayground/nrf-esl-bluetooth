@@ -44,7 +44,7 @@ K_SEM_DEFINE(esl_read_sem, 0, 1);
 K_SEM_DEFINE(esl_sync_buf_sem, 1, 1);
 
 /** Thread for PAwR **/
-#define PAWR_WQ_PRIORITY K_LOWEST_APPLICATION_THREAD_PRIO + 1
+#define PAWR_WQ_PRIORITY K_LOWEST_APPLICATION_THREAD_PRIO - 1
 static K_THREAD_STACK_DEFINE(pawr_wq_stack_area, KB(4));
 struct k_work_q pawr_work_q;
 
@@ -174,7 +174,7 @@ static uint16_t chrc_read_offset;
 /* 52840dk uses CONFIG_BT_CTLR_SDC_PERIODIC_ADV_RSP_TX_BUFFER_COUNT */
 /* 5340dk has to retrieve CONFIG_BT_CTLR_SDC_PERIODIC_ADV_RSP_TX_BUFFER_COUNT from netcore*/
 #ifndef CONFIG_BT_CTLR_SDC_PERIODIC_ADV_RSP_TX_BUFFER_COUNT
-#define CONFIG_BT_CTLR_SDC_PERIODIC_ADV_RSP_TX_BUFFER_COUNT 5
+#define CONFIG_BT_CTLR_SDC_PERIODIC_ADV_RSP_TX_BUFFER_COUNT 3
 #endif
 static struct bt_le_per_adv_subevent_data_params
 	subevent_data_params[CONFIG_BT_CTLR_SDC_PERIODIC_ADV_RSP_TX_BUFFER_COUNT];
@@ -235,6 +235,10 @@ int esl_c_push_sync_to_controller(uint8_t group_id, uint8_t count)
 						      subevent_data_params);
 		if (err != 0) {
 			LOG_ERR("bt_le_pawr_set_subevent_data failed (err %d)", err);
+			for (size_t i = 0; i < num_subevents; i++) {
+				esl_c_obj_l->sync_buf[subevent_data_params[i].subevent].status =
+					SYNC_READY_TO_PUSH;
+			}
 		}
 	}
 
@@ -3313,7 +3317,8 @@ int bt_esl_client_init(struct bt_esl_client *esl_c,
 			K_THREAD_STACK_SIZEOF(esl_auto_ap_connect_thread_stack),
 			esl_auto_ap_connect_work_fn, NULL, NULL, NULL,
 			K_LOWEST_APPLICATION_THREAD_PRIO + 2, K_USER, K_NO_WAIT);
-#endif
+#endif /* CONFIG_BT_ESL_AP_AUTO_MODE */
+
 	pawr_cbs.pawr_data_request = pawr_request;
 	pawr_cbs.pawr_response = pawr_response;
 	setup_pawr_adv();
