@@ -173,6 +173,11 @@ int main(void)
 	init_param.cb.led_control = led_control;
 	init_param.cb.display_unassociated = display_unassociated;
 	init_param.cb.display_associated = display_associated;
+#if defined(CONFIG_CHARACTER_FRAMEBUFFER)
+	init_param.cb.display_update_font = display_update_cfb;
+	init_param.cb.display_clear_font = display_clear_cfb;
+	init_param.cb.display_print_font = display_print_cfb;
+#endif /* CONFIG_CHARACTER_FRAMEBUFFER */
 #if defined(CONFIG_BT_ESL_IMAGE_AVAILABLE)
 	init_param.cb.buffer_img = buffer_img;
 	init_param.cb.write_img_to_storage = write_img_to_storage;

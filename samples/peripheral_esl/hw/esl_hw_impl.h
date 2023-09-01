@@ -20,20 +20,258 @@ struct waveshare_gray_head {
 	uint16_t h;
 } __packed;
 
+/**
+ * @brief Initializes the ESL information characteristics.
+ *
+ * This function initializes the ESL display/sensor/led information characteristics
+ * by setting the characteristic values.
+ *
+ * @param init_param A pointer to a bt_esl_init_param struct containing initialization
+ * parameters for the Bluetooth Electronic Shelf Label (ESL).
+ */
 void hw_chrc_init(struct bt_esl_init_param *init_param);
+
+/**
+ * @brief Initializes the display hardware.
+ *
+ * This function initializes the display hardware and returns an error code
+ * if the initialization fails.
+ *
+ * @return 0 if the initialization is successful, or a negative error code
+ * if the initialization fails.
+ */
 int display_init(void);
+
+/**
+ * @brief Controls the display.
+ *
+ * This function controls the display by enabling or disabling the specified image on the
+ * specified display.(Only one display supported for now)
+ *
+ * @param disp_idx The index of the display to control.
+ * @param img_idx The index of the image to enable or disable.
+ * @param enable True to enable the image, false to disable it.
+ *
+ * @return 0 if the operation is successful, or a negative error code if the operation fails.
+ */
 int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable);
+
+/**
+ * @brief Sets the specified display to an unassociated state.
+ *
+ * This function sets the specified display to an unassociated state, which means that
+ * it is not associated with any image.
+ *
+ * @param disp_idx The index of the display to set to an unassociated state.
+ */
 void display_unassociated(uint8_t disp_idx);
+
+/**
+ * @brief Sets the specified display to an associated state.
+ *
+ * This function sets the specified display to an associated state, which means that
+ * it is associated with an AP.
+ *
+ * @param disp_idx The index of the display to set to an associated state.
+ */
 void display_associated(uint8_t disp_idx);
+
+#if defined(CONFIG_CHARACTER_FRAMEBUFFER)
+/**
+ * @brief Callback @ref display_clear_font() implementation with CFB API.
+ *
+ * This function clears the specified display by disabling all images on the display.
+ *
+ * @param disp_idx The index of the display to clear.
+ *
+ * @return 0 if the operation is successful, or a negative error code if the operation fails.
+ */
+int display_clear_cfb(uint8_t disp_idx);
+
+/**
+ * @brief Callback @ref display_print_font() implementation with CFB API.
+ *
+ * This function prints text on the specified display using the CFB function.
+ * The text is printed at the specified position.
+ * @param disp_idx The index of the display to print the text on.
+ * @param text The text to print.
+ * @param x The x-coordinate of the top-left corner of the text.
+ * @param y The y-coordinate of the top-left corner of the text.
+ *
+ * @return 0 if the operation is successful, or a negative error code if the operation fails.
+ */
+int display_print_cfb(uint8_t disp_idx, const char *text, uint16_t x, uint16_t y);
+
+/**
+ * @brief Callback @ref display_update_font() implementation with CFB API.
+ *
+ * This function finalizes the CFB by flushing any pending updates to the display buffer and
+ * checking if the EPD needs to be re-initialized.
+ *
+ * @param disp_idx The index of the display to update.
+ *
+ * @return 0 if the operation is successful, or a negative error code if the operation fails.
+ */
+int display_update_cfb(uint8_t disp_idx);
+#endif /* CONFIG_CHARACTER_FRAMEBUFFER */
+
+#if defined(CONFIG_BT_ESL_PAINT_LIB)
+
+/**
+ * @brief Callback @ref display_clear_font() implementation with Font Paint API.
+ *
+ * This function clears the specified display by disabling all images on the display.
+ *
+ * @param disp_idx The index of the display to clear.
+ *
+ * @return 0 if the operation is successful, or a negative error code if the operation fails.
+ */
+int display_clear_paint(uint8_t disp_idx);
+
+/**
+ * @brief Callback @ref display_print_font() implementation with Font Paint API.
+ *
+ * This function prints text on the specified display using the CFB function.
+ * The text is printed at the specified position.
+ * @param disp_idx The index of the display to print the text on.
+ * @param text The text to print.
+ * @param x The x-coordinate of the top-left corner of the text.
+ * @param y The y-coordinate of the top-left corner of the text.
+ *
+ * @return 0 if the operation is successful, or a negative error code if the operation fails.
+ */
+int display_print_paint(uint8_t disp_idx, const char *text, uint16_t x, uint16_t y);
+
+/**
+ * @brief Callback @ref display_update_font() implementation with Font Paint API.
+ *
+ * This function finalizes the CFB by flushing any pending updates to the display buffer and
+ * checking if the EPD needs to be re-initialized.
+ *
+ * @param disp_idx The index of the display to update.
+ *
+ * @return 0 if the operation is successful, or a negative error code if the operation fails.
+ */
+int display_update_paint(uint8_t disp_idx);
+
+#endif /* CONFIG_BT_ESL_PAINT_LIB */
+/**
+ * @brief Initializes the sensor hardware.
+ *
+ * This function initializes the sensor hardware and returns an error code
+ * if the initialization fails.
+ *
+ * @return 0 if the initialization is successful, or a negative error code
+ * if the initialization fails.
+ */
 int sensor_init(void);
+
+/**
+ * @brief Controls the sensor.
+ *
+ * This function receives the data from the specified sensor.
+ *
+ * @param sensor_idx The index of the sensor to control.
+ * @param len A pointer to the length of the data to send or receive.
+ * @param data A pointer to the data to send or receive.
+ *
+ * @return 0 if the operation is successful, or a negative error code if the operation fails.
+ */
 int sensor_control(uint8_t sensor_idx, uint8_t *len, uint8_t *data);
+
+/**
+ * @brief Controls the specified LED.
+ *
+ * This function controls the specified LED by setting its color and brightness
+ * and turning it on or off.
+ *
+ * @param led_idx The index of the LED to control.
+ * @param color_brightness The color and brightness of the LED.
+ * @param onoff True to turn the LED on, false to turn it off.
+ */
 void led_control(uint8_t led_idx, uint8_t color_brightness, bool onoff);
+
+/**
+ * @brief Initializes the LED hardware.
+ *
+ * This function initializes the LED hardware and returns an error code
+ * if the initialization fails.
+ *
+ * @return 0 if the initialization is successful, or a negative error code
+ * if the initialization fails.
+ */
 int led_init(void);
+
+/**
+ * @brief Buffers an image.
+ *
+ * This function buffers an image by copying the specified data to the specified
+ * offset in the image buffer.
+ *
+ * @param data A pointer to the data to buffer.
+ * @param len The length of the data to buffer.
+ * @param offset The offset in the image buffer to copy the data to.
+ */
 void buffer_img(const void *data, size_t len, off_t offset);
+
+/**
+ * @brief Writes an image to storage.
+ *
+ * This function writes the specified image to storage at the specified offset and returns
+ * an error code if the write fails.
+ *
+ * @param img_idx The index of the image to write.
+ * @param len The length of the image data to write.
+ * @param offset The offset in storage to write the image data to.
+ *
+ * @return 0 if the write is successful, or a negative error code if the write fails.
+ */
 int write_img_to_storage(uint8_t img_idx, size_t len, off_t offset);
+
+/**
+ * @brief Reads an image from storage.
+ *
+ * This function reads the specified image from storage at the specified offset and returns
+ * an error code if the read fails.
+ *
+ * @param img_idx The index of the image to read.
+ * @param data A pointer to the buffer to read the image data into.
+ * @param len The length of the image data to read.
+ * @param offset The offset in storage to read the image data from.
+ *
+ * @return 0 if the read is successful, or a negative error code if the read fails.
+ */
 int read_img_from_storage(uint8_t img_idx, void *data, size_t len, off_t offset);
+
+/**
+ * @brief Gets the size of an image in storage.
+ *
+ * This function gets the size of the specified image in storage and returns the size or
+ * a negative error code if the size cannot be determined.
+ *
+ * @param img_idx The index of the image to get the size of.
+ *
+ * @return The size of the image, or a negative error code if the size cannot be determined.
+ */
 size_t read_img_size_from_storage(uint8_t img_idx);
+
+/**
+ * @brief Deletes all images from storage.
+ *
+ * This function deletes all images from storage and returns an error code if the deletion fails.
+ *
+ * @return 0 if the deletion is successful, or a negative error code if the deletion fails.
+ */
 int delete_imgs_from_storage(void);
+
+/**
+ * @brief Initializes the OTS (Object Transfer Service) storage.
+ *
+ * This function initializes the OTS storage.
+ *
+ * @return 0 if the initialization is successful, or a negative error code
+ * if the initialization fails.
+ */
 int ots_storage_init(void);
 
 /**

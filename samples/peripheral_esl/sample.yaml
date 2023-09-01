@@ -20,9 +20,9 @@ tests:
     tags: bluetooth ci_build
     extra_args: OVERLAY_CONFIG=nrf52dk_nrf52832_epd.conf
       DTC_OVERLAY_FILE="conf/nrf52dk_nrf52832/nrf52dk_nrf52832_epd.overlay"
-  # application.bluetooth.peripheral_esl_52833epd:
-  #   build_only: true
-  #   platform_allow: nrf52833dk_nrf52833
-  #   tags: bluetooth ci_build
-  #   extra_args: OVERLAY_CONFIG=nrf52833dk_nrf52833_power_profiler_release_epd.conf
-  #     DTC_OVERLAY_FILE="conf/nrf52833dk_nrf52833/nrf52833dk_nrf52833_release_epd.overlay"
+  application.bluetooth.peripheral_esl_52833epd:
+    build_only: true
+    platform_allow: nrf52833dk_nrf52833
+    tags: bluetooth ci_build
+    extra_args: OVERLAY_CONFIG=nrf52833dk_nrf52833_power_profiler_release_epd.conf
+      DTC_OVERLAY_FILE="conf/nrf52833dk_nrf52833/nrf52833dk_nrf52833_release_epd.overlay"

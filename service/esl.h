@@ -100,6 +100,51 @@ struct bt_esl_cb {
 	 */
 	void (*display_associated)(uint8_t disp_idx);
 
+	/**
+	 * @brief Clears the framebuffer allocated by the font library for the specified display.
+	 *
+	 * This function is a callback for the font library and clears the framebuffer allocated by
+	 * the font library for the specified display. The function disables all images on the
+	 * display by clearing the framebuffer.
+	 *
+	 * @param disp_idx The index of the display to clear.
+	 *
+	 * @return 0 if the operation is successful, or a negative error code if the operation
+	 * fails.
+	 */
+	int (*display_clear_font)(uint8_t disp_idx);
+
+	/**
+	 * @brief Prints text on the specified display using the font library.
+	 *
+	 * This function is a callback for the font library and prints text on the specified display
+	 * using the font library. The text is printed at the specified position with the specified
+	 * font and color. The function returns an error code if the text cannot be printed.
+	 *
+	 * @param disp_idx The index of the display to print the text on.
+	 * @param text The text to print.
+	 * @param x The x-coordinate of the top-left corner of the text.
+	 * @param y The y-coordinate of the top-left corner of the text.
+	 *
+	 * @return 0 if the text is printed successfully, or a negative error code if the text
+	 * cannot be printed.
+	 */
+	int (*display_print_font)(uint8_t disp_idx, const char *text, uint16_t x, uint16_t y);
+
+	/**
+	 * @brief Finalizes(Write to framebuffer of EPD) the CFB and checks if the
+	 * EPD (Electronic Paper Display) needs to be re-initialized.
+	 *
+	 * This function finalizes the CFB by flushing any pending updates to the display buffer and
+	 * checking if the EPD needs to be re-initialized.
+	 *
+	 * @param disp_idx The index of the display to update.
+	 *
+	 * @return 0 if the operation is successful, or a negative error code if the operation
+	 * fails.
+	 */
+	int (*display_update_font)(uint8_t disp_idx);
+
 	/** @brief LED control callback.
 	 *
 	 * This function is called when the ESL tag decides to change LED flashing pattern.

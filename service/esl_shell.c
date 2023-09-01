@@ -236,6 +236,79 @@ static int cmd_esl_display(const struct shell *shell, size_t argc, char *argv[])
 
 	return 0;
 }
+
+#if defined(CONFIG_CHARACTER_FRAMEBUFFER)
+static int cmd_esl_print_on_display(const struct shell *shell, size_t argc, char *argv[])
+{
+	shell_fprintf(shell, SHELL_NORMAL, "%s\n", __func__);
+	if (argc < 3) {
+		shell_fprintf(shell, SHELL_ERROR, "no valid parameter <x> <y> <string>\n");
+		return -ENOEXEC;
+	}
+
+	struct bt_esls *esl = esl_get_esl_obj();
+	uint8_t start_x = strtoul(argv[1], NULL, 16);
+	uint8_t start_y = strtoul(argv[2], NULL, 16);
+	int ret;
+
+	if (esl->cb.display_print_font) {
+		ret = esl->cb.display_print_font(0, argv[3], start_x, start_y);
+		if (ret) {
+			shell_fprintf(shell, SHELL_ERROR, "CFB print string failed (%d)\n", ret);
+			return -ENOEXEC;
+		}
+	} else {
+		shell_fprintf(shell, SHELL_ERROR,
+			      "Display font print string callback is not registered\n");
+		return -ENOEXEC;
+	}
+
+	return 0;
+}
+
+static int cmd_esl_clear_display(const struct shell *shell, size_t argc, char *argv[])
+{
+	shell_fprintf(shell, SHELL_NORMAL, "%s\n", __func__);
+	struct bt_esls *esl = esl_get_esl_obj();
+	int ret;
+
+	if (esl->cb.display_clear_font) {
+		ret = esl->cb.display_clear_font(0);
+		if (ret) {
+			shell_fprintf(shell, SHELL_ERROR, "CFB clear display failed (%d)\n", ret);
+			return -ENOEXEC;
+		}
+	} else {
+		shell_fprintf(shell, SHELL_ERROR,
+			      "Display font clear display callback is not registered\n");
+		return -ENOEXEC;
+	}
+
+	return 0;
+}
+
+static int cmd_esl_update_display(const struct shell *shell, size_t argc, char *argv[])
+{
+	shell_fprintf(shell, SHELL_NORMAL, "%s\n", __func__);
+	struct bt_esls *esl = esl_get_esl_obj();
+	int ret;
+
+	if (esl->cb.display_update_font) {
+		ret = esl->cb.display_update_font(0);
+		if (ret) {
+			shell_fprintf(shell, SHELL_ERROR, "CFB update display failed (%d)\n", ret);
+			return -ENOEXEC;
+		}
+	} else {
+		shell_fprintf(shell, SHELL_ERROR,
+			      "Display font update display callback is not registered\n");
+		return -ENOEXEC;
+	}
+
+	return 0;
+}
+#endif /* CONFIG_CHARACTER_FRAMEBUFFER */
+
 static int cmd_esl_led_work_dump(const struct shell *shell, size_t argc, char *argv[])
 {
 	shell_fprintf(shell, SHELL_NORMAL, "cmd_esl_led_work_dump\n");
@@ -434,7 +507,6 @@ static int cmd_esl_security(const struct shell *shell, size_t argc, char *argv[]
 
 static int cmd_esl_configuring(const struct shell *shell, size_t argc, char *argv[])
 {
-
 	shell_fprintf(shell, SHELL_NORMAL, "cmd_esl_configuring\n");
 	struct bt_esls *esl = esl_get_esl_obj();
 
@@ -496,6 +568,12 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 	SHELL_CMD(adv, NULL, "ESL advertising start/stop", cmd_esl_adv),
 	SHELL_CMD(led, NULL, "LED control for debugging", cmd_esl_led),
 	SHELL_CMD(display, NULL, "DISPLAY control for debugging", cmd_esl_display),
+#if defined(CONFIG_CHARACTER_FRAMEBUFFER)
+	SHELL_CMD(print_on_display, NULL, "Print text to display framebuffer",
+		  cmd_esl_print_on_display),
+	SHELL_CMD(clear_display, NULL, "Clear display framebuffer", cmd_esl_clear_display),
+	SHELL_CMD(update_display, NULL, "Update framebuffer to display", cmd_esl_update_display),
+#endif /* (CONFIG_CHARACTER_FRAMEBUFFER) */
 	SHELL_CMD(led_work_dump, NULL, "LED work item status dump for debugging",
 		  cmd_esl_led_work_dump),
 	SHELL_CMD(display_work_dump, NULL, "DISPLAY work item status for debugging",

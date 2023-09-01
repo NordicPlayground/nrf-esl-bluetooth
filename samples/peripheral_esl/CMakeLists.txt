@@ -28,7 +28,7 @@ zephyr_library_include_directories_ifdef(CONFIG_BT_ESL_CLIENT ../../service)
 
 # Display HW implementation
 
-if (CONFIG_DISPLAY)
+if (CONFIG_SSD16XX)
   target_sources(app PRIVATE hw/display/epd_shield_display.c)
 endif()
 
