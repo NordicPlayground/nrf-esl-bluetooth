@@ -93,11 +93,13 @@ static struct esl_ap_resp_fill_buf_work_info {
 	struct bt_le_per_adv_response_info info;
 } esl_ap_resp_fill_buf_work;
 
+#if defined(CONFIG_BT_ESL_TAG_STORAGE)
 static struct esl_tag_load_work_info {
 	struct k_work_delayable work;
 	const bt_addr_le_t *ble_addr;
 	uint8_t conn_idx;
 } esl_tag_load_work;
+#endif /* CONFIG_BT_ESL_TAG_STORAGE */
 
 static struct esl_list_tag_work_info {
 	struct k_work_delayable work;
@@ -469,6 +471,7 @@ static void dis_gatt_discover(struct bt_conn *conn);
 static void esl_auto_ap_connect_work_fn(void *p1, void *p2, void *p3)
 {
 	bt_addr_le_t addr;
+	int ret;
 	struct tag_addr_node *cur = NULL, *next = NULL;
 
 	while (true) {
@@ -488,7 +491,11 @@ static void esl_auto_ap_connect_work_fn(void *p1, void *p2, void *p3)
 				bt_addr_le_copy(&addr, &cur->addr);
 				if (!atomic_test_and_set_bit(&esl_c_obj_l->acl_state,
 							     ESL_C_CONNECTING)) {
-					esl_c_connect(&addr, ESL_ADDR_BROADCAST);
+					ret = esl_c_connect(&addr, ESL_ADDR_BROADCAST);
+					if (ret) {
+						atomic_clear_bit(&esl_c_obj_l->acl_state,
+								 ESL_C_CONNECTING);
+					}
 				}
 
 				k_sem_take(&sem_auto_config, K_SECONDS(60));
@@ -748,7 +755,7 @@ static void esl_c_auto_configuring_tag(uint8_t conn_idx)
 	if (LOW_BYTE(++esl_c_obj_l->esl_addr_start) >=
 	    CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + esl_c_tags_per_group) {
 		esl_c_obj_l->esl_addr_start =
-			(((GROUPID_BYTE(esl_c_obj_l->esl_addr_start) + 1) & 0xff) << 8 |
+			(((GROUPID_BYTE(esl_c_obj_l->esl_addr_start) + 1) & 0x7f) << 8 |
 			 (CONFIG_ESL_CLIENT_DEFAULT_ESL_ID & 0xff));
 		LOG_INF("exceed esl_c_tags_per_group %d , change to next group %d",
 			esl_c_tags_per_group, GROUPID_BYTE(esl_c_obj_l->esl_addr_start));
@@ -1087,8 +1094,12 @@ static void connected(struct bt_conn *conn, uint8_t conn_err)
 
 	printk("Connected:Conn_idx:%02d\n", conn_idx);
 	LOG_INF("Connected: %s", addr);
+
+#if defined(CONFIG_BT_ESL_TAG_STORAGE)
 	esl_tag_load_work.ble_addr = peer;
 	esl_tag_load_work.conn_idx = conn_idx;
+#endif /* CONFIG_BT_ESL_TAG_STORAGE */
+
 	k_work_reschedule(&esl_tag_load_work.work, K_NO_WAIT);
 
 	tag = esl_c_get_tag_addr(-1, peer);
@@ -2494,29 +2505,15 @@ static int esl_c_past_unsynced_tag(uint8_t conn_idx)
 		return ret;
 	}
 
-	for (size_t i = 0; i <= AUTO_PAST_RETRY; i++) {
-		LOG_INF("AUTO_PAST_RETRY %d\n", i);
-		CHECKIF(check_ble_connection(esl_c_obj_l->conn[conn_idx])) {
-			if (i == AUTO_PAST_RETRY) {
-				LOG_ERR("Auto PAST failed");
-				peer_disconnect(esl_c_obj_l->conn[conn_idx]);
-				ret = -EAGAIN;
-			}
-
-			ret = esl_c_past(conn_idx);
-			if (ret) {
-				LOG_ERR("Send PAST %02d (ret %d)", conn_idx, ret);
-			}
-			/* Wait till next subevent interval */
-			k_msleep((CONFIG_ESL_PAWR_INTERVAL_MIN * 4 / 3));
-		} else {
-			break;
-		}
+	ret = esl_c_past(conn_idx);
+	if (ret) {
+		LOG_ERR("Send PAST %02d (ret %d)", conn_idx, ret);
 	}
 
 	return ret;
 }
 
+#if defined(CONFIG_BT_ESL_TAG_STORAGE)
 static void esl_tag_load_work_fn(struct k_work *work)
 {
 	struct k_work_delayable *dwork = k_work_delayable_from_work(work);
@@ -2527,6 +2524,7 @@ static void esl_tag_load_work_fn(struct k_work *work)
 	load_tag_in_storage(tag_work->ble_addr, &esl_c_obj_l->gatt[tag_work->conn_idx].esl_device);
 	LOG_INF("load tag end");
 }
+#endif /* (CONFIG_BT_ESL_TAG_STORAGE) */
 
 /* 6.1.1 Configure or reconfigure an ESL procedure */
 void esl_ap_config_work_fn(struct k_work *work)
@@ -3233,15 +3231,51 @@ void esl_c_gatt_flag_set(uint8_t flag_idx, uint8_t set_unset)
 
 int esl_c_past(uint8_t conn_idx)
 {
-	int err;
+	int err = 0;
+	bt_addr_le_t peer_addr;
+	char peer_addr_str[BT_ADDR_LE_STR_LEN];
+	char cur_peer_addr_str[BT_ADDR_LE_STR_LEN];
 
-	err = bt_le_per_adv_set_info_transfer(adv_pawr, esl_c_obj_l->conn[conn_idx],
-					      BT_UUID_ESL_VAL);
+	bt_addr_le_copy(&peer_addr, bt_conn_get_dst(esl_c_obj_l->conn[conn_idx]));
+	bt_addr_le_to_str(&peer_addr, peer_addr_str, sizeof(peer_addr_str));
+	for (size_t i = 0; i <= CONFIG_BT_ESL_AUTO_PAST_RETRY_TIME; i++) {
+		bt_addr_le_t cur_peer_addr;
 
-	if (err != 0) {
-		printk("#PAST:0,%02d,%d\n", conn_idx, err);
-	} else {
-		printk("#PAST:1,%02d\n", conn_idx);
+		bt_addr_le_copy(&cur_peer_addr, bt_conn_get_dst(esl_c_obj_l->conn[conn_idx]));
+		bt_addr_le_to_str(&cur_peer_addr, cur_peer_addr_str, sizeof(cur_peer_addr_str));
+		LOG_INF("PAST %d %s  %s", i, peer_addr_str, cur_peer_addr_str);
+		LOG_INF("check_ble_connection %d bt_addr_le_eq %d",
+			check_ble_connection(esl_c_obj_l->conn[conn_idx]),
+			bt_addr_le_eq(&peer_addr, &cur_peer_addr));
+		CHECKIF((check_ble_connection(esl_c_obj_l->conn[conn_idx]) &&
+			 bt_addr_le_eq(&peer_addr, &cur_peer_addr))) {
+			if (i == CONFIG_BT_ESL_AUTO_PAST_RETRY_TIME) {
+				LOG_ERR("PAST time is over retry times %d",
+					CONFIG_BT_ESL_AUTO_PAST_RETRY_TIME);
+				peer_disconnect(esl_c_obj_l->conn[conn_idx]);
+				return -EAGAIN;
+			}
+
+			err = bt_le_per_adv_set_info_transfer(adv_pawr, esl_c_obj_l->conn[conn_idx],
+							      BT_UUID_ESL_VAL);
+			if (!err) {
+				printk("#PAST:1,%02d\n", conn_idx);
+			} else {
+				LOG_ERR("Send PAST %02d (err %d)", conn_idx, err);
+				printk("#PAST:0,%02d,%d\n", conn_idx, err);
+				return err;
+			}
+
+			/* Wait till next subevent interval */
+			k_msleep((CONFIG_ESL_PAWR_INTERVAL_MIN * 4 / 3));
+		} else {
+			/* Previous PAST sent to Tag successful */
+			if (i > 0) {
+				err = 0;
+			}
+
+			break;
+		}
 	}
 
 	return err;

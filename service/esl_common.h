@@ -230,7 +230,7 @@ enum ESL_BASIC_STATE_BIT {
 
 #define BT_ATT_INVALID_HANDLE		  0x0000
 #define DEFAULT_RESPONSE_START		  0
-#define AUTO_PAST_RETRY			  5
+
 /* AAD for EAD*/
 #define EAD_AES_ADDITIONAL_SIZE		  (1)
 /* OTS V10 Table 3.25: List of OLCP Result Codes and Response Parameters */

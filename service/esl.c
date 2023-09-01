@@ -1772,17 +1772,20 @@ static ssize_t ots_obj_write(struct bt_ots *ots, struct bt_conn *conn, uint64_t 
 		LOG_ERR("no buffer_img cb");
 	}
 #else
+#ifndef CONFIG_BT_ESL_UNSYNCHRONIZED_IMMEIDATELY
 	if (esl_obj_l->cb.write_img_to_storage) {
 		esl_obj_l->cb.write_img_to_storage(obj_index, len, offset);
 	} else {
 		LOG_ERR("no write_img_to_storage cb");
 	}
+#endif /* CONFIG_BT_ESL_UNSYNCHRONIZED_IMMEIDATELY */
 #endif /* (CONFIG_ESL_OTS_NVS) */
 
 	if (rem == 0) {
 		LOG_INF("ots_obj_write %d done %ld", obj_index, offset + len);
 		esl_obj_l->stored_image_size[obj_index] = offset + len;
 #if (CONFIG_ESL_OTS_NVS)
+#ifndef CONFIG_BT_ESL_UNSYNCHRONIZED_IMMEIDATELY
 
 		if (esl_obj_l->cb.write_img_to_storage) {
 			esl_obj_l->cb.write_img_to_storage(
@@ -1790,7 +1793,8 @@ static ssize_t ots_obj_write(struct bt_ots *ots, struct bt_conn *conn, uint64_t 
 		} else {
 			LOG_ERR("no write_img_to_storage cb");
 		}
-#endif
+#endif /* CONFIG_BT_ESL_UNSYNCHRONIZED_IMMEIDATELY */
+#endif /* (CONFIG_ESL_OTS_NVS) */
 	}
 
 	return len;

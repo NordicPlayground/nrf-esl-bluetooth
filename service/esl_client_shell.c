@@ -258,8 +258,9 @@ static int cmd_pawr_set_pawr_data(const struct shell *shell, size_t argc, char *
 	uint8_t group_id = strtol(argv[2], NULL, 16) & 0xff;
 
 	esl_dummy_ap_ad_data(esl_sync_type, group_id);
+#if defined(CONFIG_BT_ESL_TAG_STORAGE)
 	load_all_tags_in_storage(group_id);
-
+#endif /* CONFIG_BT_ESL_TAG_STORAGE */
 	return 0;
 }
 
