@@ -60,10 +60,13 @@ extern "C" {
 struct esl_ecp_resp {
 	uint8_t resp_op;
 	uint8_t error_code;
-	uint8_t led_idx;
-	uint8_t display_idx;
+	union {
+		uint8_t led_idx;
+		uint8_t display_idx;
+		uint8_t sensor_idx;
+	};
+
 	uint8_t img_idx;
-	uint8_t sensor_idx;
 };
 
 /** @brief Pointers to the callback functions for service events. */
@@ -244,6 +247,21 @@ struct bt_esl_cb {
 	 * @retval 0 success. Otherwise, a (negative) error code is returned.
 	 */
 	int (*delete_imgs)(void);
+
+	/** @brief Vendor-specific OP Code handler callback.
+	 *
+	 * @param[in] buf ECP command includes OP code and parameter
+	 *
+	 */
+	void (*vs_command_handler)(struct net_buf_simple *buf);
+
+	/** @brief Vendoer-spefic OP Code response callback
+	 *
+	 * @param[in] buf ECP response includes OP code and parameter
+	 *
+	 * @retval length of ECP response
+	 */
+	uint8_t (*vs_response_handler)(uint8_t *buf);
 };
 
 /** @brief ESL LED flashing work item. */
@@ -386,6 +404,21 @@ struct bt_esls *esl_get_esl_obj(void);
 
 /** @brief Remove remove all data configured by Access Point */
 void bt_esl_factory_reset(void);
+
+/**
+ * @brief Check if the given ESL ID matches the expected ID and handle errors accordingly.
+ *
+ * @param esl_id The ESL ID to check.
+ * @param resp Pointer to the response structure to fill in case of errors.
+ * @return int Returns 0 on success, or a negative error code on failure.
+ *
+ * This function checks if the given ESL ID matches the expected ID, and handles errors accordingly.
+ * If the given ID does not match the expected ID or is a broadcast ID, an error response is
+ * generated. If the ESL object is busy, a retry error response is generated.
+ *
+ * The function returns 0 on success, or a negative error code on failure.
+ */
+int check_ecp_esl_id(uint8_t esl_id, struct esl_ecp_resp *resp);
 
 #ifdef __cplusplus
 }

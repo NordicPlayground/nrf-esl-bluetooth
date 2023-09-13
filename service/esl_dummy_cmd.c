@@ -602,7 +602,88 @@ void esl_dummy_ap_ad_data(uint8_t sync_pkt_type, uint8_t group_id)
 		buf[44] = 0x02;
 		len = 44 + sizeof(uint8_t);
 		break;
-
+	/* type 0x15 Tag 0~10 Enable DFU
+	 * Vendor-specific command VS_DFU_REQ = 0x1F, parameter 0x00 = disable DFU, 0x01 = enable
+	 * DFU
+	 */
+	case 0x15:
+		LOG_INF("type 0x15 Tag 0~10 Enable DFU");
+		buf[1] = 0x1F;
+		buf[2] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID;
+		buf[3] = 1;
+		buf[4] = 0x1F;
+		buf[5] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 1;
+		buf[6] = 1;
+		buf[7] = 0x1F;
+		buf[8] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 2;
+		buf[9] = 1;
+		buf[10] = 0x1F;
+		buf[11] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 3;
+		buf[12] = 1;
+		buf[13] = 0x1F;
+		buf[14] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 4;
+		buf[15] = 1;
+		buf[16] = 0x1F;
+		buf[17] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 5;
+		buf[18] = 1;
+		buf[19] = 0x1F;
+		buf[20] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 6;
+		buf[21] = 1;
+		buf[22] = 0x1F;
+		buf[23] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 7;
+		buf[24] = 1;
+		buf[25] = 0x1F;
+		buf[26] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 8;
+		buf[27] = 1;
+		buf[28] = 0x1F;
+		buf[29] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 9;
+		buf[30] = 1;
+		buf[31] = 0x1F;
+		buf[32] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 10;
+		buf[33] = 1;
+		len = 33 + sizeof(uint8_t);
+		break;
+	/* type 0x16 Tag 0~10 Disable DFU
+	 * Vendor-specific command VS_DFU_REQ = 0x1F, parameter 0x00 = disable DFU, 0x01 = enable
+	 * DFU
+	 */
+	case 0x16:
+		LOG_INF("type 0x16 Tag 0~10 Disable DFU");
+		buf[1] = 0x1F;
+		buf[2] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID;
+		buf[3] = 0; /*  change this to 0 to disable DFU */
+		buf[4] = 0x1F;
+		buf[5] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 1;
+		buf[6] = 0;
+		buf[7] = 0x1F;
+		buf[8] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 2;
+		buf[9] = 0;
+		buf[10] = 0x1F;
+		buf[11] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 3;
+		buf[12] = 0;
+		buf[13] = 0x1F;
+		buf[14] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 4;
+		buf[15] = 0;
+		buf[16] = 0x1F;
+		buf[17] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 5;
+		buf[18] = 0;
+		buf[19] = 0x1F;
+		buf[20] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 6;
+		buf[21] = 0;
+		buf[22] = 0x1F;
+		buf[23] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 7;
+		buf[24] = 0;
+		buf[25] = 0x1F;
+		buf[26] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 8;
+		buf[27] = 0;
+		buf[28] = 0x1F;
+		buf[29] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 9;
+		buf[30] = 0;
+		buf[31] = 0x1F;
+		buf[32] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 10;
+		buf[33] = 0;
+		len = 33 + sizeof(uint8_t);
+		break;
 	default:
 		LOG_ERR("invalid sync_pkt_type");
 		return;

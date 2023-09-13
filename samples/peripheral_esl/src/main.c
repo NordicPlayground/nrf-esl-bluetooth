@@ -27,6 +27,10 @@
 
 #include "esl.h"
 #include "esl_hw_impl.h"
+#if defined(CONFIG_BT_ESL_VENDOR_SPECIFIC_SUPPORT)
+#include "esl_vs_impl.h"
+#endif /* CONFIG_BT_ESL_VENDOR_SPECIFIC_SUPPORT */
+
 LOG_MODULE_REGISTER(peripheral_esl, CONFIG_PERIPHERAL_ESL_LOG_LEVEL);
 
 BT_ESL_DEF(esl_obj);
@@ -192,6 +196,10 @@ int main(void)
 	}
 
 #endif /* CONFIG_BT_ESL_IMAGE_AVAILABLE*/
+#if defined(CONFIG_BT_ESL_VENDOR_SPECIFIC_SUPPORT)
+	init_param.cb.vs_command_handler = vs_command_handler;
+	init_param.cb.vs_response_handler = vs_response_handler;
+#endif /* CONFIG_BT_ESL_VENDOR_SPECIFIC_SUPPORT */
 	err = bt_esl_init(&esl_obj, &init_param);
 	printk("bt_esl_init (err %d)\n", err);
 	if (err != 0) {

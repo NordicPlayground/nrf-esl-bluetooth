@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
-#ifndef EL_HW_IMPL_H_
-#define EL_HW_IMPL_H_
+#ifndef ESL_HW_IMPL_H_
+#define ESL_HW_IMPL_H_
 #include <zephyr/device.h>
 
 /**
@@ -283,4 +283,4 @@ int ssd16xx_init(const struct device *dev);
  **/
 int uc81xx_init(const struct device *dev);
 
-#endif /* (EL_HW_IMPL_H_) */
+#endif /* (ESL_HW_IMPL_H_) */

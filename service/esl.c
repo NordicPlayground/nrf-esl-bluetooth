@@ -880,6 +880,35 @@ void ecp_notify_cb(struct bt_conn *conn, void *user_data)
 	LOG_HEXDUMP_DBG(ecp_rsp_net_buf.data, ESL_RESPONSE_MAX_LEN, "");
 }
 
+int check_ecp_esl_id(uint8_t esl_id, struct esl_ecp_resp *resp)
+{
+	struct bt_esls *esl_obj = esl_get_esl_obj();
+
+	if (esl_id != (LOW_BYTE(esl_obj->esl_chrc.esl_addr)) && esl_id != ESL_ADDR_BROADCAST) {
+		LOG_ERR("ESL_ID not match 0x%02x 0x%02x", LOW_BYTE(esl_id),
+			LOW_BYTE(esl_obj->esl_chrc.esl_addr));
+		resp->resp_op = OP_ERR;
+		/**
+		 *  ESLS/SR/ECP/BI-14-C [Reject Invalid ESL ID] says Invalid Parameter(s)
+		 *  ESLS spec says Invalid Parameter(s) page 28
+		 */
+		resp->error_code = ERR_INV_PARAMS;
+		return -EINVAL;
+	}
+
+	if (esl_id == ESL_ADDR_BROADCAST) {
+		LOG_DBG("BROADCAST");
+	}
+
+	if (esl_obj->busy == true) {
+		resp->resp_op = OP_ERR;
+		resp->error_code = ERR_RETRY;
+		esl_obj->busy = false;
+	}
+
+	return 0;
+}
+
 static void ecp_command_handler(struct k_work *work)
 {
 	struct esl_ecp_work_info *info = CONTAINER_OF(work, struct esl_ecp_work_info, work);
@@ -915,26 +944,10 @@ static void ecp_command_handler(struct k_work *work)
 	}
 
 	esl_id = command[1];
-	if (esl_id != (LOW_BYTE(esl_obj->esl_chrc.esl_addr)) && esl_id != ESL_ADDR_BROADCAST) {
-		LOG_ERR("ESL_ID not match 0x%02x 0x%02x", LOW_BYTE(esl_id),
-			LOW_BYTE(esl_obj->esl_chrc.esl_addr));
-		esl_obj->resp.resp_op = OP_ERR;
-		/**
-		 *  ESLS/SR/ECP/BI-14-C [Reject Invalid ESL ID] says Invalid Parameter(s)
-		 *  ESLS spec says Invalid Parameter(s) page 28
-		 */
-		esl_obj->resp.error_code = ERR_INV_PARAMS;
-		goto ecp_response;
-	}
 
-	if (esl_id == ESL_ADDR_BROADCAST) {
-		LOG_DBG("BROADCAST");
-	}
-
-	if (esl_obj->busy == true) {
-		esl_obj->resp.resp_op = OP_ERR;
-		esl_obj->resp.error_code = ERR_RETRY;
-		esl_obj->busy = false;
+	if (check_ecp_esl_id(esl_id, &esl_obj->resp)) {
+		/* It is unnecessary to response wrong ESL ID */
+		return;
 	}
 
 	if (esl_obj->resp.resp_op != OP_ERR) {
@@ -1305,8 +1318,10 @@ static void ecp_command_handler(struct k_work *work)
 		default:
 			if ((op_code & OP_VENDOR_SPECIFIC_STATE_MASK)) {
 				LOG_DBG("vendor-specific TAG");
-				/* TODO: Do something about vendor-specific command */
-				esl_obj->resp.resp_op = OP_VENDOR_SPECIFIC_STATE_MASK;
+				if (esl_obj->cb.vs_command_handler) {
+					esl_obj->cb.vs_command_handler(&ecp_net_buf);
+					esl_obj->resp.resp_op = OP_VENDOR_SPECIFIC_STATE_MASK;
+				}
 			} else {
 				LOG_ERR("OP CODE invalid");
 				esl_obj->resp.resp_op = OP_ERR;
@@ -1339,30 +1354,27 @@ static void ecp_response_handler(struct bt_esls *esl_obj, enum esl_ecp_command_s
 	}
 
 	buf[0] = esl_obj->resp.resp_op;
+	esl_obj->ecp_notify_params.len = ECP_LEN(esl_obj->resp.resp_op);
 
 	switch (esl_obj->resp.resp_op) {
 	case OP_ERR:
 		LOG_DBG("OP_ERR");
 		buf[1] = esl_obj->resp.error_code;
-		esl_obj->ecp_notify_params.len = 2;
 		break;
 	case OP_LED_STATE:
 		LOG_DBG("OP_LED_STATE");
 		buf[1] = esl_obj->resp.led_idx;
-		esl_obj->ecp_notify_params.len = 2;
 		break;
 	case OP_BASIC_STATE:
 		LOG_DBG("OP_BASIC_STATE");
 		bt_esl_basic_state_update();
 		buf[1] = LOW_BYTE(esl_obj->basic_state);
 		buf[2] = HIGH_BYTE(esl_obj->basic_state);
-		esl_obj->ecp_notify_params.len = 3;
 		break;
 	case OP_DISPLAY_STATE:
 		LOG_DBG("OP_DISPLAY_STATE");
 		buf[1] = esl_obj->resp.display_idx;
 		buf[2] = esl_obj->resp.img_idx;
-		esl_obj->ecp_notify_params.len = 3;
 		break;
 	case OP_SENSOR_VALUE_STATE_MASK:
 		LOG_DBG("OP_SENSOR_VALUE");
@@ -1381,12 +1393,22 @@ static void ecp_response_handler(struct bt_esls *esl_obj, enum esl_ecp_command_s
 				esl_obj->ecp_notify_params.len = 2 + len;
 			}
 		}
+
 		break;
 	default:
-		LOG_DBG("OP_ERR");
-		buf[0] = OP_ERR;
-		buf[1] = ERR_UNSPEC;
-		esl_obj->ecp_notify_params.len = 2;
+		if ((esl_obj->resp.resp_op & OP_VENDOR_SPECIFIC_STATE_MASK)) {
+			LOG_DBG("vendor-specific TAG");
+			if (esl_obj->cb.vs_response_handler) {
+				esl_obj->ecp_notify_params.len =
+					esl_obj->cb.vs_response_handler(buf);
+			}
+		} else {
+			LOG_DBG("OP_ERR");
+			buf[0] = OP_ERR;
+			buf[1] = ERR_UNSPEC;
+			esl_obj->ecp_notify_params.len = 2;
+		}
+
 		break;
 	}
 
@@ -1457,7 +1479,7 @@ static ssize_t esl_addr_write(struct bt_conn *conn, struct bt_gatt_attr const *a
 	}
 
 	/* Check ESL ID sanity*/
-	if (LOW_BYTE(new_esl_addr) == 0xff) {
+	if (LOW_BYTE(new_esl_addr) == ESL_ADDR_BROADCAST) {
 		LOG_ERR("Broadcast esl_id 0xff is not allowaced");
 		return BT_GATT_ERR(BT_ATT_ERR_VALUE_NOT_ALLOWED);
 	}

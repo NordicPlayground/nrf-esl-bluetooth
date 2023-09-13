@@ -56,6 +56,11 @@ if (CONFIG_BT_ESL_IMAGE_AVAILABLE)
 else()
   target_sources(app PRIVATE hw/storage/dummy.c)
 endif()
+
+# Vendor Specific ECP command
+if (CONFIG_BT_ESL_VENDOR_SPECIFIC_SUPPORT)
+  target_sources(app PRIVATE hw/esl_vs_impl.c)
+endif()
 # NORDIC SDK APP END
 
 target_include_directories(app PRIVATE hw)
