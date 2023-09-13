@@ -25,27 +25,27 @@ config BT_ESL_SECURITY_ENABLED
 config BT_ESL_AP_AUTO_MODE
 	bool "AP auto onboarding Tag mode"
 	help
-	  "Enable,AP will auto scan and configure tag. Disable,AP will only accept shell command"
+	  "When enabled, AP auto scans and configures the tag. When disabled, AP only accepts shell commands"
 
 if BT_ESL_AP_AUTO_MODE
 config BT_ESL_AP_AUTO_TAG_PER_GROUP
 	int "Tag per group"
 	default ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER
 	help
-	  "How many tags should keep in same group for auto onboarding.
-	   Tag number exceeds this number should be in next group.
+	  "The number of tags to be kept in same group for auto onboarding.
+	   Tags exceeding this number are placed in next group.
 	   Otherwise, response key is not enough for all tags in same group.
-	   How to choose this number depends on what scenario we want to show.
-	   Less or equal to ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER demostrates decrypts response EAD on-the-fly.
-	   Greater than ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER demostrates ESL AP able to control large amount of tags at the same time."
+	   How to select this number depends on the desired scenario.
+	   Less or equal to ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER decrypts the response EAD on the fly.
+	   Greater than ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER enables the ESL AP to control large amount of tags at the same time."
 
 config BT_ESL_AP_GROUP_PER_BUTTON
-	int "Group per button"
+	int "Groups for one button"
 	default 3
 	help
-	  "How many groups should be controlled by one button.
-	   If this number is greater than 1, AP will control multiple groups by one button.
-	   Otherwise, AP will control one group by one button."
+	  "The number of groups controlled by one button.
+	   If this number is greater than 1, an AP can control multiple groups by one button.
+	   Otherwise, an AP controls one group by one button."
 
 config BT_ESL_AP_AUTO_PING
 	bool "AP auto ping mode"
@@ -65,7 +65,7 @@ endif
 config BT_ESL_AP_AUTO_PAST_TAG
 	bool "AP auto past mode"
 	help
-	  "Enable,AP will auto send update complete command and PAST to unsynchronized tag. Disable,AP will only accept shell command"
+	  "When enabled, the AP sends automatic update complete command and PAST to an unsynchronized tag. When disabled, the AP only accepts shell commands."
 
 config BT_ESL_AP_PTS
 	bool "ESL access point for PTS test"
