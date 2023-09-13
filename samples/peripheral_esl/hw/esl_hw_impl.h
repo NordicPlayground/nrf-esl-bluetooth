@@ -76,6 +76,15 @@ void display_unassociated(uint8_t disp_idx);
  */
 void display_associated(uint8_t disp_idx);
 
+/**
+ * @brief Turns the display GPIO on or off.
+ *
+ * This function should only implement and call when use combination of SPI3 and Zephyr display.
+ * @param onoff A boolean value indicating whether to turn the GPIO on or off.
+ * @return int Returns 0 on success, or a negative error code on failure.
+ */
+int display_gpio_onoff(bool onoff);
+
 #if defined(CONFIG_CHARACTER_FRAMEBUFFER)
 /**
  * @brief Callback @ref display_clear_font() implementation with CFB API.

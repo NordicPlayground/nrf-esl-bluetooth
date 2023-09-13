@@ -61,6 +61,12 @@ endif()
 if (CONFIG_BT_ESL_VENDOR_SPECIFIC_SUPPORT)
   target_sources(app PRIVATE hw/esl_vs_impl.c)
 endif()
+
+# NFC
+if (CONFIG_ESL_NFC_SUPPORT)
+  target_sources(app PRIVATE hw/esl_nfc_impl.c)
+endif()
+
 # NORDIC SDK APP END
 
 target_include_directories(app PRIVATE hw)

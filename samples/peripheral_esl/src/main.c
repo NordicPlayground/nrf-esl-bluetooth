@@ -21,6 +21,14 @@
 #include <zephyr/bluetooth/controller.h>
 #include <zephyr/drivers/led.h>
 #include <zephyr/drivers/gpio.h>
+#include <hal/nrf_gpio.h>
+#include <hal/nrf_power.h>
+#if !NRF_POWER_HAS_RESETREAS
+#include <hal/nrf_reset.h>
+#endif
+#include <zephyr/pm/pm.h>
+#include <zephyr/pm/policy.h>
+
 #include <zephyr/settings/settings.h>
 #include <zephyr/logging/log.h>
 #include <dk_buttons_and_leds.h>
@@ -30,6 +38,10 @@
 #if defined(CONFIG_BT_ESL_VENDOR_SPECIFIC_SUPPORT)
 #include "esl_vs_impl.h"
 #endif /* CONFIG_BT_ESL_VENDOR_SPECIFIC_SUPPORT */
+#if defined(CONFIG_ESL_NFC_SUPPORT)
+#include "esl_nfc_impl.h"
+#endif /* CONFIG_ESL_NFC_SUPPORT */
+
 
 LOG_MODULE_REGISTER(peripheral_esl, CONFIG_PERIPHERAL_ESL_LOG_LEVEL);
 
@@ -128,7 +140,103 @@ static void button_changed(uint32_t button_state, uint32_t has_changed)
 	}
 }
 
-static void configure_gpio(void)
+#if defined(CONFIG_ESL_WAKE_GPIO)
+static void config_wakeup_gpio(void)
+{
+	nrf_gpio_cfg_input(CONFIG_ESL_WAKE_GPIO, NRF_GPIO_PIN_PULLUP);
+	nrf_gpio_cfg_sense_set(CONFIG_ESL_WAKE_GPIO, NRF_GPIO_PIN_SENSE_LOW);
+}
+#endif /* CONFIG_ESL_WAKE_GPIO */
+
+#if defined(CONFIG_ESL_SHIPPING_MODE)
+
+static void system_off(void)
+{
+#if defined(CONFIG_ESL_SHIPPING_WAKE_BY_NFC)
+#define WAKEUP_MSG "Approach an NFC reader to wake up.\n"
+#elif defined(CONFIG_ESL_SHIPPING_WAKE_BY_BOTH)
+#define WAKEUP_MSG "Approach an NFC reader or press the button to wake up.\n"
+#elif defined(CONFIG_ESL_SHIPPING_WAKE_BY_BUTTON)
+#define WAKEUP_MSG "Press the button to wake up.\n"
+#else
+#error "Invalid wake-up configuration"
+#endif
+
+	printk("Entering system off.\n");
+	printk("%s", WAKEUP_MSG);
+
+#if defined(CONFIG_ESL_POWER_PROFILE)
+	/* Get rid of this by not using SPI3 */
+	display_gpio_onoff(false);
+#endif
+	/* Before we disabled entry to deep sleep. Here we need to override
+	 * that, then force a sleep so that the deep sleep takes effect.
+	 */
+	const struct pm_state_info si = {PM_STATE_SOFT_OFF, 0, 0};
+
+	pm_state_force(0, &si);
+
+	/* Going into sleep will actually go to system off mode, because we
+	 * forced it above.
+	 */
+	k_sleep(K_MSEC(1));
+
+	/* k_sleep will never exit, so below two lines will never be executed
+	 * if system off was correct. On the other hand if someting gone wrong
+	 * we will see it on terminal and LED.
+	 */
+	printk("ERROR: System off failed\n");
+}
+
+/**
+ * @brief  Helper function for printing the reason of the last reset.
+ * Can be used to confirm that NCF field actually woke up the system.
+ */
+static uint32_t print_reset_reason(void)
+{
+	uint32_t reas;
+
+#if NRF_POWER_HAS_RESETREAS
+	reas = nrf_power_resetreas_get(NRF_POWER);
+	printk("rr 0x%08x ", reas);
+	nrf_power_resetreas_clear(NRF_POWER, reas);
+	if (reas & NRF_POWER_RESETREAS_NFC_MASK) {
+		printk("Wake up by NFC field detect\n");
+	} else if (reas & NRF_POWER_RESETREAS_RESETPIN_MASK) {
+		printk("Reset by pin-reset\n");
+	} else if (reas & NRF_POWER_RESETREAS_SREQ_MASK) {
+		printk("Reset by soft-reset\n");
+	} else if (reas & NRF_POWER_RESETREAS_OFF_MASK) {
+		printk("Reset by Sense pin\n");
+	} else if (reas) {
+		printk("Reset by a different source (0x%08X)\n", reas);
+	} else {
+		printk("Power-on-reset\n");
+	}
+#else
+	reas = nrf_reset_resetreas_get(NRF_RESET);
+	printk("rr 0x%08x\n", reas);
+	nrf_reset_resetreas_clear(NRF_RESET, reas);
+	if (reas & NRF_RESET_RESETREAS_NFC_MASK) {
+		printk("Wake up by NFC field detect\n");
+	} else if (reas & NRF_RESET_RESETREAS_RESETPIN_MASK) {
+		printk("Reset by pin-reset\n");
+	} else if (reas & NRF_RESET_RESETREAS_SREQ_MASK) {
+		printk("Reset by soft-reset\n");
+	} else if (reas & NRF_RESET_RESETREA_OFF_MASK) {
+		printk("Reset by Sense pin\n");
+	} else if (reas) {
+		printk("Reset by a different source (0x%08X)\n", reas);
+	} else {
+		printk("Power-on-reset\n");
+	}
+#endif
+	return reas;
+}
+
+#endif /* CONFIG_ESL_SHIPPING_MODE */
+
+static void configure_dk_button(void)
 {
 	int err;
 
@@ -138,12 +246,12 @@ static void configure_gpio(void)
 	}
 }
 
-int main(void)
+static int start_execute(void)
 {
-	int err = 0;
+	int err;
 	uint8_t own_addr_type;
 
-	configure_gpio();
+	configure_dk_button();
 	if (IS_ENABLED(CONFIG_BT_ESL_PTS)) {
 		uint8_t pub_addr[] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA};
 
@@ -164,6 +272,14 @@ int main(void)
 	if (IS_ENABLED(CONFIG_SETTINGS)) {
 		settings_load();
 	}
+
+	bt_id_set_scan_own_addr(true, &own_addr_type);
+#if defined(CONFIG_ESL_NFC_SUPPORT)
+	err = esl_msg_update();
+	if (err) {
+		LOG_WRN("esl_msg_update error %d", err);
+	}
+#endif /* CONFIG_ESL_NFC_SUPPORT */
 
 	/* Assign hardware characteristics*/
 	hw_chrc_init(&init_param);
@@ -207,8 +323,6 @@ int main(void)
 		return err;
 	}
 
-	bt_id_set_scan_own_addr(true, &own_addr_type);
-
 	if (IS_ENABLED(CONFIG_BT_ESL_SECURITY_ENABLED)) {
 		err = bt_conn_auth_cb_register(&conn_auth_callbacks);
 		if (err) {
@@ -226,4 +340,36 @@ int main(void)
 	for (;;) {
 		k_sleep(K_FOREVER);
 	}
+}
+
+int main(void)
+{
+	int err;
+
+#if defined(CONFIG_ESL_NFC_SUPPORT)
+	err = esl_nfc_init();
+	if (err) {
+		LOG_WRN("esl_nfc_init error %d", err);
+	}
+#endif /* CONFIG_ESL_NFC_GREETING */
+
+#if defined(CONFIG_ESL_SHIPPING_MODE)
+	uint32_t rr = print_reset_reason();
+
+#if NRF_POWER_HAS_RESETREAS
+	if ((rr & NRF_POWER_RESETREAS_NFC_MASK) || (rr & NRF_POWER_RESETREAS_OFF_MASK)) {
+		return start_execute();
+#else
+	if ((rr & NRF_RESET_RESETREAS_NFC_MASK) || (rr & NRF_RESET_RESETREAS_OFF_MASK)) {
+		return start_execute();
+#endif /* NRF_POWER_HAS_RESETREAS */
+	} else {
+#if defined(CONFIG_ESL_WAKE_GPIO)
+		config_wakeup_gpio();
+#endif /* CONFIG_ESL_WAKE_GPIO */
+		system_off();
+	}
+#else
+	return start_execute();
+#endif /* CONFIG_ESL_SHIPPING_MODE */
 }

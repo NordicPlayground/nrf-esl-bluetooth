@@ -36,7 +36,7 @@ static struct display_buffer_descriptor buf_desc;
 
 #if defined(CONFIG_ESL_POWER_PROFILE)
 /** Turn off SPI and Wavashare gpio to save power */
-static int display_gpio_onoff(bool onoff)
+int display_gpio_onoff(bool onoff)
 {
 	int err;
 

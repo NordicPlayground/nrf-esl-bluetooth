@@ -43,6 +43,47 @@ config ESL_POWER_PROFILE
 	help
 	  Turn off SPI and EPD power when not in use
 
+config ESL_NFC_SUPPORT
+	bool "ESL support NFC"
+	imply NFC_T2T_NRFXLIB
+	imply NFC_NDEF
+	imply NFC_NDEF_MSG
+	imply NFC_NDEF_RECORD
+	imply NFC_NDEF_TEXT_RECORD
+	help
+	  Enable NFC support for ESL peripheral. Use the NFC tag to expose a greeting message record to NFC polling devices.
+	  The message could be MAC address or everthing. Or use NFC to wake up ESL from shipping mode.
+
+config ESL_SHIPPING_MODE
+	bool "ESL shipping mode"
+	help
+	  Make ESL enter system_off immediately. Wake ESL by NFC or button.
+if ESL_SHIPPING_MODE
+choice ESL_SHIPPING_WAKE_BY
+	prompt "ESL shipping mode wake by"
+	default ESL_SHIPPING_WAKE_BY_BOTH
+	help
+	  Select the way to wake up ESL from shipping mode
+	config ESL_SHIPPING_WAKE_BY_NFC
+	bool "NFC could wake ESL"
+
+	config ESL_SHIPPING_WAKE_BY_BUTTON
+		depends on ESL_NFC_SUPPORT
+		bool "Button could wake ESL"
+
+	config ESL_SHIPPING_WAKE_BY_BOTH
+	bool "NFC + Button"
+endchoice # ESL_SHIPPING_WAKE_BY
+
+if ESL_SHIPPING_WAKE_BY_BUTTON || ESL_SHIPPING_WAKE_BY_BOTH
+config ESL_WAKE_GPIO
+	int "GPIO Pin number of wake up button. Use absolute pin number without port number."
+	default 12
+	help
+	  Port 0 as 0, Port1 as 32. Default is P0.12 as button2 on DK board.
+
+endif # WAKE_BY_BUTTON || WAKE_BY_BOTH
+endif # SHIPPING_MODE
 
 module = PERIPHERAL_ESL
 module-str = peripheral esl

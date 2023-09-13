@@ -420,6 +420,15 @@ void bt_esl_factory_reset(void);
  */
 int check_ecp_esl_id(uint8_t esl_id, struct esl_ecp_resp *resp);
 
+/**
+ * @brief Checks if all the required data for configuring the Bluetooth Electronic Shelf Label (ESL)
+ * service object is set.
+ *
+ * @param esl_obj Pointer to the Electronic Shelf Label (ESL) service object.
+ * @return true if all the required data is set, false otherwise.
+ */
+bool esl_is_configuring_state(struct bt_esls *esl_obj);
+
 #ifdef __cplusplus
 }
 #endif
