@@ -166,8 +166,8 @@ static void system_off(void)
 	printk("%s", WAKEUP_MSG);
 
 #if defined(CONFIG_ESL_POWER_PROFILE)
-	/* Get rid of this by not using SPI3 */
-	display_gpio_onoff(false);
+	/* Get rid of this by using user own driver */
+	display_epd_onoff(EPD_POWER_OFF_IMMEDIATELY);
 #endif
 	/* Before we disabled entry to deep sleep. Here we need to override
 	 * that, then force a sleep so that the deep sleep takes effect.
@@ -344,9 +344,9 @@ static int start_execute(void)
 
 int main(void)
 {
+#if defined(CONFIG_ESL_NFC_SUPPORT)
 	int err;
 
-#if defined(CONFIG_ESL_NFC_SUPPORT)
 	err = esl_nfc_init();
 	if (err) {
 		LOG_WRN("esl_nfc_init error %d", err);

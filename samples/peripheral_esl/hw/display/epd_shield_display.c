@@ -16,6 +16,8 @@
 
 LOG_MODULE_DECLARE(peripheral_esl);
 #if DT_HAS_COMPAT_STATUS_OKAY(solomon_ssd16xxfb)
+/* Choose this value according EPD datasheet */
+#define SSD16XX_FULL_UPDATE_TIME 3500
 #define DT_DRV_COMPAT solomon_ssd16xxfb
 #endif /* DT_HAS_COMPAT_STATUS_OKAY(solomon_ssd16xxfb) */
 
@@ -29,6 +31,7 @@ const struct device *display_dev;
 const struct device *spi = DEVICE_DT_GET(DT_NODELABEL(arduino_spi));
 const struct gpio_dt_spec reset_gpio = GPIO_DT_SPEC_INST_GET(0, reset_gpios);
 const struct gpio_dt_spec dc_gpio = GPIO_DT_SPEC_INST_GET(0, dc_gpios);
+const struct gpio_dt_spec busy_gpio = GPIO_DT_SPEC_INST_GET(0, busy_gpios);
 PINCTRL_DT_DEFINE(DT_NODELABEL(arduino_spi));
 const struct pinctrl_dev_config *pcfg = PINCTRL_DT_DEV_CONFIG_GET(DT_NODELABEL(arduino_spi));
 static struct display_capabilities capabilities;
@@ -36,11 +39,11 @@ static struct display_buffer_descriptor buf_desc;
 
 #if defined(CONFIG_ESL_POWER_PROFILE)
 /** Turn off SPI and Wavashare gpio to save power */
-int display_gpio_onoff(bool onoff)
+int display_epd_onoff(uint8_t mode)
 {
 	int err;
 
-	if (onoff) {
+	if (mode == EPD_POWER_ON) {
 		err = gpio_pin_configure_dt(&reset_gpio, GPIO_OUTPUT_INACTIVE);
 		if (err < 0) {
 			LOG_ERR("Failed to configure reset GPIO");
@@ -54,13 +57,19 @@ int display_gpio_onoff(bool onoff)
 		}
 
 		(void)pm_device_action_run(spi, PM_DEVICE_ACTION_RESUME);
-	} else {
+	} else if (mode == EPD_POWER_OFF || mode == EPD_POWER_OFF_IMMEDIATELY) {
 		(void)pm_device_action_run(spi, PM_DEVICE_ACTION_SUSPEND);
 		*(volatile uint32_t *)(DT_REG_ADDR(DT_NODELABEL(arduino_spi)) | 0xFFC) = 0;
 		*(volatile uint32_t *)(DT_REG_ADDR(DT_NODELABEL(arduino_spi)) | 0xFFC);
 		*(volatile uint32_t *)(DT_REG_ADDR(DT_NODELABEL(arduino_spi)) | 0xFFC) = 1;
 
-		err = gpio_pin_configure_dt(&reset_gpio, GPIO_DISCONNECTED);
+		/* turn off EPD after full update otherwise immediately */
+		if (mode == EPD_POWER_OFF) {
+			k_msleep(SSD16XX_FULL_UPDATE_TIME);
+		}
+
+		err = gpio_pin_set_dt(&reset_gpio, 1);
+
 		if (err < 0) {
 			LOG_ERR("Failed to configure reset GPIO disconneted");
 			return err;
@@ -72,14 +81,18 @@ int display_gpio_onoff(bool onoff)
 			return err;
 		}
 
+		err = gpio_pin_configure_dt(&busy_gpio, GPIO_DISCONNECTED);
+		if (err < 0) {
+			LOG_ERR("Failed to configure Busy GPIO disconneted");
+			return err;
+		}
+
 		/* SPI related pin need to be disconnect after SPI module powered off */
 		err = pinctrl_apply_state(pcfg, PINCTRL_STATE_SLEEP);
 		if (err < 0) {
 			return err;
 		}
 	}
-
-	LOG_DBG("display_gpio_onoff leave");
 
 	return 0;
 }
@@ -133,7 +146,7 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 	int err, rc;
 
 #if defined(CONFIG_ESL_POWER_PROFILE)
-	display_gpio_onoff(true);
+	display_epd_onoff(EPD_POWER_ON);
 #if DT_HAS_COMPAT_STATUS_OKAY(solomon_ssd16xxfb)
 	/**
 	 * To optimize power remove static declaration of ssd16xx_init in
@@ -141,8 +154,9 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 	 **/
 	ssd16xx_init(display_dev);
 #endif /* DT_HAS_COMPAT_STATUS_OKAY(solomon_ssd16xxfb) */
-	LOG_DBG("display %d img %d on/off %d", disp_idx, img_idx, enable);
 #endif /* ESL_POWER_PROFILE */
+
+	LOG_DBG("display %d img %d on/off %d", disp_idx, img_idx, enable);
 
 	/* Load image to buffer for all kind of E-paper*/
 	memset(esl_obj->img_obj_buf, 0, CONFIG_ESL_IMAGE_BUFFER_SIZE);
@@ -175,7 +189,7 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 	display_blanking_off(display_dev);
 	LOG_DBG("Use Raw display interface API");
 #if defined(CONFIG_ESL_POWER_PROFILE)
-	display_gpio_onoff(false);
+	display_epd_onoff(EPD_POWER_OFF);
 #endif
 	return 0;
 }
@@ -194,7 +208,7 @@ void display_unassociated(uint8_t disp_idx)
 
 	bt_addr_to_str(&oob.addr.a, tag_str, sizeof(tag_str));
 #if defined(CONFIG_ESL_POWER_PROFILE)
-	display_gpio_onoff(true);
+	display_epd_onoff(EPD_POWER_ON);
 #if DT_HAS_COMPAT_STATUS_OKAY(solomon_ssd16xxfb)
 	/**
 	 * To optimize power remove static declaration of ssd16xx_init in
@@ -224,7 +238,7 @@ void display_unassociated(uint8_t disp_idx)
 #endif /* CONFIG_CHARACTER_FRAMEBUFFER */
 
 #if defined(CONFIG_ESL_POWER_PROFILE)
-	display_gpio_onoff(false);
+	display_epd_onoff(EPD_POWER_OFF);
 #endif
 }
 
@@ -232,7 +246,7 @@ void display_associated(uint8_t disp_idx)
 {
 
 #if defined(CONFIG_ESL_POWER_PROFILE)
-	display_gpio_onoff(true);
+	display_epd_onoff(EPD_POWER_ON);
 #if DT_HAS_COMPAT_STATUS_OKAY(solomon_ssd16xxfb)
 	/**
 	 * To optimize power remove static declaration of ssd16xx_init in
@@ -264,7 +278,7 @@ void display_associated(uint8_t disp_idx)
 #endif /* CONFIG_CHARACTER_FRAMEBUFFER */
 
 #if defined(CONFIG_ESL_POWER_PROFILE)
-	display_gpio_onoff(false);
+	display_epd_onoff(EPD_POWER_OFF);
 #endif
 }
 
@@ -273,7 +287,7 @@ int display_clear_cfb(uint8_t disp_idx)
 {
 	int err;
 #if defined(CONFIG_ESL_POWER_PROFILE)
-	display_gpio_onoff(true);
+	display_epd_onoff(EPD_POWER_ON);
 #endif /* CONFIG_ESL_POWER_PROFILE */
 	ARG_UNUSED(disp_idx);
 	err = cfb_framebuffer_clear(display_dev, true);
@@ -281,7 +295,7 @@ int display_clear_cfb(uint8_t disp_idx)
 		LOG_ERR("cfb_framebuffer_clear (rc %d)", err);
 	}
 #if defined(CONFIG_ESL_POWER_PROFILE)
-	display_gpio_onoff(false);
+	display_epd_onoff(EPD_POWER_OFF);
 #endif /* CONFIG_ESL_POWER_PROFILE */
 	return err;
 }
@@ -303,7 +317,7 @@ int display_update_cfb(uint8_t disp_idx)
 {
 	int err;
 #if defined(CONFIG_ESL_POWER_PROFILE)
-	display_gpio_onoff(true);
+	display_epd_onoff(EPD_POWER_ON);
 #endif /* CONFIG_ESL_POWER_PROFILE */
 	ARG_UNUSED(disp_idx);
 	err = cfb_framebuffer_finalize(display_dev);
@@ -312,7 +326,7 @@ int display_update_cfb(uint8_t disp_idx)
 	}
 
 #if defined(CONFIG_ESL_POWER_PROFILE)
-	display_gpio_onoff(false);
+	display_epd_onoff(EPD_POWER_OFF);
 #endif /* CONFIG_ESL_POWER_PROFILE */
 	return err;
 }
