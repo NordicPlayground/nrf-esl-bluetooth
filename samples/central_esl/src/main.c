@@ -292,7 +292,7 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 
 	if (button & DK_BTN2_MSK) {
 #if defined(CONFIG_BT_ESL_TAG_STORAGE)
-		bt_c_esl_unbond(-1);
+		bt_c_esl_unbond_all();
 		remove_all_tags_in_storage();
 #endif
 	}

@@ -473,16 +473,29 @@ int bt_esl_c_display_control(struct bt_esl_client *esl_c, uint8_t conn_idx, uint
 int bt_esl_c_led_control(struct bt_esl_client *esl_c, uint8_t conn_idx, uint8_t led_idx,
 			 struct led_obj *led, bool timed, uint32_t abs_time);
 
-/** @brief Clear bonding data
+/**
+ * Unbond the specified ESL by BLE address.
  *
- * Ask AP to clear bonding data for current ACL connection
- *
- * @param[in] conn_idx Index of ACL connection to remove bond. -1 means remove all of bonding data.
- *
- * @retval 0 If the operation was successful.
- *           Otherwise, a negative error code is returned.
+ * @param addr The address of the device to unbond.
+ * @return 0 on success, or a negative error code on failure.
  */
-int bt_c_esl_unbond(int conn_idx);
+int bt_c_esl_unbond(const bt_addr_le_t *addr);
+
+/**
+ * Unbond all ESL Tags.
+ *
+ * @return 0 if successful, otherwise an error code.
+ */
+int bt_c_esl_unbond_all(void);
+
+/**
+ * Unbonds an ESL device with the specified ESL address.
+ * Look up ESL tag BLE address in the tag DB and unbond it.
+ *
+ * @param esl_addr The ESL address of the device to unbond.
+ * @return 0 if the device was successfully unbonded, or a negative error code otherwise.
+ */
+int bt_c_esl_unbond_by_esl_addr(uint16_t esl_addr);
 
 /** @brief Start/stop to scan ESL service.
  *

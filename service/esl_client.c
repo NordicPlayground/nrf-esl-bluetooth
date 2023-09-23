@@ -192,7 +192,14 @@ uint16_t esl_c_tags_per_group =
 uint8_t groups_per_button =
 	COND_CODE_1(CONFIG_BT_ESL_AP_AUTO_MODE, (CONFIG_BT_ESL_AP_GROUP_PER_BUTTON), 1);
 bool esl_c_write_wo_rsp;
-/* 0 = PAST success, 1 = no need PAST, non-zero means error */
+
+/**
+ * @brief This function checks if Auto PAST is needed and sends PAST if necessary.
+ *
+ * @param conn_idx The index of the connection.
+ * @return int Returns 0 if PAST is successful, 1 if no PAST is needed, and non-zero if there is an
+ * error.
+ */
 static int esl_c_past_unsynced_tag(uint8_t conn_idx);
 
 int esl_c_push_sync_to_controller(uint8_t group_id, uint8_t count)
@@ -2483,7 +2490,6 @@ void esl_ap_pawr_work_fn(struct k_work *work)
 	bt_le_ext_adv_stop(adv_pawr);
 }
 
-/* 0 = PAST success, 1 = no need PAST, non-zero means error */
 static int esl_c_past_unsynced_tag(uint8_t conn_idx)
 {
 	int ret;
@@ -2598,17 +2604,47 @@ int bt_c_esl_unassociate(struct bt_esl_client *esl_c, uint8_t conn_idx)
 	return err;
 }
 
-int bt_c_esl_unbond(int conn_idx)
+int bt_c_esl_unbond(const bt_addr_le_t *addr)
+{
+	int err;
+	char addr_str[BT_ADDR_LE_STR_LEN];
+
+	bt_addr_le_to_str(addr, addr_str, sizeof(addr_str));
+	err = bt_unpair(BT_ID_DEFAULT, addr);
+	if (err) {
+		LOG_ERR("Unbond %s failed (err %d)", addr_str, err);
+	}
+
+	return err;
+}
+int bt_c_esl_unbond_all(void)
 {
 	int err;
 
-	if (conn_idx == -1) {
-		err = bt_unpair(BT_ID_DEFAULT, BT_ADDR_LE_ANY);
-	} else if (conn_idx < CONFIG_BT_ESL_PERIPHERAL_MAX) {
-		err = bt_unpair(BT_ID_DEFAULT, &esl_c_obj_l->gatt[conn_idx].esl_device.ble_addr);
-	} else {
-		LOG_ERR("invalid conn_idx");
-		err = -EINVAL;
+	err = bt_unpair(BT_ID_DEFAULT, BT_ADDR_LE_ANY);
+	if (err) {
+		LOG_ERR("Unbond all failed (err %d)", err);
+	}
+
+	return err;
+}
+
+int bt_c_esl_unbond_by_esl_addr(uint16_t esl_addr)
+{
+	int err;
+	bt_addr_le_t addr;
+	char addr_str[BT_ADDR_LE_STR_LEN];
+
+	err = find_tag_in_storage_with_esl_addr(esl_addr, &addr);
+	if (err) {
+		LOG_ERR("ESL address is not in tag DB (err %d)", err);
+		return err;
+	}
+
+	bt_addr_le_to_str(&addr, addr_str, sizeof(addr_str));
+	err = bt_unpair(BT_ID_DEFAULT, &addr);
+	if (err) {
+		LOG_ERR("Unbond %s failed (err %d)", addr_str, err);
 	}
 
 	return err;
@@ -3158,7 +3194,7 @@ int bt_esl_c_reset_ap(void)
 		memset(&esl_c_obj_l->gatt[idx].esl_device, 0, sizeof(struct bt_esl_chrc_data));
 	}
 
-	err = bt_c_esl_unbond(-1);
+	(void)bt_c_esl_unbond_all();
 #if defined(BT_ESL_TAG_STORAGE)
 	err = remove_all_tags_in_storage();
 #endif /* (CONFIG_BT_ESL_TAG_STORAGE) */
