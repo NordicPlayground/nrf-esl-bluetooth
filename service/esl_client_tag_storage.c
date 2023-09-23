@@ -337,7 +337,6 @@ int load_all_tags_in_storage(uint8_t group_id)
 	return rc;
 }
 
-/* type 0 list esl, type 1 list ble*/
 int list_tags_in_storage(uint8_t type)
 {
 	int rc;
@@ -404,6 +403,13 @@ int remove_tag_in_storage(uint16_t esl_addr, const bt_addr_le_t *peer_addr)
 
 		bt_addr_to_str(&ble_addr.a, addr, BT_ADDR_STR_LEN);
 		LOG_INF("find addr %s", addr);
+	} else {
+		bt_addr_le_copy(&ble_addr, peer_addr);
+	}
+
+	rc = bt_c_esl_unbond(&ble_addr);
+	if (rc) {
+		LOG_ERR("FAIL: bt_c_esl_unbond %s: %d", addr, rc);
 	}
 
 	fs_file_t_init(&file);

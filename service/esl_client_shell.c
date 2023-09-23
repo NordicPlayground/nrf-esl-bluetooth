@@ -39,6 +39,40 @@ static struct {
 	const struct shell *shell;
 } context;
 
+static int esl_c_argv_to_ble_addr(char *argv[], bt_addr_le_t *peer_addr)
+{
+	/**
+	 * #define BT_ADDR_LE_PUBLIC       0x00
+	 * #define BT_ADDR_LE_RANDOM       0x01
+	 * #define BT_ADDR_LE_PUBLIC_ID    0x02
+	 * #define BT_ADDR_LE_RANDOM_ID    0x03
+	 * #define BT_ADDR_LE_UNRESOLVED   0xFE Resolvable Private Address (Controller unable to
+	 * resolve) #define BT_ADDR_LE_ANONYMOUS    0xFF (anonymous advertisement)
+	 **/
+	uint8_t addr_type = strtol(argv[1], NULL, 16);
+	int ret;
+
+	switch (addr_type) {
+	case BT_ADDR_LE_PUBLIC:
+		ret = bt_addr_le_from_str(argv[2], "public", peer_addr);
+		break;
+	case BT_ADDR_LE_PUBLIC_ID:
+		ret = bt_addr_le_from_str(argv[2], "public-id", peer_addr);
+		break;
+	case BT_ADDR_LE_RANDOM_ID:
+		ret = bt_addr_le_from_str(argv[2], "random-id", peer_addr);
+		break;
+	case BT_ADDR_LE_RANDOM:
+		ret = bt_addr_le_from_str(argv[2], "random", peer_addr);
+		break;
+	default:
+		shell_fprintf(context.shell, SHELL_ERROR, "Invalid address type %d\n", addr_type);
+		ret = -EINVAL;
+	}
+
+	return ret;
+}
+
 static int cmd_esl_c_state(const struct shell *shell, size_t argc, char *argv[])
 {
 	shell_fprintf(shell, SHELL_NORMAL, "ESL client state ? there is no such thing\n");
@@ -115,7 +149,24 @@ static int cmd_esl_c_unbond_all(const struct shell *shell, size_t argc, char *ar
 {
 	int err;
 
-	err = bt_c_esl_unbond(-1);
+	err = bt_c_esl_unbond_all();
+
+	return err;
+}
+
+static int cmd_esl_c_unbond_ble(const struct shell *shell, size_t argc, char *argv[])
+{
+	int err;
+	bt_addr_le_t peer_addr;
+
+	err = esl_c_argv_to_ble_addr(argv, &peer_addr);
+	if (err) {
+		shell_fprintf(shell, SHELL_ERROR, "Create BLE Addr failed %d %s %d", peer_addr.type,
+			      argv[2], err);
+		return err;
+	}
+
+	err = bt_c_esl_unbond(&peer_addr);
 
 	return err;
 }
@@ -365,42 +416,20 @@ static int cmd_acl_connect_addr(const struct shell *shell, size_t argc, char *ar
 		shell_fprintf(shell, SHELL_ERROR, "no valid parameter <address_type><address>\n");
 		return -ENOEXEC;
 	}
-	/**
-	 * #define BT_ADDR_LE_PUBLIC       0x00
-	 * #define BT_ADDR_LE_RANDOM       0x01
-	 * #define BT_ADDR_LE_PUBLIC_ID    0x02
-	 * #define BT_ADDR_LE_RANDOM_ID    0x03
-	 * #define BT_ADDR_LE_UNRESOLVED   0xFE Resolvable Private Address (Controller unable to
-	 *resolve) #define BT_ADDR_LE_ANONYMOUS    0xFF (anonymous advertisement)
-	 **/
-	uint8_t addr_type = strtol(argv[1], NULL, 16);
+
+	int ret;
 	bt_addr_le_t peer_addr;
 	uint16_t esl_addr = ESL_ADDR_BROADCAST;
-	int ret;
 	char addr[BT_ADDR_LE_STR_LEN];
 
-	switch (addr_type) {
-	case BT_ADDR_LE_PUBLIC:
-		ret = bt_addr_le_from_str(argv[2], "public", &peer_addr);
-		break;
-	case BT_ADDR_LE_PUBLIC_ID:
-		ret = bt_addr_le_from_str(argv[2], "public-id", &peer_addr);
-		break;
-	case BT_ADDR_LE_RANDOM_ID:
-		ret = bt_addr_le_from_str(argv[2], "random-id", &peer_addr);
-		break;
-	case BT_ADDR_LE_RANDOM:
-	default:
-		ret = bt_addr_le_from_str(argv[2], "random", &peer_addr);
-		break;
-	}
+	ret = esl_c_argv_to_ble_addr(argv, &peer_addr);
 
 	if (argc > 3) {
 		esl_addr = strtol(argv[3], NULL, 16);
 	}
 
 	if (ret != 0) {
-		shell_fprintf(shell, SHELL_ERROR, "Create BLE Addr failed %d %s %d", addr_type,
+		shell_fprintf(shell, SHELL_ERROR, "Create BLE Addr failed %d %s %d", peer_addr.type,
 			      argv[2], ret);
 	} else {
 		bt_addr_le_to_str(&peer_addr, addr, sizeof(addr));
@@ -917,7 +946,7 @@ static int cmd_esl_c_reset_ap(const struct shell *shell, size_t argc, char *argv
 }
 
 #if defined(CONFIG_BT_ESL_TAG_STORAGE)
-static int cmd_esl_c_remove_tags(const struct shell *shell, size_t argc, char *argv[])
+static int cmd_esl_c_remove_all_tags(const struct shell *shell, size_t argc, char *argv[])
 {
 	int err;
 
@@ -1020,6 +1049,29 @@ static int cmd_acl_connect_esl(const struct shell *shell, size_t argc, char *arg
 
 	return 0;
 }
+
+static int cmd_esl_c_unbond_esl(const struct shell *shell, size_t argc, char *argv[])
+{
+	if (argc < 2) {
+		shell_fprintf(shell, SHELL_ERROR, "no valid parameter <esl_addr>\n");
+		return -ENOEXEC;
+	}
+
+	uint16_t esl_addr = strtol(argv[1], NULL, 16);
+	int ret;
+
+	ret = bt_c_esl_unbond_by_esl_addr(esl_addr);
+
+	if (ret != 0) {
+		shell_fprintf(shell, SHELL_ERROR, "Could not found tag esl_addr 0%04x (ret %d)",
+			      esl_addr, ret);
+	} else {
+		shell_fprintf(shell, SHELL_NORMAL, "Unbond tag esl_addr 0x%04x\n", esl_addr);
+	}
+
+	return 0;
+}
+
 #endif /* CONFIG_BT_ESL_TAG_STORAGE */
 
 static int cmd_acl_write_wo_rsp(const struct shell *shell, size_t argc, char *argv[])
@@ -1334,6 +1386,7 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 	SHELL_CMD(force_un, NULL, "ESL AP unassociate tag command", cmd_esl_c_force_unassociated),
 	SHELL_CMD(bond_dump, NULL, "ESL AP bond tags dump command", cmd_esl_c_bond_dump),
 	SHELL_CMD(unbond_all, NULL, "ESL AP unbond all tags debug command", cmd_esl_c_unbond_all),
+	SHELL_CMD(unbond_ble, NULL, "ESL AP unbond tag with ble addr", cmd_esl_c_unbond_ble),
 	SHELL_CMD(ap_abs, NULL, "ESL AP change AP absolute timer tick", cmd_esl_abs),
 	SHELL_CMD(update_abs, NULL, "ESL AP change TAG absolute timer tick", cmd_esl_c_update_abs),
 	SHELL_CMD(led, NULL, "ESL AP control tag led", cmd_esl_c_led),
@@ -1349,8 +1402,8 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 	SHELL_CMD(update_complete, NULL, "ESL AP ECP Update Complete", cmd_esl_c_update_complete),
 	SHELL_CMD(auto_ap, NULL, "ESL AP Auto mode toggle", cmd_auto_ap),
 #if defined(CONFIG_BT_ESL_TAG_STORAGE)
-	SHELL_CMD(remove_tags, NULL, "ESL AP remove tags esl address in storage DB",
-		  cmd_esl_c_remove_tags),
+	SHELL_CMD(remove_all_tags, NULL, "ESL AP remove tags esl address in storage DB",
+		  cmd_esl_c_remove_all_tags),
 	SHELL_CMD(list_tags_storage, NULL, "ESL AP list Tag in ESL address format",
 		  cmd_esl_c_list_tags),
 	SHELL_CMD(remove_tag, NULL, "ESL AP remove tag in storage DB", cmd_esl_c_remove_tag),
@@ -1359,6 +1412,7 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 	SHELL_CMD(groups_per_button, NULL,
 		  "ESL AP set/get how many groups could be controlled by button",
 		  cmd_groups_per_button),
+	SHELL_CMD(unbond_esl, NULL, "ESL AP unbond tag with esl addr", cmd_esl_c_unbond_esl),
 #endif /* CONFIG_BT_ESL_TAG_STROAGE */
 	SHELL_CMD(obj_c, &obj_c_cmds, "Object Transfer client commands", NULL),
 	SHELL_CMD(acl, &acl_cmds, "ESL ACL commands", NULL),
