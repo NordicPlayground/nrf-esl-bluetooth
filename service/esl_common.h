@@ -7,6 +7,8 @@
 #ifndef BT_ESL_COMMON_H_
 #define BT_ESL_COMMON_H_
 
+#include <host/keys.h>
+
 /**
  * @file
  * @defgroup bt_esl Electronics Shelf Label (ESL) GATT Service

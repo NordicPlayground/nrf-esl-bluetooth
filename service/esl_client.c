@@ -488,7 +488,7 @@ static void esl_auto_ap_connect_work_fn(void *p1, void *p2, void *p3)
 		}
 
 		if (sys_slist_peek_head(&esl_c_obj_l->scanned_tag_addr_list) == NULL) {
-			k_msleep(100);
+			k_msleep(CONFIG_ESL_SUBEVENT_INTERVAL);
 			continue;
 		}
 
@@ -1256,8 +1256,11 @@ static int esl_c_scan_init(void)
 {
 	int err;
 	uint8_t mode = BT_SCAN_UUID_FILTER;
+	struct bt_le_scan_param *scan_param =
+		BT_LE_SCAN_PARAM(BT_LE_SCAN_TYPE_PASSIVE, BT_LE_SCAN_OPT_FILTER_DUPLICATE,
+				 CONFIG_ESL_SUBEVENT_INTERVAL, CONFIG_ESL_SUBEVENT_INTERVAL / 2);
 	struct bt_scan_init_param scan_init = {
-		.scan_param = NULL,
+		.scan_param = scan_param,
 		.conn_param = BT_LE_CONN_PARAM_DEFAULT,
 		.connect_if_match = 0,
 	};
@@ -1311,7 +1314,9 @@ static void ecp_rsp_handler(uint8_t conn_idx, struct bt_esl_client *esl_obj, con
 	case OP_BASIC_STATE:
 		LOG_DBG("OP_BASIC_STATE\n");
 		esl_obj->gatt[conn_idx].basic_state = sys_get_le16(command + 1);
-		printk("#BASIC_STATE:1,0x%04x\n", esl_c_obj_l->gatt[conn_idx].esl_device.esl_addr);
+		printk("#BASIC_STATE:1,0x%04x,0x%04lx\n",
+		       esl_c_obj_l->gatt[conn_idx].esl_device.esl_addr,
+		       esl_obj->gatt[conn_idx].basic_state);
 		print_basic_state((atomic_t)esl_obj->gatt[conn_idx].basic_state);
 		if (ecp_command[0] == OP_UNASSOCIATE) {
 			bt_c_esl_post_unassociate(esl_c_obj_l->pending_unassociated_tag);
@@ -2526,10 +2531,25 @@ static void esl_tag_load_work_fn(struct k_work *work)
 	struct esl_tag_load_work_info *tag_work =
 		CONTAINER_OF(dwork, struct esl_tag_load_work_info, work);
 
-	LOG_INF("load tag begin");
-	load_tag_in_storage(tag_work->ble_addr, &esl_c_obj_l->gatt[tag_work->conn_idx].esl_device);
-	LOG_INF("load tag end");
+	(void)load_tag_in_storage(tag_work->ble_addr,
+				  &esl_c_obj_l->gatt[tag_work->conn_idx].esl_device);
 }
+
+int esl_c_import_bt_key(struct bt_keys *new_key)
+{
+	int err;
+
+	err = bt_keys_store(new_key);
+	if (err) {
+		LOG_WRN("bt_keys_store failed(err %d)", err);
+	}
+
+	/* reload settings to make new bt key working */
+	settings_load();
+
+	return err;
+}
+
 #endif /* (CONFIG_BT_ESL_TAG_STORAGE) */
 
 /* 6.1.1 Configure or reconfigure an ESL procedure */
@@ -2991,6 +3011,17 @@ int esl_c_connect(const bt_addr_le_t *peer_addr, uint16_t esl_addr)
 		esl_c_scan(false, esl_c_obj_l->scan_one_shot);
 	}
 
+	/* Load bt keys from tag DB since there is limitation of max paired device */
+#if defined(CONFIG_BT_ESL_TAG_BT_KEY_STORAGE)
+	struct bt_keys bt_key;
+
+	ret = load_bt_key_in_storage(peer_addr, &bt_key);
+	if (!ret) {
+		LOG_INF("Load bt key from tag DB %d", ret);
+		(void)esl_c_import_bt_key(&bt_key);
+	}
+
+#endif
 	if (LOW_BYTE(esl_addr) == ESL_ADDR_BROADCAST) {
 		ret = bt_conn_le_create(peer_addr, create_param, conn_param,
 					&esl_c_obj_l->conn[conn_idx]);

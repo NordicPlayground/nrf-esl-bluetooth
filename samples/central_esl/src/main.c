@@ -27,6 +27,8 @@
 #include <dk_buttons_and_leds.h>
 
 #include "esl_client.h"
+#include "esl_client_tag_storage.h"
+#include "esl_dummy_cmd.h"
 
 LOG_MODULE_REGISTER(central_esl, CONFIG_CENTRAL_ESL_LOG_LEVEL);
 
