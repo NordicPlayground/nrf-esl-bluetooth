@@ -32,6 +32,10 @@ if (CONFIG_SSD16XX)
   target_sources(app PRIVATE hw/display/epd_shield_display.c)
 endif()
 
+if (CONFIG_UC81XX)
+  target_sources(app PRIVATE hw/display/epd_shield_uc81xx_display.c)
+endif()
+
 if (CONFIG_ESL_SIMULATE_DISPLAY)
   target_sources(app PRIVATE hw/display/led_display.c)
 endif()
@@ -44,7 +48,11 @@ endif()
 target_sources(app PRIVATE hw/sensor/sensor.c)
 
 # LED HW implementation
-target_sources(app PRIVATE hw/led/led.c)
+if (CONFIG_BT_ESL_LED_MAX EQUAL 0)
+  target_sources(app PRIVATE hw/led/dummy_led.c)
+else()
+  target_sources(app PRIVATE hw/led/led.c)
+endif()
 
 # Storage HW implementation
 if (CONFIG_BT_ESL_IMAGE_AVAILABLE)

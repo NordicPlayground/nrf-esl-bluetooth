@@ -1,0 +1,38 @@
+/*
+ * Copyright (c) 2023 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/delete-node/ &storage_partition;
+/ {
+    fstab {
+        compatible = "zephyr,fstab";
+        lfs1: lfs1 {
+            compatible = "zephyr,fstab,littlefs";
+            mount-point = "/ots_image";
+            partition = <&lfs1_part>;
+            read-size = <16>;
+            prog-size = <16>;
+            cache-size = <64>;
+            lookahead-size = <32>;
+            block-cycles = <512>;
+        };
+    };
+};
+
+&flash0 {
+    partitions {
+        compatible = "fixed-partitions";
+        #address-cells = <1>;
+        #size-cells = <1>;
+        storage_partition: partition@6e000 {
+            label = "storage";
+            reg = <0x6e000 0x2000>;
+        };
+        lfs1_part: partition@70000 {
+            label = "littlefs_storage";
+            reg = <0x70000 0x10000>;
+        };
+    };
+};
