@@ -26,8 +26,7 @@
 #if !NRF_POWER_HAS_RESETREAS
 #include <hal/nrf_reset.h>
 #endif
-#include <zephyr/pm/pm.h>
-#include <zephyr/pm/policy.h>
+#include <zephyr/sys/poweroff.h>
 
 #include <zephyr/settings/settings.h>
 #include <zephyr/logging/log.h>
@@ -169,23 +168,7 @@ static void system_off(void)
 	/* Get rid of this by using user own driver */
 	display_epd_onoff(EPD_POWER_OFF_IMMEDIATELY);
 #endif
-	/* Before we disabled entry to deep sleep. Here we need to override
-	 * that, then force a sleep so that the deep sleep takes effect.
-	 */
-	const struct pm_state_info si = {PM_STATE_SOFT_OFF, 0, 0};
-
-	pm_state_force(0, &si);
-
-	/* Going into sleep will actually go to system off mode, because we
-	 * forced it above.
-	 */
-	k_sleep(K_MSEC(1));
-
-	/* k_sleep will never exit, so below two lines will never be executed
-	 * if system off was correct. On the other hand if someting gone wrong
-	 * we will see it on terminal and LED.
-	 */
-	printk("ERROR: System off failed\n");
+	sys_poweroff();
 }
 
 /**

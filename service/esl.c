@@ -1921,7 +1921,7 @@ static int ots_create_obj(void)
 static int ots_init_func(void)
 {
 	int err;
-	struct bt_ots_init ots_init;
+	struct bt_ots_init_param ots_init;
 
 	esl_obj_l->ots = bt_ots_free_instance_get();
 	if (!esl_obj_l->ots) {
@@ -1959,7 +1959,7 @@ void bt_esl_delete_images(void)
 			esl_obj_l->stored_image_size[idx] = 0;
 			err = bt_ots_obj_delete(esl_obj_l->ots, idx + BT_OTS_OBJ_ID_MIN);
 			if (err != 0) {
-				LOG_ERR("delete obj 0x %08x failed (err %d)",
+				LOG_ERR("delete obj 0x %08llx failed (err %d)",
 					idx + BT_OTS_OBJ_ID_MIN, err);
 			}
 			obj_cnt--;
