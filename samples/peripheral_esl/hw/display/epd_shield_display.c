@@ -149,7 +149,7 @@ int display_init(void)
 int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 {
 	ARG_UNUSED(disp_idx);
-	+size_t img_size;
+	size_t img_size;
 	struct waveshare_gray_head *img_head;
 	struct bt_esls *esl_obj = esl_get_esl_obj();
 	int err;
