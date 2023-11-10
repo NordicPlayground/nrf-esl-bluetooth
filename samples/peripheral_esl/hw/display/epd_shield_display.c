@@ -28,12 +28,21 @@ static uint8_t font_height;
 #endif /* CONFIG_CHARACTER_FRAMEBUFFER */
 
 const struct device *display_dev;
-const struct device *spi = DEVICE_DT_GET(DT_NODELABEL(arduino_spi));
+/* nRF52 family Devkit has arduino header as SPI interface */
+#if IS_ENABLED(CONFIG_DT_HAS_ARDUINO_HEADER_R3_ENABLED)
+#define SPI_NODE DT_NODELABEL(arduino_spi)
+/* nRF54L Devkit uses SPI00 for now */
+#elif IS_ENABLED(CONFIG_NRFX_SPIM00)
+#define SPI_NODE DT_NODELABEL(spi00)
+#else
+#error "No SPI node found"
+#endif /* CONFIG_DT_HAS_ARDUINO_HEADER_R3_ENABLED */
+const struct device *spi = DEVICE_DT_GET(SPI_NODE);
 const struct gpio_dt_spec reset_gpio = GPIO_DT_SPEC_INST_GET(0, reset_gpios);
 const struct gpio_dt_spec dc_gpio = GPIO_DT_SPEC_INST_GET(0, dc_gpios);
 const struct gpio_dt_spec busy_gpio = GPIO_DT_SPEC_INST_GET(0, busy_gpios);
-PINCTRL_DT_DEFINE(DT_NODELABEL(arduino_spi));
-const struct pinctrl_dev_config *pcfg = PINCTRL_DT_DEV_CONFIG_GET(DT_NODELABEL(arduino_spi));
+PINCTRL_DT_DEFINE(SPI_NODE);
+const struct pinctrl_dev_config *pcfg = PINCTRL_DT_DEV_CONFIG_GET(SPI_NODE);
 static struct display_capabilities capabilities;
 static struct display_buffer_descriptor buf_desc;
 

@@ -569,6 +569,8 @@ static void esl_c_auto_configuring_tag(uint8_t conn_idx)
 	 * 0x5488 = 52833, waveshare gdew042t2 400x300 4 grayscale
 	 * 0x5489 = 52840 dongle, LED simulated display
 	 * 0x548A = 52832dk, waveshare gdeh0213b72 250x122 2 colors
+	 * 0x548B = 54L15, LED simulated display
+	 * 0x548C = 54L15, waveshare gdeh0213b72 250x122 2 colors
 	 * ...
 	 **/
 
@@ -700,9 +702,15 @@ static void esl_c_auto_configuring_tag(uint8_t conn_idx)
 
 		break;
 	case 0x5486:
-		/* Thin Simulate no image use image 0 */
+		/* Thin Simulate no display, but uses image 0 to test OTS */
 		LOG_INF("Thin tag on nRF52DK");
-		LOG_INF("No Image");
+		LOG_INF("Image 0");
+ 		qk_data.tag_img_idx = 0;
+ 		qk_data.img_idx = 0;
+ 		ret = k_msgq_put(&kimage_worker_msgq, &qk_data, K_NO_WAIT);
+		if (ret) {
+			LOG_ERR("No space in the queue for qk_data");
+		}
 
 		break;
 	case 0x5487:
@@ -756,6 +764,30 @@ static void esl_c_auto_configuring_tag(uint8_t conn_idx)
 		}
 
 		break;
+	case 0x548B:
+		/* 54L15 Simulate no display no image */
+		LOG_INF("54L tag on nRF54L15DK");
+		LOG_INF("No image");
+
+		break;
+	case 0x548C:
+		/* 54L15 2.13" EPD uses image 0 and 1 */
+		LOG_INF("54L tag with 2.13 EPD on nRF54L15DK");
+		qk_data.tag_img_idx = 0;
+		qk_data.img_idx = 0;
+		ret = k_msgq_put(&kimage_worker_msgq, &qk_data, K_NO_WAIT);
+		if (ret) {
+			LOG_ERR("No space in the queue for qk_data");
+		}
+
+		qk_data.tag_img_idx = 1;
+		qk_data.img_idx = 1;
+		ret = k_msgq_put(&kimage_worker_msgq, &qk_data, K_NO_WAIT);
+		if (ret) {
+			LOG_ERR("No space in the queue for qk_data");
+		}
+
+		break;		
 	default:
 		LOG_WRN("Not predefied tag, should manually configuring");
 		break;
