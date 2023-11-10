@@ -1,4 +1,16 @@
 #include "waveshare_epaper_HINK-E0213-G01.dtsi"
+#include "waveshare_epaper_common_b.dtsi"
+
+/ {
+	chosen {
+		nordic,pm-ext-flash = &mx25r64;
+	};
+
+
+	aliases {
+		spi-flash0 = &mx25r64;
+	};
+};
 
 &i2c0 {
 	status = "disabled";
@@ -15,3 +27,8 @@
 &usbd {
 	status = "disabled";
 };
+
+&mx25r64 {
+	status = "okay";
+};
+

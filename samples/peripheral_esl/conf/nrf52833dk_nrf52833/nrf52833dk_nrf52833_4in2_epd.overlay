@@ -1,0 +1,23 @@
+/*
+ * Copyright (c) 2023 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include "waveshare_epaper_WFT0420CZ15.dtsi"
+
+/* 4.2" Panel need more rom to store image */
+/delete-node/ &storage_partition;
+&flash0 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		storage_partition: partition@74000 {
+			label = "storage";
+			reg = < 0x74000 0xC000 >;
+		};
+
+	};
+};

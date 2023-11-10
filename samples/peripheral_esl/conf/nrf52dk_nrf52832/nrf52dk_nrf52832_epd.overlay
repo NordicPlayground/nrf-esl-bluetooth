@@ -1,23 +1,7 @@
-/ {
-	chosen {
-		zephyr,display = &ssd16xx;
-	};
-};
+/*
+ * Copyright (c) 2023 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
-&arduino_spi {
-	status = "okay";
-	cs-gpios = <&arduino_header 16 GPIO_ACTIVE_LOW>;
-
-	ssd16xx: ssd16xxfb@0 {
-		compatible = "gooddisplay,gdeh0213b72", "solomon,ssd1675a", "solomon,ssd16xxfb";
-		spi-max-frequency = <8000000>;
-		reg = <0>;
-		width = <250>;
-		height = <122>;
-		pp-width-bits = <8>;
-		pp-height-bits = <16>;
-		dc-gpios = <&arduino_header 15 GPIO_ACTIVE_LOW>;	/* D9 */
-		reset-gpios = <&arduino_header 14 GPIO_ACTIVE_LOW>;	/* D8 */
-		busy-gpios = <&arduino_header 13 GPIO_ACTIVE_HIGH>;	/* D7 */
-	};
-};
+#include "waveshare_epaper_HINK-E0213-G01.dtsi"
