@@ -337,6 +337,10 @@ static int start_execute(void)
 		}
 	}
 
+#if defined(CONFIG_MCUBOOT_IMAGE_VERSION)
+	printk("CONFIG_MCUBOOT_IMAGE_VERSION %s\n", CONFIG_MCUBOOT_IMAGE_VERSION);
+#endif /* CONFIG_MCUBOOT_IMAGE_VERSION */
+
 	for (;;) {
 		k_sleep(K_FOREVER);
 	}

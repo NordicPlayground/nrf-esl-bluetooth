@@ -84,14 +84,17 @@ config BT_ESL_LED_INDICATION
 # PAWR timing
 config ESL_PAWR_INTERVAL_MIN
 	int
+	default 704 if BT_ESL_AP_PTS
 	default 1408
 
 config ESL_PAWR_INTERVAL_MAX
 	int
+	default 704 if BT_ESL_AP_PTS
 	default 1408
 
 config ESL_CLIENT_MAX_GROUP
 	int
+	default 64 if BT_ESL_AP_PTS
 	default 128
 
 config ESL_SUBEVENT_INTERVAL

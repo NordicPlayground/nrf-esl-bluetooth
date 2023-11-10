@@ -47,6 +47,13 @@ int save_tag_in_storage(const struct bt_esl_chrc_data *tag)
 	fs_write(&file, &tag->esl_addr, ESL_ADDR_LEN);
 	fs_write(&file, tag->esl_rsp_key.key_v, EAD_KEY_MATERIAL_LEN);
 	fs_write(&file, &tag->ble_addr.type, sizeof(uint8_t));
+#if defined(CONFIG_BT_ESL_TAG_BT_KEY_STORAGE)
+	/* Save BT key along with tag data */
+	struct bt_keys *bt_key = bt_keys_find_addr(BT_ID_DEFAULT, &tag->ble_addr);
+
+	fs_write(&file, bt_key->storage_start, BT_KEYS_STORAGE_LEN);
+#endif
+
 	fs_close(&file);
 
 	/* Save tag with esl addr */
@@ -159,6 +166,7 @@ int find_tag_in_storage_with_esl_addr(uint16_t esl_addr, bt_addr_le_t *ble_addr)
 
 	fs_read(&file, ble_addr->a.val, BT_ADDR_SIZE);
 	fs_read(&file, &ble_addr->type, sizeof(uint8_t));
+
 out:
 	(void)fs_close(&file);
 	if (rc < 0) {
@@ -260,7 +268,6 @@ esl:
 	return rc;
 }
 
-/* group_id RFU bit on means read all id */
 int load_all_tags_in_storage(uint8_t group_id)
 {
 	int rc;
@@ -425,6 +432,53 @@ int remove_tag_in_storage(uint16_t esl_addr, const bt_addr_le_t *peer_addr)
 	rc = fs_unlink(fname);
 	if (rc < 0) {
 		LOG_ERR("FAIL: remove file %s: %d", fname, rc);
+	}
+
+	return rc;
+}
+
+int load_bt_key_in_storage(const bt_addr_le_t *ble_addr, struct bt_keys *key)
+{
+	struct fs_dirent dirent;
+	struct fs_file_t file;
+	int rc;
+	char fname[CONFIG_MCUMGR_GRP_FS_PATH_LEN];
+	char addr[BT_ADDR_LE_STR_LEN];
+
+	memset(key, 0, BT_KEYS_STORAGE_LEN);
+	bt_addr_to_str(&ble_addr->a, addr, BT_ADDR_LE_STR_LEN);
+	snprintk(fname, CONFIG_MCUMGR_GRP_FS_PATH_LEN, "%s/%s", TAG_BLE_ADDR_ROOT, addr);
+	fs_file_t_init(&file);
+	rc = fs_open(&file, fname, FS_O_READ);
+	if (rc < 0) {
+		LOG_WRN("FAIL: open %s: %d", fname, rc);
+		goto out;
+	}
+
+	rc = fs_stat(fname, &dirent);
+	if (rc < 0) {
+		LOG_WRN("FAIL: stat %s: %d", fname, rc);
+		goto out;
+	}
+
+	if (rc == 0 && dirent.type == FS_DIR_ENTRY_FILE && dirent.size == 0) {
+		LOG_INF("Tag file: %s empty found. New tag", fname);
+		rc = -ENOENT;
+		goto out;
+	}
+
+	key->id = BT_ID_DEFAULT;
+	bt_addr_le_copy(&key->addr, ble_addr);
+
+	fs_seek(&file, ESL_BT_KEY_OFFSET, FS_SEEK_SET);
+	fs_read(&file, &key->storage_start, BT_KEYS_STORAGE_LEN);
+
+	LOG_HEXDUMP_DBG(key, BT_KEYS_STORAGE_LEN, "");
+
+out:
+	rc = fs_close(&file);
+	if (rc < 0) {
+		LOG_ERR("FAIL: close %s: %d", fname, rc);
 	}
 
 	return rc;

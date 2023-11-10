@@ -1,0 +1,61 @@
+/ {
+	chosen {
+		zephyr,display = &ssd16xx;
+	};
+
+	aliases {
+		/delete-property/ sw2;
+		/delete-property/ sw3;
+	};
+};
+
+/delete-node/ &button2;
+/delete-node/ &button3;
+
+&nfct {
+	status = "disabled";
+};
+
+&pinctrl {
+	spi00_default: spi00_default {
+		group1 {
+			// nordic,drive-mode = <NRF_DRIVE_H0H1>;
+			psels = <NRF_PSEL(SPIM_SCK, 2, 6)>,
+			        <NRF_PSEL(SPIM_MISO, 2, 9)>,
+			        <NRF_PSEL(SPIM_MOSI, 2, 8)>;
+		};
+	};
+
+	spi00_sleep: spi00_sleep {
+		group1 {
+			psels = <NRF_PSEL(SPIM_SCK, 2, 6)>,
+			        <NRF_PSEL(SPIM_MISO, 2, 9)>,
+			        <NRF_PSEL(SPIM_MOSI, 2, 8)>;
+			low-power-enable;
+		};
+	};
+
+};
+
+&spi00 {
+	status = "okay";
+	cs-gpios = <&gpio2 10 GPIO_ACTIVE_LOW>;
+	pinctrl-0 = <&spi00_default>;
+	pinctrl-1 = <&spi00_sleep>;
+	pinctrl-names = "default", "sleep";
+
+	ssd16xx: ssd16xxfb@0 {
+		compatible = "gooddisplay,gdeh0213b72",
+		             "solomon,ssd1675a",
+		             "solomon,ssd16xxfb";
+		             spi-max-frequency = <8000000>;
+		reg = <0>;
+		width = <250>;
+		height = <122>;
+		pp-width-bits = <8>;
+		pp-height-bits = <16>;
+		dc-gpios = <&gpio2 7 GPIO_ACTIVE_LOW>;
+		reset-gpios = <&gpio0 2 GPIO_ACTIVE_LOW>;
+		busy-gpios = <&gpio0 3 GPIO_ACTIVE_HIGH>;
+	};
+};

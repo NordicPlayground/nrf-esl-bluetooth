@@ -27,6 +27,8 @@
 #include <dk_buttons_and_leds.h>
 
 #include "esl_client.h"
+#include "esl_client_tag_storage.h"
+#include "esl_dummy_cmd.h"
 
 LOG_MODULE_REGISTER(central_esl, CONFIG_CENTRAL_ESL_LOG_LEVEL);
 
@@ -356,12 +358,6 @@ int main(void)
 		LOG_ERR("Failed to register authorization callbacks. %d", err);
 		return err;
 	}
-
-#if defined(BT_ESL_AP_PTS)
-	uint8_t pub_addr[] = {0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB};
-
-	bt_ctlr_set_public_addr(pub_addr);
-#endif /* CONFIG_BT_ESL_AP_PTS */
 
 	err = bt_enable(NULL);
 	if (IS_ENABLED(CONFIG_SETTINGS)) {

@@ -47,7 +47,7 @@ static struct bt_le_per_adv_sync *pawr_sync;
 static uint8_t sync_count;
 static uint8_t response_slot_delay;
 static struct esl_pawr_sync_work_info {
-	struct k_work_delayable work;
+	struct k_work work;
 	struct net_buf_simple buf;
 	uint16_t periodic_event_counter;
 	uint8_t subevent;
@@ -60,7 +60,7 @@ static struct esl_sm_object sm_obj;
 
 /** Thread for PAwR **/
 #define PAWR_WQ_STACK_SIZE KB(2)
-#define PAWR_WQ_PRIORITY   K_LOWEST_APPLICATION_THREAD_PRIO
+#define PAWR_WQ_PRIORITY   K_LOWEST_APPLICATION_THREAD_PRIO - 1
 static K_THREAD_STACK_DEFINE(pawr_wq_stack_area, PAWR_WQ_STACK_SIZE);
 struct k_work_q pawr_work_q;
 
@@ -73,8 +73,10 @@ static struct net_buf_simple pa_rsp;
 static K_THREAD_STACK_DEFINE(led_wq_stack_area, LED_WQ_STACK_SIZE);
 struct k_work_q led_work_q;
 
-/** Thread for Display **/
-#define DISPLAY_WQ_STACK_SIZE KB(1)
+/** Thread for Display
+ * littlefs used in display workqueue need more than 1KB memory
+ **/
+#define DISPLAY_WQ_STACK_SIZE COND_CODE_1(CONFIG_ESL_OTS_LFS, KB(2), KB(1))
 #define DISPLAY_WQ_PRIORITY   K_LOWEST_APPLICATION_THREAD_PRIO
 static K_THREAD_STACK_DEFINE(display_wq_stack_area, DISPLAY_WQ_STACK_SIZE);
 struct k_work_q display_work_q;
@@ -241,11 +243,6 @@ static void esl_init_provisioned_data(void)
 	memset(esl_obj_l->esl_chrc.esl_ap_key.key_v, 0, EAD_KEY_MATERIAL_LEN);
 	memset(esl_obj_l->esl_chrc.esl_randomizer, 0, EAD_RANDOMIZER_LEN);
 	memset(esl_obj_l->esl_chrc.esl_rsp_key.key_v, 0, EAD_KEY_MATERIAL_LEN);
-#if defined(CONFIG_BT_ESL_IMAGE_AVAILABLE)
-	for (size_t idx = 0; idx < CONFIG_BT_ESL_IMAGE_MAX; idx++) {
-		esl_obj_l->stored_image_size[idx] = 0;
-	}
-#endif
 	esl_obj_l->esl_sm_timeout_update_needed = true;
 }
 
@@ -600,7 +597,7 @@ static void recv_cb(struct bt_le_per_adv_sync *sync,
 	esl_pawr_sync_work.periodic_event_counter = info->periodic_event_counter;
 	esl_pawr_sync_work.subevent = info->subevent;
 	net_buf_simple_init_with_data(&esl_pawr_sync_work.buf, buf->data, buf->len);
-	k_work_schedule_for_queue(&pawr_work_q, &esl_pawr_sync_work.work, K_NO_WAIT);
+	k_work_submit_to_queue(&pawr_work_q, &esl_pawr_sync_work.work);
 }
 static struct bt_le_per_adv_sync_cb sync_callbacks = {
 	.synced = sync_cb, .term = term_cb, .recv = recv_cb};
@@ -914,7 +911,6 @@ static void ecp_command_handler(struct k_work *work)
 	struct esl_ecp_work_info *info = CONTAINER_OF(work, struct esl_ecp_work_info, work);
 	uint8_t op_code, cp_tag, cp_len, esl_id;
 	uint8_t sensor_idx, display_idx, image_idx, led_idx, led_color;
-	size_t img_size = 0;
 	uint32_t new_abs_time, offset_time;
 	struct bt_esls *esl_obj = esl_get_esl_obj();
 	uint8_t *command = ecp_net_buf.data;
@@ -1057,9 +1053,6 @@ static void ecp_command_handler(struct k_work *work)
 			LOG_DBG("OP_DISPLAY_IMAGE");
 			display_idx = command[ESL_OP_DISPLAY_IDX];
 			image_idx = command[ESL_OP_DISPLAY_IMAGE_IDX];
-			if (esl_obj_l->cb.read_img_size_from_storage) {
-				img_size = esl_obj_l->cb.read_img_size_from_storage(image_idx);
-			}
 
 			if (CONFIG_BT_ESL_DISPLAY_MAX == 0) {
 				LOG_ERR("No display, invalid OP Code");
@@ -1079,7 +1072,8 @@ static void ecp_command_handler(struct k_work *work)
 				 **/
 				esl_obj->resp.error_code = ERR_INV_PARAMS;
 				/* Simulated display ignore image size */
-			} else if (img_size == 0 && !IS_ENABLED(CONFIG_ESL_SIMULATE_DISPLAY)) {
+			} else if (esl_obj_l->stored_image_size[image_idx] == 0 &&
+				   !IS_ENABLED(CONFIG_ESL_SIMULATE_DISPLAY)) {
 				LOG_ERR("The requested image contained no image data");
 				esl_obj->resp.resp_op = OP_ERR;
 				esl_obj->resp.error_code = ERR_IMG_NOT_AVAIL;
@@ -1101,9 +1095,6 @@ static void ecp_command_handler(struct k_work *work)
 			new_abs_time = sys_get_le32((command + ESL_OP_DISPLAY_TIMED_ABS_TIME_IDX));
 			LOG_DBG("new_abs_time %u", new_abs_time);
 			offset_time = new_abs_time - esl_get_abs_time();
-			if (esl_obj_l->cb.read_img_size_from_storage) {
-				img_size = esl_obj_l->cb.read_img_size_from_storage(image_idx);
-			}
 
 			if (CONFIG_BT_ESL_DISPLAY_MAX == 0) {
 				LOG_ERR("No display, invalid OP Code");
@@ -1126,7 +1117,8 @@ static void ecp_command_handler(struct k_work *work)
 				 **/
 				esl_obj->resp.error_code = ERR_INV_PARAMS;
 				break;
-			} else if (img_size == 0 && !IS_ENABLED(CONFIG_ESL_SIMULATE_DISPLAY)) {
+			} else if (esl_obj_l->stored_image_size[image_idx] == 0 &&
+				   !IS_ENABLED(CONFIG_ESL_SIMULATE_DISPLAY)) {
 				LOG_ERR("The requested image contained no image data");
 				esl_obj->resp.resp_op = OP_ERR;
 				esl_obj->resp.error_code = ERR_IMG_NOT_AVAIL;
@@ -1688,6 +1680,23 @@ static void esl_display_register(struct bt_esls *esl_obj,
 	BT_GATT_POOL_CHRC(&esl_obj->gp, BT_UUID_DISP_INF, BT_GATT_CHRC_READ, ESL_GATT_PERM_DEFAULT,
 			  esl_disp_read, NULL, esl_obj->esl_chrc.displays);
 }
+
+static void image_size_init(void)
+{
+	struct bt_esls *esl_obj = esl_get_esl_obj();
+
+	for (size_t idx = 0; idx < CONFIG_BT_ESL_IMAGE_MAX; idx++) {
+		esl_obj->stored_image_size[idx] = esl_obj->cb.read_img_size_from_storage(idx);
+	}
+}
+
+#if defined(CONFIG_ESL_SHELL)
+struct ots_img_object *bt_esl_otc_inst(void)
+{
+	return esl_obj_l->img_objects;
+}
+#endif /* CONFIG_ESL_SHELL */
+ 
 static uint32_t obj_cnt;
 
 struct object_creation_data {
@@ -1781,6 +1790,7 @@ static ssize_t ots_obj_write(struct bt_ots *ots, struct bt_conn *conn, uint64_t 
 {
 	char id_str[BT_OTS_OBJ_ID_STR_LEN];
 	uint8_t obj_index = id - BT_OTS_OBJ_ID_MIN;
+	int rc, retry = 0;
 
 	bt_ots_obj_id_to_str(id, id_str, sizeof(id_str));
 
@@ -1793,10 +1803,14 @@ static ssize_t ots_obj_write(struct bt_ots *ots, struct bt_conn *conn, uint64_t 
 	} else {
 		LOG_ERR("no buffer_img cb");
 	}
-#else
+#else  /* USE littlefs*/
 #ifndef CONFIG_BT_ESL_UNSYNCHRONIZED_IMMEIDATELY
+	memcpy(esl_obj_l->img_obj_buf, data, len);
 	if (esl_obj_l->cb.write_img_to_storage) {
-		esl_obj_l->cb.write_img_to_storage(obj_index, len, offset);
+		do {
+			rc = esl_obj_l->cb.write_img_to_storage(obj_index, len, offset);
+			retry++;
+		} while (rc < 0 && retry < OTS_LFS_RETRY);
 	} else {
 		LOG_ERR("no write_img_to_storage cb");
 	}
@@ -1872,15 +1886,7 @@ static int ots_create_obj(void)
 	uint32_t cur_size;
 	uint32_t alloc_size;
 
-	/* Prepare first object demo data and add it to the instance. */
-	for (uint8_t idx = 0; idx < CONFIG_BT_ESL_IMAGE_MAX; idx++) {
-		if (esl_obj_l->cb.read_img_size_from_storage) {
-			/** esl_obj_l->stored_image_size[idx] =
-			 *  esl_obj_l->cb.read_img_size_from_storage(idx);
-			 **/
-			;
-		}
-
+	for (size_t idx = 0; idx < CONFIG_BT_ESL_IMAGE_MAX; idx++) {
 		cur_size = esl_obj_l->stored_image_size[idx];
 		alloc_size = OBJ_IMG_MAX_SIZE;
 		sprintf(object_name, OBJECT_NAME_TEMPLETE, idx);
@@ -1950,6 +1956,7 @@ void bt_esl_delete_images(void)
 	if (esl_obj_l->cb.delete_imgs) {
 		esl_obj_l->cb.delete_imgs();
 		for (size_t idx = 0; idx < CONFIG_BT_ESL_IMAGE_MAX; idx++) {
+			esl_obj_l->stored_image_size[idx] = 0;
 			err = bt_ots_obj_delete(esl_obj_l->ots, idx + BT_OTS_OBJ_ID_MIN);
 			if (err != 0) {
 				LOG_ERR("delete obj 0x %08x failed (err %d)",
@@ -2134,7 +2141,7 @@ static void led_dwork_reset(uint8_t idx)
 
 static void led_dwork_init(struct bt_esls *esl_obj)
 {
-	for (uint8_t idx = 0; idx < CONFIG_BT_ESL_LED_MAX; idx++) {
+	for (size_t idx = 0; idx < CONFIG_BT_ESL_LED_MAX; idx++) {
 		esl_obj->led_dworks[idx].led_idx = idx;
 		k_work_init_delayable(&esl_obj->led_dworks[idx].work, led_delay_worker_fn);
 		led_dwork_reset(idx);
@@ -2156,7 +2163,7 @@ static void display_dwork_reset(uint8_t idx)
 
 static void display_dwork_init(struct bt_esls *esl_obj)
 {
-	for (uint8_t idx = 0; idx < CONFIG_BT_ESL_DISPLAY_MAX; idx++) {
+	for (size_t idx = 0; idx < CONFIG_BT_ESL_DISPLAY_MAX; idx++) {
 		esl_obj_l->display_works[idx].display_idx = idx;
 		k_work_init_delayable(&esl_obj->display_works[idx].work, display_delay_worker_fn);
 		display_dwork_reset(idx);
@@ -2183,7 +2190,7 @@ void bt_esl_unassociate(void)
 	bt_unpair(BT_ID_DEFAULT, BT_ADDR_LE_ANY);
 	esl_init_provisioned_data();
 	esl_settings_delete_provisioned_data();
-	for (uint8_t idx = 0; idx < CONFIG_BT_ESL_LED_MAX; idx++) {
+	for (size_t idx = 0; idx < CONFIG_BT_ESL_LED_MAX; idx++) {
 		led_dwork_reset(idx);
 	}
 
@@ -2208,9 +2215,8 @@ void bt_esl_disconnect(void)
 
 static void esl_pawr_sync_work_fn(struct k_work *work)
 {
-	struct k_work_delayable *dwork = k_work_delayable_from_work(work);
 	struct esl_pawr_sync_work_info *pawr_work =
-		CONTAINER_OF(dwork, struct esl_pawr_sync_work_info, work);
+		CONTAINER_OF(work, struct esl_pawr_sync_work_info, work);
 	uint8_t decrypted_data[ESL_ENCRTYPTED_DATA_MAX_LEN];
 	size_t esl_payload_len;
 	int err;
@@ -2244,7 +2250,7 @@ static void woker_init(void)
 	k_work_init_delayable(&esl_adv_work.work, esl_advertising_fn);
 	k_work_init(&esl_ecp_work.work, ecp_command_handler);
 	esl_setup_pawr_sync();
-	k_work_init_delayable(&esl_pawr_sync_work.work, esl_pawr_sync_work_fn);
+	k_work_init(&esl_pawr_sync_work.work, esl_pawr_sync_work_fn);
 	esl_pawr_sync_work.buf = ecp_net_buf;
 	led_dwork_init(esl_obj_l);
 	display_dwork_init(esl_obj_l);
@@ -2254,7 +2260,7 @@ static void woker_init(void)
 
 void bt_esl_basic_state_update(void)
 {
-	uint8_t idx;
+	size_t idx;
 
 	atomic_clear_bit(&esl_obj_l->basic_state, ESL_ACTIVE_LED);
 	atomic_clear_bit(&esl_obj_l->basic_state, ESL_PENDING_LED_UPDATE);
@@ -2277,12 +2283,6 @@ void bt_esl_basic_state_update(void)
 		}
 	}
 }
-#if defined(CONFIG_ESL_SHELL) && defined(CONFIG_BT_ESL_IMAGE_AVAILABLE)
-struct ots_img_object *bt_esl_otc_inst(void)
-{
-	return esl_obj_l->img_objects;
-}
-#endif
 
 struct bt_esls *esl_get_esl_obj(void)
 {
@@ -2292,17 +2292,29 @@ struct bt_esls *esl_get_esl_obj(void)
 int bt_esl_init(struct bt_esls *esl_obj, const struct bt_esl_init_param *init_param)
 {
 	int err;
-	size_t idx;
+	struct k_work_queue_config pawr_work_q_config = {
+		.name = "pawr_workq",
+	};
+
+	struct k_work_queue_config led_work_q_config = {
+		.name = "led_workq",
+	};
+
+	struct k_work_queue_config display_work_q_config = {
+		.name = "display_workq",
+	};
 
 	/* PAwR workqueue init */
 	k_work_queue_start(&pawr_work_q, pawr_wq_stack_area,
-			   K_THREAD_STACK_SIZEOF(pawr_wq_stack_area), PAWR_WQ_PRIORITY, NULL);
+			   K_THREAD_STACK_SIZEOF(pawr_wq_stack_area), PAWR_WQ_PRIORITY,
+			   &pawr_work_q_config);
 	/* LED workqueue init */
 	k_work_queue_start(&led_work_q, led_wq_stack_area, K_THREAD_STACK_SIZEOF(led_wq_stack_area),
-			   LED_WQ_PRIORITY, NULL);
+			   LED_WQ_PRIORITY, &led_work_q_config);
 	/* DISPLAY workqueue init */
 	k_work_queue_start(&display_work_q, display_wq_stack_area,
-			   K_THREAD_STACK_SIZEOF(display_wq_stack_area), DISPLAY_WQ_PRIORITY, NULL);
+			   K_THREAD_STACK_SIZEOF(display_wq_stack_area), DISPLAY_WQ_PRIORITY,
+			   &display_work_q_config);
 
 	bt_conn_cb_register(&conn_callbacks);
 	bt_gatt_cb_register(&gatt_callbacks);
@@ -2313,7 +2325,7 @@ int bt_esl_init(struct bt_esls *esl_obj, const struct bt_esl_init_param *init_pa
 	esl_obj->cb = init_param->cb;
 	int (*module_init[])(void) = {esl_obj->cb.display_init, esl_obj->cb.led_init,
 				      esl_obj->cb.sensor_init};
-	for (idx = 0; idx < ARRAY_SIZE(module_init); idx++) {
+	for (size_t idx = 0; idx < ARRAY_SIZE(module_init); idx++) {
 		if (*module_init[idx]) {
 			err = (*module_init[idx])();
 		}
@@ -2387,6 +2399,7 @@ int bt_esl_init(struct bt_esls *esl_obj, const struct bt_esl_init_param *init_pa
 	}
 
 #if defined(CONFIG_BT_ESL_IMAGE_AVAILABLE)
+	image_size_init();
 	err = ots_init_func();
 	if (err != 0) {
 		LOG_ERR("Failed to init OTS (err:%d)", err);

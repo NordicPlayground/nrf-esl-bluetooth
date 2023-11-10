@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include <zephyr/bluetooth/conn.h>
 #include <host/settings.h>
-#include <host/keys.h>
 #include <host/id.h>
 #include <zephyr/kernel.h>
 #include <zephyr/sys/crc.h>
@@ -1072,6 +1071,38 @@ static int cmd_esl_c_unbond_esl(const struct shell *shell, size_t argc, char *ar
 	return 0;
 }
 
+static int cmd_acl_load_bt_key_esl(const struct shell *shell, size_t argc, char *argv[])
+{
+	if (argc < 2) {
+		shell_fprintf(shell, SHELL_ERROR, "no valid parameter <esl_addr>\n");
+		return -ENOEXEC;
+	}
+
+	uint16_t esl_addr = strtol(argv[1], NULL, 16);
+	bt_addr_le_t peer_addr;
+	int ret;
+	char addr[BT_ADDR_LE_STR_LEN];
+
+	ret = find_tag_in_storage_with_esl_addr(esl_addr, &peer_addr);
+	if (ret) {
+		shell_fprintf(shell, SHELL_ERROR, "Could not found tag esl_addr 0%04x (ret %d)",
+			      esl_addr, ret);
+		return -ENOENT;
+	} else {
+		struct bt_keys bt_key;
+
+		bt_addr_le_to_str(&peer_addr, addr, sizeof(addr));
+		shell_fprintf(shell, SHELL_NORMAL, "Load bt key from %s esl_addr 0x%04x \n", addr,
+			      esl_addr);
+		load_bt_key_in_storage(&peer_addr, &bt_key);
+		for (int i = 0; i < BT_KEYS_STORAGE_LEN; i++) {
+			shell_fprintf(shell, SHELL_NORMAL, "%02x", *(bt_key.storage_start + i));
+		}
+	}
+
+	return ret;
+}
+
 #endif /* CONFIG_BT_ESL_TAG_STORAGE */
 
 static int cmd_acl_write_wo_rsp(const struct shell *shell, size_t argc, char *argv[])
@@ -1181,7 +1212,7 @@ static int cmd_acl_bt_key_import(const struct shell *shell, size_t argc, char *a
 	size_t len;
 
 	/* Parse ble addr argument to bt settings encoded */
-	if (strlen(argv[1]) != 13) {
+	if (strlen(argv[1]) < 12) {
 		shell_fprintf(shell, SHELL_ERROR, "BLE addr size is not correct %d\n",
 			      strlen(argv[1]));
 		return -EINVAL;
@@ -1209,10 +1240,9 @@ static int cmd_acl_bt_key_import(const struct shell *shell, size_t argc, char *a
 	}
 
 	new_key.id = BT_ID_DEFAULT;
-	memcpy(&new_key.enc_size, data, len);
+	memcpy(&new_key.enc_size, data, BT_KEYS_STORAGE_LEN);
+	err = esl_c_import_bt_key(&new_key);
 
-	err = bt_keys_store(&new_key);
-	settings_load();
 	shell_fprintf(shell, SHELL_NORMAL, "#BT_KEY_IMPORT:%d\n", err);
 
 	return err;
@@ -1329,6 +1359,34 @@ static int cmd_acl_past(const struct shell *shell, size_t argc, char *argv[])
 	return err;
 }
 
+static int cmd_acl_ap_key_update(const struct shell *shell, size_t argc, char *argv[])
+{
+	if (argc < 2) {
+		shell_fprintf(shell, SHELL_ERROR, "no valid parameter <conn_id>\n");
+		return -ENOEXEC;
+	}
+
+	uint8_t conn_idx = strtol(argv[1], NULL, 16);
+
+	esl_c_ap_key_update(conn_idx);
+
+	return 0;
+}
+
+static int cmd_acl_rsp_key_update(const struct shell *shell, size_t argc, char *argv[])
+{
+	if (argc < 2) {
+		shell_fprintf(shell, SHELL_ERROR, "no valid parameter <conn_id>\n");
+		return -ENOEXEC;
+	}
+
+	uint8_t conn_idx = strtol(argv[1], NULL, 16);
+
+	esl_c_rsp_key_update(conn_idx);
+
+	return 0;
+}
+
 SHELL_STATIC_SUBCMD_SET_CREATE(
 	obj_c_cmds, SHELL_CMD(select, NULL, "Select Object with ID", cmd_obj_c_select),
 	SHELL_CMD(read_meta, NULL, "Read metadata of Object", cmd_obj_c_readmeta),
@@ -1356,6 +1414,8 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 	SHELL_CMD(bd_addr, NULL, "ESL AP BD Addr", cmd_bd_addr),
 #if defined(CONFIG_BT_ESL_TAG_STORAGE)
 	SHELL_CMD(connect_esl, NULL, "Connect ESL service tag with esl addr", cmd_acl_connect_esl),
+	SHELL_CMD(load_bt_key_esl, NULL, "Debug fuction to dump bt_key with ESL address",
+		  cmd_acl_load_bt_key_esl),
 #endif /* CONFIG_BT_ESL_TAG_STORAGE */
 	SHELL_CMD(configure, NULL, "Configure connected tag manually", cmd_acl_configure),
 	SHELL_CMD(discovery, NULL, "Discovery connected tag manually", cmd_acl_discovery),
@@ -1364,6 +1424,8 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 	SHELL_CMD(subscribe, NULL, "ESL AP subscribe ECP", cmd_acl_subscribe),
 	SHELL_CMD(past, NULL, "ESL AP commence PAST(Periodic Advertising Sync Transfer)",
 		  cmd_acl_past),
+	SHELL_CMD(ap_key_update, NULL, "ESL AP update AP key", cmd_acl_ap_key_update),
+	SHELL_CMD(rsp_key_update, NULL, "ESL AP update response key", cmd_acl_rsp_key_update),
 	SHELL_SUBCMD_SET_END);
 
 SHELL_STATIC_SUBCMD_SET_CREATE(

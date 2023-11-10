@@ -125,7 +125,7 @@ config ESL_SYNC_COUNT
 	default 1
 
 choice BT_ESL_PERM
-	default BT_ESL_DEFAULT_PERM_RW
+	default BT_ESL_DEFAULT_PERM_RW_ENCRYPT
 endchoice # BT_ESL_PERM
 
 config NRFX_TEMP

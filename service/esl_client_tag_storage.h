@@ -12,6 +12,15 @@
 #include "esl_common.h"
 
 /**
+ * @def ESL_BT_KEY_OFFSET
+ * @brief Macro that defines the offset of the BT key in the tag storage buffer.
+ *
+ * The BT key offset is calculated as the sum of the length of the ESL address, the length of the
+ * EAD key material, and the size of a uint8_t data type.
+ */
+#define ESL_BT_KEY_OFFSET (ESL_ADDR_LEN + EAD_KEY_MATERIAL_LEN + sizeof(uint8_t))
+
+/**
  * @brief Saves the given ESL data in the storage.
  *
  * This function saves the given tag data in the storage with the BLE address and the ESL address.
@@ -36,6 +45,7 @@ int save_tag_in_storage(const struct bt_esl_chrc_data *tag);
  * @return 0 on success, negative errno code on error.
  */
 int load_tag_in_storage(const bt_addr_le_t *ble_addr, struct bt_esl_chrc_data *tag);
+
 /**
  * Searches for a ESL Bluetooth address in the storage with the given ESL address
  *
@@ -69,5 +79,48 @@ int list_tags_in_storage(uint8_t type);
  * @return 0 on success, negative errno code on error.
  */
 int remove_tag_in_storage(uint16_t esl_addr, const bt_addr_le_t *peer_addr);
+
+/**
+ * @brief Loads the Bluetooth key in the storage for the specified Bluetooth address.
+ *
+ * @param ble_addr Pointer to the Bluetooth address.
+ * @param key Pointer to the Bluetooth keys structure.
+ * @return int Returns 0 on success, otherwise a negative error code.
+ *
+ * @note The function loads the Bluetooth key in the storage for the specified Bluetooth address.
+ */
+int load_bt_key_in_storage(const bt_addr_le_t *ble_addr, struct bt_keys *key);
+
+/** @brief Remove tag information from storage backend.
+ *
+ * @retval 0 If the operation was successful.
+ *           Otherwise, a negative error code is returned.
+ *
+ */
+int remove_all_tags_in_storage(void);
+
+/** @brief Load tag's response from storage backend.
+ *
+ * @param[in] group_id Which group of ESL to load.RFU bit on means read all esl id in storage.
+ *
+ * @retval 0 If the operation was successful.
+ *           Otherwise, a negative error code is returned.
+ *
+ */
+int load_all_tags_in_storage(uint8_t group_id);
+
+/**
+ * @brief Imports a Bluetooth key into the ESL client.
+ *
+ * This function imports a Bluetooth key into the ESL client by copying the key data from the
+ * provided buffer into the specified bt_keys structure. The length of the key data must also be
+ * provided.
+ *
+ * @param keys Pointer to the bt_keys structure to copy the key data into.
+ * @param data Pointer to the buffer containing the key data to import.
+ *
+ * @return 0 on success, or a negative error code on failure.
+ */
+int esl_c_import_bt_key(struct bt_keys *keys);
 
 #endif /* ESL_CLIENT_TAG_STORAGE_H_ */

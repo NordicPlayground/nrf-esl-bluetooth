@@ -51,6 +51,8 @@ extern "C" {
 		 ? (BT_GATT_PERM_READ_ENCRYPT | BT_GATT_PERM_WRITE_ENCRYPT)                        \
 		 : (BT_GATT_PERM_READ | BT_GATT_PERM_WRITE))
 
+#define OTS_LFS_RETRY 3
+
 /** @brief helper of ESL service. **/
 #define BT_ESL_DEF(_name, ...)                                                                     \
 	static struct bt_esls _name = {                                                            \

@@ -505,36 +505,23 @@ int bt_c_esl_unbond_by_esl_addr(uint16_t esl_addr);
  */
 void esl_c_scan(bool onoff, bool oneshot);
 
-/** @brief Get esl_client object */
+/**
+ * @brief Returns a pointer to the bt_esl_client object.
+ *
+ * @return struct bt_esl_client* Pointer to the bt_esl_client object.
+ */
 struct bt_esl_client *esl_c_get_esl_c_obj(void);
 
-/** @brief Load predefined command buffer to the specified ESL group
+/**
+ * @brief Import and reload Bluetooth keys.
  *
- * @param[in] sync_pkt_type Predefined ESL TLV set.
- * @param[in] group_id Index of group to load TLVs.
  *
+ * @param new_key A pointer to a struct containing the Bluetooth keys to be imported.
+ * @return An integer value indicating the success or failure of the import operation.
+ *
+ * @note This function is only available in C++.
  */
-void esl_dummy_ap_ad_data(uint8_t sync_pkt_type, uint8_t group_id);
-
-#if defined(CONFIG_BT_ESL_TAG_STORAGE)
-/** @brief Remove tag information from storage backend.
- *
- * @retval 0 If the operation was successful.
- *           Otherwise, a negative error code is returned.
- *
- */
-int remove_all_tags_in_storage(void);
-
-/** @brief Load tag's response from storage backend.
- *
- * @param[in] group_id Which group of ESL to load.
- *
- * @retval 0 If the operation was successful.
- *           Otherwise, a negative error code is returned.
- *
- */
-int load_all_tags_in_storage(uint8_t group_id);
-#endif /* CONFIG_BT_ESL_TAG_STORAGE */
+int esl_c_import_bt_key(struct bt_keys *new_key);
 
 #ifdef __cplusplus
 }

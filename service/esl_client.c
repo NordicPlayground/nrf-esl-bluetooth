@@ -185,7 +185,8 @@ static uint8_t subevent_bufs_data[CONFIG_BT_CTLR_SDC_PERIODIC_ADV_RSP_TX_BUFFER_
 				 [ESL_ENCRTYPTED_DATA_MAX_LEN];
 
 bt_security_t esl_ap_security_level;
-bool esl_c_auto_ap_mode = IS_ENABLED(CONFIG_BT_ESL_AP_AUTO_MODE);
+bool esl_c_auto_ap_mode =
+	(IS_ENABLED(CONFIG_BT_ESL_AP_AUTO_MODE) && !IS_ENABLED(CONFIG_BT_ESL_AP_PTS));
 uint16_t esl_c_tags_per_group =
 	COND_CODE_1(CONFIG_BT_ESL_AP_AUTO_MODE, (CONFIG_BT_ESL_AP_AUTO_TAG_PER_GROUP),
 		    (CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER));
@@ -415,15 +416,22 @@ int esl_c_obj_write_by_name(uint16_t conn_idx, uint8_t tag_img_idx, uint8_t *img
 	}
 
 	WAIT_FOR_FLAG(esl_ots_select_flag);
-	snprintk(fname, sizeof(fname), "%s/%s", MNT_POINT, img_name);
-
-	size = esl_c_obj_l->cb.ap_read_img_size_from_storage(fname);
-	memset(esl_c_obj_l->img_obj_buf, 0, size);
-	err = esl_c_obj_l->cb.ap_read_img_from_storage(fname, esl_c_obj_l->img_obj_buf, &size);
-	if (err) {
-		LOG_ERR("Image %s not exists\n", img_name);
-		printk("OTS_WRITE:0,%s,No Image\n", img_name);
-		return -ENXIO;
+	if (IS_ENABLED(CONFIG_BT_ESL_AP_PTS) && strcmp(img_name, "PTS") == 0) {
+		/* generate random content for PTS */
+		size = 100;
+		(void)bt_rand(esl_c_obj_l->img_obj_buf, size);
+	} else {
+		/* Read image from storage */
+		snprintk(fname, sizeof(fname), "%s/%s", MNT_POINT, img_name);
+		size = esl_c_obj_l->cb.ap_read_img_size_from_storage(fname);
+		memset(esl_c_obj_l->img_obj_buf, 0, size);
+		err = esl_c_obj_l->cb.ap_read_img_from_storage(fname, esl_c_obj_l->img_obj_buf,
+							       &size);
+		if (err) {
+			LOG_ERR("Image %s not exists\n", img_name);
+			printk("OTS_WRITE:0,%s,No Image\n", img_name);
+			return -ENXIO;
+		}
 	}
 
 	esl_c_obj_l->gatt[conn_idx].last_image_crc = crc32_ieee(esl_c_obj_l->img_obj_buf, size);
@@ -488,7 +496,7 @@ static void esl_auto_ap_connect_work_fn(void *p1, void *p2, void *p3)
 		}
 
 		if (sys_slist_peek_head(&esl_c_obj_l->scanned_tag_addr_list) == NULL) {
-			k_msleep(100);
+			k_msleep(CONFIG_ESL_SUBEVENT_INTERVAL);
 			continue;
 		}
 
@@ -561,6 +569,8 @@ static void esl_c_auto_configuring_tag(uint8_t conn_idx)
 	 * 0x5488 = 52833, waveshare gdew042t2 400x300 4 grayscale
 	 * 0x5489 = 52840 dongle, LED simulated display
 	 * 0x548A = 52832dk, waveshare gdeh0213b72 250x122 2 colors
+	 * 0x548B = 54L15, LED simulated display
+	 * 0x548C = 54L15, waveshare gdeh0213b72 250x122 2 colors
 	 * ...
 	 **/
 
@@ -692,9 +702,15 @@ static void esl_c_auto_configuring_tag(uint8_t conn_idx)
 
 		break;
 	case 0x5486:
-		/* Thin Simulate no image use image 0 */
+		/* Thin Simulate no display, but uses image 0 to test OTS */
 		LOG_INF("Thin tag on nRF52DK");
-		LOG_INF("No Image");
+		LOG_INF("Image 0");
+ 		qk_data.tag_img_idx = 0;
+ 		qk_data.img_idx = 0;
+ 		ret = k_msgq_put(&kimage_worker_msgq, &qk_data, K_NO_WAIT);
+		if (ret) {
+			LOG_ERR("No space in the queue for qk_data");
+		}
 
 		break;
 	case 0x5487:
@@ -748,6 +764,30 @@ static void esl_c_auto_configuring_tag(uint8_t conn_idx)
 		}
 
 		break;
+	case 0x548B:
+		/* 54L15 Simulate no display no image */
+		LOG_INF("54L tag on nRF54L15DK");
+		LOG_INF("No image");
+
+		break;
+	case 0x548C:
+		/* 54L15 2.13" EPD uses image 0 and 1 */
+		LOG_INF("54L tag with 2.13 EPD on nRF54L15DK");
+		qk_data.tag_img_idx = 0;
+		qk_data.img_idx = 0;
+		ret = k_msgq_put(&kimage_worker_msgq, &qk_data, K_NO_WAIT);
+		if (ret) {
+			LOG_ERR("No space in the queue for qk_data");
+		}
+
+		qk_data.tag_img_idx = 1;
+		qk_data.img_idx = 1;
+		ret = k_msgq_put(&kimage_worker_msgq, &qk_data, K_NO_WAIT);
+		if (ret) {
+			LOG_ERR("No space in the queue for qk_data");
+		}
+
+		break;		
 	default:
 		LOG_WRN("Not predefied tag, should manually configuring");
 		break;
@@ -1256,8 +1296,11 @@ static int esl_c_scan_init(void)
 {
 	int err;
 	uint8_t mode = BT_SCAN_UUID_FILTER;
+	struct bt_le_scan_param *scan_param =
+		BT_LE_SCAN_PARAM(BT_LE_SCAN_TYPE_PASSIVE, BT_LE_SCAN_OPT_FILTER_DUPLICATE,
+				 CONFIG_ESL_SUBEVENT_INTERVAL, CONFIG_ESL_SUBEVENT_INTERVAL / 2);
 	struct bt_scan_init_param scan_init = {
-		.scan_param = NULL,
+		.scan_param = scan_param,
 		.conn_param = BT_LE_CONN_PARAM_DEFAULT,
 		.connect_if_match = 0,
 	};
@@ -1311,7 +1354,9 @@ static void ecp_rsp_handler(uint8_t conn_idx, struct bt_esl_client *esl_obj, con
 	case OP_BASIC_STATE:
 		LOG_DBG("OP_BASIC_STATE\n");
 		esl_obj->gatt[conn_idx].basic_state = sys_get_le16(command + 1);
-		printk("#BASIC_STATE:1,0x%04x\n", esl_c_obj_l->gatt[conn_idx].esl_device.esl_addr);
+		printk("#BASIC_STATE:1,0x%04x,0x%04lx\n",
+		       esl_c_obj_l->gatt[conn_idx].esl_device.esl_addr,
+		       esl_obj->gatt[conn_idx].basic_state);
 		print_basic_state((atomic_t)esl_obj->gatt[conn_idx].basic_state);
 		if (ecp_command[0] == OP_UNASSOCIATE) {
 			bt_c_esl_post_unassociate(esl_c_obj_l->pending_unassociated_tag);
@@ -2526,10 +2571,25 @@ static void esl_tag_load_work_fn(struct k_work *work)
 	struct esl_tag_load_work_info *tag_work =
 		CONTAINER_OF(dwork, struct esl_tag_load_work_info, work);
 
-	LOG_INF("load tag begin");
-	load_tag_in_storage(tag_work->ble_addr, &esl_c_obj_l->gatt[tag_work->conn_idx].esl_device);
-	LOG_INF("load tag end");
+	(void)load_tag_in_storage(tag_work->ble_addr,
+				  &esl_c_obj_l->gatt[tag_work->conn_idx].esl_device);
 }
+
+int esl_c_import_bt_key(struct bt_keys *new_key)
+{
+	int err;
+
+	err = bt_keys_store(new_key);
+	if (err) {
+		LOG_WRN("bt_keys_store failed(err %d)", err);
+	}
+
+	/* reload settings to make new bt key working */
+	settings_load();
+
+	return err;
+}
+
 #endif /* (CONFIG_BT_ESL_TAG_STORAGE) */
 
 /* 6.1.1 Configure or reconfigure an ESL procedure */
@@ -2657,6 +2717,11 @@ int bt_c_esl_post_unassociate(uint8_t conn_idx)
 	LOG_DBG("pending conn_idx %d", conn_idx);
 
 	ret = bt_unpair(BT_ID_DEFAULT, &esl_c_obj_l->gatt[conn_idx].esl_device.ble_addr);
+	/* Manual unbond ESL if in PTS mode */
+	if (!IS_ENABLED(CONFIG_BT_ESL_AP_PTS)) {
+		ret = bt_unpair(BT_ID_DEFAULT, &esl_c_obj_l->gatt[conn_idx].esl_device.ble_addr);
+	}
+
 	esl_c_obj_l->pending_unassociated_tag = -1;
 	LOG_DBG("tag before %d", esl_c_obj_l->current_esl_count);
 
@@ -2991,6 +3056,17 @@ int esl_c_connect(const bt_addr_le_t *peer_addr, uint16_t esl_addr)
 		esl_c_scan(false, esl_c_obj_l->scan_one_shot);
 	}
 
+	/* Load bt keys from tag DB since there is limitation of max paired device */
+#if defined(CONFIG_BT_ESL_TAG_BT_KEY_STORAGE)
+	struct bt_keys bt_key;
+
+	ret = load_bt_key_in_storage(peer_addr, &bt_key);
+	if (!ret) {
+		LOG_INF("Load bt key from tag DB %d", ret);
+		(void)esl_c_import_bt_key(&bt_key);
+	}
+
+#endif
 	if (LOW_BYTE(esl_addr) == ESL_ADDR_BROADCAST) {
 		ret = bt_conn_le_create(peer_addr, create_param, conn_param,
 					&esl_c_obj_l->conn[conn_idx]);
@@ -3085,6 +3161,7 @@ void esl_c_ap_key_update(uint8_t conn_idx)
 	/* Write AP Sync Key characteristic */
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.data = esl_ap_key.key_v;
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.length = EAD_KEY_MATERIAL_LEN;
+	esl_c_obj_l->gatt[conn_idx].esl_write_params.offset = 0;
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.handle =
 		esl_c_obj_l->gatt[conn_idx].gatt_handles.handles[HANDLE_AP_SYNC_KEY];
 	LOG_HEXDUMP_DBG(esl_ap_key.key_v, EAD_KEY_MATERIAL_LEN, "ap_sync_key");
@@ -3118,6 +3195,7 @@ void esl_c_rsp_key_update(uint8_t conn_idx)
 
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.data = rsp_key;
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.length = EAD_KEY_MATERIAL_LEN;
+	esl_c_obj_l->gatt[conn_idx].esl_write_params.offset = 0;
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.handle =
 		esl_c_obj_l->gatt[conn_idx].gatt_handles.handles[HANDLE_ESL_RESP_KEY];
 	LOG_HEXDUMP_DBG(rsp_key, EAD_KEY_MATERIAL_LEN, "esl_rsp_key");
@@ -3156,6 +3234,7 @@ void esl_c_tag_abs_timer_update(uint8_t conn_idx)
 	/* Write ABSOLUTE TIME characteristic */
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.data = &abs_time;
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.length = sizeof(uint32_t);
+	esl_c_obj_l->gatt[conn_idx].esl_write_params.offset = 0;
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.handle =
 		esl_c_obj_l->gatt[conn_idx].gatt_handles.handles[HANDLE_ESL_ABS_TIME];
 	UNSET_FLAG(write_chrc);
@@ -3285,7 +3364,8 @@ int esl_c_past(uint8_t conn_idx)
 			bt_addr_le_eq(&peer_addr, &cur_peer_addr));
 		CHECKIF((check_ble_connection(esl_c_obj_l->conn[conn_idx]) &&
 			 bt_addr_le_eq(&peer_addr, &cur_peer_addr))) {
-			if (i == CONFIG_BT_ESL_AUTO_PAST_RETRY_TIME) {
+			if ((i == CONFIG_BT_ESL_AUTO_PAST_RETRY_TIME) &&
+			    !IS_ENABLED(CONFIG_BT_ESL_AP_PTS)) {
 				LOG_ERR("PAST time is over retry times %d",
 					CONFIG_BT_ESL_AUTO_PAST_RETRY_TIME);
 				peer_disconnect(esl_c_obj_l->conn[conn_idx]);
