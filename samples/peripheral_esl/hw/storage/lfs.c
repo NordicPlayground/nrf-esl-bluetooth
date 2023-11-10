@@ -17,7 +17,20 @@ LOG_MODULE_DECLARE(peripheral_esl);
 #define MAX_PATH_LEN 255
 
 #define PARTITION_NODE DT_NODELABEL(lfs1)
-FS_FSTAB_DECLARE_ENTRY(PARTITION_NODE);
+#if DT_NODE_EXISTS(PARTITION_NODE)
+	FS_FSTAB_DECLARE_ENTRY(PARTITION_NODE);
+#else
+/* External flash use PM partition */
+#define STORAGE_PARTITION_LABEL littlefs_storage
+#define STORAGE_PARTITION_ID	FIXED_PARTITION_ID(STORAGE_PARTITION_LABEL)
+#define MNT_POINT		"/ots_image"
+FS_LITTLEFS_DECLARE_DEFAULT_CONFIG(cstorage);
+static struct fs_mount_t lfs_storage_mnt = {.type = FS_LITTLEFS,
+					    .fs_data = &cstorage,
+					    .storage_dev = (void *)STORAGE_PARTITION_ID,
+					    .mnt_point = MNT_POINT};
+#endif /* (DT_NODE_EXISTS(PARTITION_NODE)) */
+
 struct fs_mount_t *mp =
 #if DT_NODE_EXISTS(PARTITION_NODE)
 	&FS_FSTAB_ENTRY(PARTITION_NODE)
@@ -112,7 +125,7 @@ size_t read_img_size_from_storage(uint8_t img_idx)
 	return size;
 }
 
-int16_t delete_imgs_from_storage(void)
+int delete_imgs_from_storage(void)
 {
 	struct fs_file_t file;
 	int rc;
@@ -169,10 +182,6 @@ int ots_storage_init(void)
 			if (rc < 0) {
 				LOG_ERR("FAIL: open %s: %d\n", fname, rc);
 			}
-
-			esl_obj->stored_image_size[idx] = 0;
-		} else {
-			esl_obj->stored_image_size[idx] = dirent.size;
 		}
 
 		rc = fs_close(&file);
