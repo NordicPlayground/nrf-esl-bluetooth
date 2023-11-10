@@ -185,7 +185,8 @@ static uint8_t subevent_bufs_data[CONFIG_BT_CTLR_SDC_PERIODIC_ADV_RSP_TX_BUFFER_
 				 [ESL_ENCRTYPTED_DATA_MAX_LEN];
 
 bt_security_t esl_ap_security_level;
-bool esl_c_auto_ap_mode = IS_ENABLED(CONFIG_BT_ESL_AP_AUTO_MODE);
+bool esl_c_auto_ap_mode =
+	(IS_ENABLED(CONFIG_BT_ESL_AP_AUTO_MODE) && !IS_ENABLED(CONFIG_BT_ESL_AP_PTS));
 uint16_t esl_c_tags_per_group =
 	COND_CODE_1(CONFIG_BT_ESL_AP_AUTO_MODE, (CONFIG_BT_ESL_AP_AUTO_TAG_PER_GROUP),
 		    (CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER));
@@ -415,15 +416,22 @@ int esl_c_obj_write_by_name(uint16_t conn_idx, uint8_t tag_img_idx, uint8_t *img
 	}
 
 	WAIT_FOR_FLAG(esl_ots_select_flag);
-	snprintk(fname, sizeof(fname), "%s/%s", MNT_POINT, img_name);
-
-	size = esl_c_obj_l->cb.ap_read_img_size_from_storage(fname);
-	memset(esl_c_obj_l->img_obj_buf, 0, size);
-	err = esl_c_obj_l->cb.ap_read_img_from_storage(fname, esl_c_obj_l->img_obj_buf, &size);
-	if (err) {
-		LOG_ERR("Image %s not exists\n", img_name);
-		printk("OTS_WRITE:0,%s,No Image\n", img_name);
-		return -ENXIO;
+	if (IS_ENABLED(CONFIG_BT_ESL_AP_PTS) && strcmp(img_name, "PTS") == 0) {
+		/* generate random content for PTS */
+		size = 100;
+		(void)bt_rand(esl_c_obj_l->img_obj_buf, size);
+	} else {
+		/* Read image from storage */
+		snprintk(fname, sizeof(fname), "%s/%s", MNT_POINT, img_name);
+		size = esl_c_obj_l->cb.ap_read_img_size_from_storage(fname);
+		memset(esl_c_obj_l->img_obj_buf, 0, size);
+		err = esl_c_obj_l->cb.ap_read_img_from_storage(fname, esl_c_obj_l->img_obj_buf,
+							       &size);
+		if (err) {
+			LOG_ERR("Image %s not exists\n", img_name);
+			printk("OTS_WRITE:0,%s,No Image\n", img_name);
+			return -ENXIO;
+		}
 	}
 
 	esl_c_obj_l->gatt[conn_idx].last_image_crc = crc32_ieee(esl_c_obj_l->img_obj_buf, size);
@@ -2677,6 +2685,11 @@ int bt_c_esl_post_unassociate(uint8_t conn_idx)
 	LOG_DBG("pending conn_idx %d", conn_idx);
 
 	ret = bt_unpair(BT_ID_DEFAULT, &esl_c_obj_l->gatt[conn_idx].esl_device.ble_addr);
+	/* Manual unbond ESL if in PTS mode */
+	if (!IS_ENABLED(CONFIG_BT_ESL_AP_PTS)) {
+		ret = bt_unpair(BT_ID_DEFAULT, &esl_c_obj_l->gatt[conn_idx].esl_device.ble_addr);
+	}
+
 	esl_c_obj_l->pending_unassociated_tag = -1;
 	LOG_DBG("tag before %d", esl_c_obj_l->current_esl_count);
 
@@ -3116,6 +3129,7 @@ void esl_c_ap_key_update(uint8_t conn_idx)
 	/* Write AP Sync Key characteristic */
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.data = esl_ap_key.key_v;
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.length = EAD_KEY_MATERIAL_LEN;
+	esl_c_obj_l->gatt[conn_idx].esl_write_params.offset = 0;
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.handle =
 		esl_c_obj_l->gatt[conn_idx].gatt_handles.handles[HANDLE_AP_SYNC_KEY];
 	LOG_HEXDUMP_DBG(esl_ap_key.key_v, EAD_KEY_MATERIAL_LEN, "ap_sync_key");
@@ -3149,6 +3163,7 @@ void esl_c_rsp_key_update(uint8_t conn_idx)
 
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.data = rsp_key;
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.length = EAD_KEY_MATERIAL_LEN;
+	esl_c_obj_l->gatt[conn_idx].esl_write_params.offset = 0;
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.handle =
 		esl_c_obj_l->gatt[conn_idx].gatt_handles.handles[HANDLE_ESL_RESP_KEY];
 	LOG_HEXDUMP_DBG(rsp_key, EAD_KEY_MATERIAL_LEN, "esl_rsp_key");
@@ -3187,6 +3202,7 @@ void esl_c_tag_abs_timer_update(uint8_t conn_idx)
 	/* Write ABSOLUTE TIME characteristic */
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.data = &abs_time;
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.length = sizeof(uint32_t);
+	esl_c_obj_l->gatt[conn_idx].esl_write_params.offset = 0;
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.handle =
 		esl_c_obj_l->gatt[conn_idx].gatt_handles.handles[HANDLE_ESL_ABS_TIME];
 	UNSET_FLAG(write_chrc);
@@ -3316,7 +3332,8 @@ int esl_c_past(uint8_t conn_idx)
 			bt_addr_le_eq(&peer_addr, &cur_peer_addr));
 		CHECKIF((check_ble_connection(esl_c_obj_l->conn[conn_idx]) &&
 			 bt_addr_le_eq(&peer_addr, &cur_peer_addr))) {
-			if (i == CONFIG_BT_ESL_AUTO_PAST_RETRY_TIME) {
+			if ((i == CONFIG_BT_ESL_AUTO_PAST_RETRY_TIME) &&
+			    !IS_ENABLED(CONFIG_BT_ESL_AP_PTS)) {
 				LOG_ERR("PAST time is over retry times %d",
 					CONFIG_BT_ESL_AUTO_PAST_RETRY_TIME);
 				peer_disconnect(esl_c_obj_l->conn[conn_idx]);

@@ -359,12 +359,6 @@ int main(void)
 		return err;
 	}
 
-#if defined(BT_ESL_AP_PTS)
-	uint8_t pub_addr[] = {0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB};
-
-	bt_ctlr_set_public_addr(pub_addr);
-#endif /* CONFIG_BT_ESL_AP_PTS */
-
 	err = bt_enable(NULL);
 	if (IS_ENABLED(CONFIG_SETTINGS)) {
 		settings_load();

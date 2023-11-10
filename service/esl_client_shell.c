@@ -1359,6 +1359,34 @@ static int cmd_acl_past(const struct shell *shell, size_t argc, char *argv[])
 	return err;
 }
 
+static int cmd_acl_ap_key_update(const struct shell *shell, size_t argc, char *argv[])
+{
+	if (argc < 2) {
+		shell_fprintf(shell, SHELL_ERROR, "no valid parameter <conn_id>\n");
+		return -ENOEXEC;
+	}
+
+	uint8_t conn_idx = strtol(argv[1], NULL, 16);
+
+	esl_c_ap_key_update(conn_idx);
+
+	return 0;
+}
+
+static int cmd_acl_rsp_key_update(const struct shell *shell, size_t argc, char *argv[])
+{
+	if (argc < 2) {
+		shell_fprintf(shell, SHELL_ERROR, "no valid parameter <conn_id>\n");
+		return -ENOEXEC;
+	}
+
+	uint8_t conn_idx = strtol(argv[1], NULL, 16);
+
+	esl_c_rsp_key_update(conn_idx);
+
+	return 0;
+}
+
 SHELL_STATIC_SUBCMD_SET_CREATE(
 	obj_c_cmds, SHELL_CMD(select, NULL, "Select Object with ID", cmd_obj_c_select),
 	SHELL_CMD(read_meta, NULL, "Read metadata of Object", cmd_obj_c_readmeta),
@@ -1396,6 +1424,8 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 	SHELL_CMD(subscribe, NULL, "ESL AP subscribe ECP", cmd_acl_subscribe),
 	SHELL_CMD(past, NULL, "ESL AP commence PAST(Periodic Advertising Sync Transfer)",
 		  cmd_acl_past),
+	SHELL_CMD(ap_key_update, NULL, "ESL AP update AP key", cmd_acl_ap_key_update),
+	SHELL_CMD(rsp_key_update, NULL, "ESL AP update response key", cmd_acl_rsp_key_update),
 	SHELL_SUBCMD_SET_END);
 
 SHELL_STATIC_SUBCMD_SET_CREATE(
