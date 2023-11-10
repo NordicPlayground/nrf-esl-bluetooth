@@ -78,7 +78,7 @@ config ESL_DISPLAY_TYPE
 			value: 0x0B"
 
 config ESL_IMAGE_FILE_SIZE
-	int "Image object max size"
+	int "Image object max size assigned to OTS object created"
 	default 4096
 	range 0 102400
 	help
@@ -86,12 +86,12 @@ config ESL_IMAGE_FILE_SIZE
 
 config ESL_IMAGE_BUFFER_SIZE
 	int "Buffer size to store image data from OTS or storage backend"
-	default 1024
+	default BT_BUF_ACL_RX_SIZE
 	range 0 16484
 	  help
 	   The size should be choose depending on BT_ESL_STORAGE_BACKEND.
-	   Should be the same size of ESL_IMAGE_FILE_SIZE if choose fs which is capiable to read/write offset. e.g.:ESL_OTS_NVS.
-	   Should be equal or large than L2CAP RX MTU or width of panel if choose fs which is capable to read/write offset. e.g.:ESL_OTS_LFS.
+	   Should be the same size of ESL_IMAGE_FILE_SIZE if chosen storage backend is incapable to read/write/seek offset. e.g.:ESL_OTS_NVS.
+	   Should be maximum of CONFIG_BT_BUF_ACL_RX_SIZE and width of panel if chosen storage backend is capable to read/write/seek offset. e.g.:ESL_OTS_LFS.
 
 config BT_ESL_IMAGE_MAX
 	int "Maximum number of image could be stored and displayed"

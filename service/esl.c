@@ -47,7 +47,7 @@ static struct bt_le_per_adv_sync *pawr_sync;
 static uint8_t sync_count;
 static uint8_t response_slot_delay;
 static struct esl_pawr_sync_work_info {
-	struct k_work_delayable work;
+	struct k_work work;
 	struct net_buf_simple buf;
 	uint16_t periodic_event_counter;
 	uint8_t subevent;
@@ -60,7 +60,7 @@ static struct esl_sm_object sm_obj;
 
 /** Thread for PAwR **/
 #define PAWR_WQ_STACK_SIZE KB(2)
-#define PAWR_WQ_PRIORITY   K_LOWEST_APPLICATION_THREAD_PRIO
+#define PAWR_WQ_PRIORITY   K_LOWEST_APPLICATION_THREAD_PRIO - 1
 static K_THREAD_STACK_DEFINE(pawr_wq_stack_area, PAWR_WQ_STACK_SIZE);
 struct k_work_q pawr_work_q;
 
@@ -73,8 +73,10 @@ static struct net_buf_simple pa_rsp;
 static K_THREAD_STACK_DEFINE(led_wq_stack_area, LED_WQ_STACK_SIZE);
 struct k_work_q led_work_q;
 
-/** Thread for Display **/
-#define DISPLAY_WQ_STACK_SIZE KB(1)
+/** Thread for Display
+ * littlefs used in display workqueue need more than 1KB memory
+ **/
+#define DISPLAY_WQ_STACK_SIZE COND_CODE_1(CONFIG_ESL_OTS_LFS, KB(2), KB(1))
 #define DISPLAY_WQ_PRIORITY   K_LOWEST_APPLICATION_THREAD_PRIO
 static K_THREAD_STACK_DEFINE(display_wq_stack_area, DISPLAY_WQ_STACK_SIZE);
 struct k_work_q display_work_q;
@@ -600,7 +602,7 @@ static void recv_cb(struct bt_le_per_adv_sync *sync,
 	esl_pawr_sync_work.periodic_event_counter = info->periodic_event_counter;
 	esl_pawr_sync_work.subevent = info->subevent;
 	net_buf_simple_init_with_data(&esl_pawr_sync_work.buf, buf->data, buf->len);
-	k_work_schedule_for_queue(&pawr_work_q, &esl_pawr_sync_work.work, K_NO_WAIT);
+	k_work_submit_to_queue(&pawr_work_q, &esl_pawr_sync_work.work);
 }
 static struct bt_le_per_adv_sync_cb sync_callbacks = {
 	.synced = sync_cb, .term = term_cb, .recv = recv_cb};
@@ -1795,6 +1797,7 @@ static ssize_t ots_obj_write(struct bt_ots *ots, struct bt_conn *conn, uint64_t 
 	}
 #else
 #ifndef CONFIG_BT_ESL_UNSYNCHRONIZED_IMMEIDATELY
+	memcpy(esl_obj_l->img_obj_buf, data, len);
 	if (esl_obj_l->cb.write_img_to_storage) {
 		esl_obj_l->cb.write_img_to_storage(obj_index, len, offset);
 	} else {
@@ -2208,9 +2211,8 @@ void bt_esl_disconnect(void)
 
 static void esl_pawr_sync_work_fn(struct k_work *work)
 {
-	struct k_work_delayable *dwork = k_work_delayable_from_work(work);
 	struct esl_pawr_sync_work_info *pawr_work =
-		CONTAINER_OF(dwork, struct esl_pawr_sync_work_info, work);
+		CONTAINER_OF(work, struct esl_pawr_sync_work_info, work);
 	uint8_t decrypted_data[ESL_ENCRTYPTED_DATA_MAX_LEN];
 	size_t esl_payload_len;
 	int err;
@@ -2244,7 +2246,7 @@ static void woker_init(void)
 	k_work_init_delayable(&esl_adv_work.work, esl_advertising_fn);
 	k_work_init(&esl_ecp_work.work, ecp_command_handler);
 	esl_setup_pawr_sync();
-	k_work_init_delayable(&esl_pawr_sync_work.work, esl_pawr_sync_work_fn);
+	k_work_init(&esl_pawr_sync_work.work, esl_pawr_sync_work_fn);
 	esl_pawr_sync_work.buf = ecp_net_buf;
 	led_dwork_init(esl_obj_l);
 	display_dwork_init(esl_obj_l);
@@ -2293,16 +2295,29 @@ int bt_esl_init(struct bt_esls *esl_obj, const struct bt_esl_init_param *init_pa
 {
 	int err;
 	size_t idx;
+	struct k_work_queue_config pawr_work_q_config = {
+		.name = "pawr_workq",
+	};
+
+	struct k_work_queue_config led_work_q_config = {
+		.name = "led_workq",
+	};
+
+	struct k_work_queue_config display_work_q_config = {
+		.name = "display_workq",
+	};
 
 	/* PAwR workqueue init */
 	k_work_queue_start(&pawr_work_q, pawr_wq_stack_area,
-			   K_THREAD_STACK_SIZEOF(pawr_wq_stack_area), PAWR_WQ_PRIORITY, NULL);
+			   K_THREAD_STACK_SIZEOF(pawr_wq_stack_area), PAWR_WQ_PRIORITY,
+			   &pawr_work_q_config);
 	/* LED workqueue init */
 	k_work_queue_start(&led_work_q, led_wq_stack_area, K_THREAD_STACK_SIZEOF(led_wq_stack_area),
-			   LED_WQ_PRIORITY, NULL);
+			   LED_WQ_PRIORITY, &led_work_q_config);
 	/* DISPLAY workqueue init */
 	k_work_queue_start(&display_work_q, display_wq_stack_area,
-			   K_THREAD_STACK_SIZEOF(display_wq_stack_area), DISPLAY_WQ_PRIORITY, NULL);
+			   K_THREAD_STACK_SIZEOF(display_wq_stack_area), DISPLAY_WQ_PRIORITY,
+			   &display_work_q_config);
 
 	bt_conn_cb_register(&conn_callbacks);
 	bt_gatt_cb_register(&gatt_callbacks);

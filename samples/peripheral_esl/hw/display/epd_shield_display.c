@@ -128,7 +128,7 @@ int display_init(void)
 	cfb_framebuffer_set_font(display_dev, 0);
 	cfb_get_font_size(display_dev, 0, &font_width, &font_height);
 
-	LOG_INF("font width %d, font height %d rows %d, cols %d\n", font_width, font_height,
+	LOG_DBG("font width %d, font height %d rows %d, cols %d\n", font_width, font_height,
 		cfb_get_display_parameter(display_dev, CFB_DISPLAY_ROWS),
 		cfb_get_display_parameter(display_dev, CFB_DISPLAY_COLS));
 #endif /* DT_HAS_COMPAT_STATUS_OKAY(solomon_ssd16xxfb) */
@@ -140,10 +140,10 @@ int display_init(void)
 int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 {
 	ARG_UNUSED(disp_idx);
-	size_t img_size, cur_pos, chunk_size;
+	+size_t img_size;
 	struct waveshare_gray_head *img_head;
 	struct bt_esls *esl_obj = esl_get_esl_obj();
-	int err, rc;
+	int err;
 
 #if defined(CONFIG_ESL_POWER_PROFILE)
 	display_epd_onoff(EPD_POWER_ON);
@@ -172,19 +172,80 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 	buf_desc.width = img_head->w;
 	buf_desc.height = img_head->h;
 	buf_desc.pitch = buf_desc.width;
-	buf_desc.buf_size = (img_head->w * img_head->h) / 8;
-	img_size -= sizeof(struct waveshare_gray_head);
+	buf_desc.buf_size = (img_head->w * img_head->h) / EPD_MONO_NUMOF_ROWS_PER_PAGE;
+	/* Check image header rational */
+	if (img_size < buf_desc.buf_size) {
+		LOG_ERR("Invalid file size %d, image size %d", img_size, buf_desc.buf_size);
+		return -EINVAL;
+	}
+
+	if (img_head->w == 0 || img_head->h == 0) {
+		LOG_ERR("Invalid resolution width or height is zero");
+		return -EINVAL;
+	}
+
+	if (img_head->w > capabilities.x_resolution || img_head->h > capabilities.y_resolution) {
+		LOG_ERR("Invalid resolution, width or height is over display resolution");
+		return -EINVAL;
+	}
 
 	display_blanking_on(display_dev);
-	cur_pos = sizeof(struct waveshare_gray_head);
-	chunk_size = img_head->w;
 
+#if defined(CONFIG_ESL_OTS_NVS)
 	err = esl_obj->cb.read_img_from_storage(img_idx, esl_obj->img_obj_buf, img_size, 0);
-	rc = display_write(display_dev, 0, 0, &buf_desc,
-			   (esl_obj->img_obj_buf + sizeof(struct display_buffer_descriptor)));
-	if (rc) {
-		LOG_ERR("display_write (rc %d)", rc);
+	if (err < 0) {
+		LOG_ERR("read image idx %d failed (err %d)", img_idx, err);
 	}
+
+	err = display_write(display_dev, 0, 0, &buf_desc,
+			    (esl_obj->img_obj_buf + sizeof(struct display_buffer_descriptor)));
+	if (err) {
+		LOG_ERR("display_write (err %d)", err);
+	}
+#elif defined(CONFIG_ESL_OTS_LFS)
+	/* Image size must align to 8 pixel*/
+	size_t cur_pos, chunk_size;
+	uint16_t cur_y;
+
+	img_size -= sizeof(struct waveshare_gray_head);
+
+	chunk_size = buf_desc.width;
+	buf_desc.height = EPD_MONO_NUMOF_ROWS_PER_PAGE;
+	cur_pos = 0;
+	cur_y = 0;
+	while (img_size > 0) {
+		err = esl_obj->cb.read_img_from_storage(img_idx, esl_obj->img_obj_buf, chunk_size,
+							cur_pos +
+								sizeof(struct waveshare_gray_head));
+		buf_desc.buf_size = chunk_size;
+		if (err < 0) {
+			LOG_ERR("read image idx %d failed (err %d)", img_idx, err);
+		}
+
+		err = display_write(display_dev, 0, cur_y, &buf_desc, esl_obj->img_obj_buf);
+		if (err) {
+			LOG_ERR("display_write (err %d)", err);
+			return err;
+		}
+
+		/**
+		 * Decreases the image size by the chunk size, updates the current position, and
+		 * determines the chunk size for the next iteration. If the remaining image size is
+		 * greater than or equal to the buffer pitch, the chunk size is set to the buffer
+		 * pitch. Otherwise, the chunk size is set to the remaining image size, and the
+		 * buffer height is adjusted accordingly.
+		 */
+		img_size -= chunk_size;
+		cur_pos += chunk_size;
+		if (img_size < chunk_size) {
+			chunk_size = img_size;
+			buf_desc.height =
+				(chunk_size * EPD_MONO_NUMOF_ROWS_PER_PAGE) / buf_desc.width;
+		}
+
+		cur_y = (cur_pos * EPD_MONO_NUMOF_ROWS_PER_PAGE) / buf_desc.width;
+	}
+#endif /* CONFIG_ESL_OTS_NVS */
 
 	display_blanking_off(display_dev);
 	LOG_DBG("Use Raw display interface API");

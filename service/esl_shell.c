@@ -450,12 +450,37 @@ static int cmd_esl_img_dump(const struct shell *shell, size_t argc, char *argv[]
 		shell_fprintf(shell, SHELL_ERROR, "image index is invalid\n");
 	}
 
+	size_t size;
 	struct bt_esls *esl = esl_get_esl_obj();
-	size_t size = esl->cb.read_img_size_from_storage(img_idx);
+	uint32_t crc = 0;
 	void *data;
 
-	(void)ots_obj_cal_checksum(NULL, NULL, img_idx, 0, size, &data);
-	shell_hexdump(shell, data, 200);
+	size = esl->cb.read_img_size_from_storage(img_idx);
+	shell_fprintf(shell, SHELL_NORMAL, "size in storage %d\n", size);
+	if (IS_ENABLED(CONFIG_ESL_OTS_NVS)) {
+		/* NVS has enough size of buffer to calculate checksum */
+		(void)ots_obj_cal_checksum(NULL, NULL, img_idx, 0, size, &data);
+		crc = crc32_ieee(data, size);
+		shell_hexdump(shell, data, size);
+		shell_fprintf(shell, SHELL_NORMAL, "Calculated checksum 0x%08x\n", crc);
+
+	} else {
+		size_t chunk_size = CONFIG_ESL_IMAGE_BUFFER_SIZE;
+		size_t cur_pos = 0;
+		while (size > 0) {
+			(void)ots_obj_cal_checksum(NULL, NULL, img_idx, cur_pos, chunk_size, &data);
+			crc = crc32_ieee_update(crc, data, chunk_size);
+			shell_hexdump(shell, data, chunk_size);
+			size -= chunk_size;
+			cur_pos += chunk_size;
+			if (size < chunk_size) {
+				chunk_size = size;
+			}
+		}
+
+		shell_fprintf(shell, SHELL_NORMAL, "Calculated checksum 0x%08x\n", crc);
+	} /* CONFIG_ESL_OTS_NVS */
+
 	return 0;
 }
 

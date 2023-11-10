@@ -20,6 +20,8 @@ struct waveshare_gray_head {
 	uint16_t h;
 } __packed;
 
+#define EPD_MONO_NUMOF_ROWS_PER_PAGE 8
+
 /**
  * @brief Initializes the ESL information characteristics.
  *
