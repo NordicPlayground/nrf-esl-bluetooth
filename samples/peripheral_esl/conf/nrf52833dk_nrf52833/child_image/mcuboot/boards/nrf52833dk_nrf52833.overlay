@@ -7,5 +7,6 @@
 };
 
 &mx25r64 {
+	reset-gpios = <&arduino_header 14 GPIO_ACTIVE_LOW>; /* D8 */
 	status = "okay";
 };
