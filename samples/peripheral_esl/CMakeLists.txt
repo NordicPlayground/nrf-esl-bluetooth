@@ -23,8 +23,12 @@ zephyr_library_sources_ifdef(
   ../../service/esl.c
   ../../service/esl_settings.c
   ../../service/esl_common.c)
+
+zephyr_library_sources_ifdef(
+  CONFIG_ESL_SHELL
+  ../../service/esl_shell.c)
+
 zephyr_library_include_directories_ifdef(CONFIG_BT_ESL ../../service)
-zephyr_library_include_directories_ifdef(CONFIG_BT_ESL_CLIENT ../../service)
 
 # Display HW implementation
 
