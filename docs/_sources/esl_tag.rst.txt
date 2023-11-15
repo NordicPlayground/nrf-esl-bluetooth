@@ -166,49 +166,58 @@ Configuration options
 
 Check and configure the following Kconfig options:
 
-.. _bt_esl_security_enabled:
+.. _bt_esl_tag_security_enabled:
 
 BT_ESL_SECURITY_ENABLED
+-----------------------
    This enables BT SMP and bonding which are security requirement of ESL Profile. Disable BLE security of the ESL service for debugging purposes.
 
 .. _esl_simulate_display:
 
 ESL_SIMULATE_DISPLAY
+--------------------
    This enable simulated display feature which uses **LED 2** on DK to simulate E-Paper display. DK will blinks few times times(:kconfig:option:`CONFIG_ESL_SIMULATE_DISPLAY_BLINK_TIMES` + Image index from Display Control OPcode) when receiving valid Display Control OPcode. This could be useful for those developers without real E-Paper display.
 
 .. _esl_simulate_display_blink_times:
 
 ESL_SIMULATE_DISPLAY_BLINK_TIMES
+--------------------------------
    This configuration option specifies how many basic times to blink when receiving Display Control OPcode with :kconfig:option:`CONFIG_ESL_SIMULATE_DISPLAY` enabled.
 
 .. _bt_esl_pts:
 
 BT_ESL_PTS
+----------
    Enable PTS feature. With this feature ESL Tag will uses static BLE address. This feature is used for PTS test only.
 
 .. _bt_esl_shipping_mode:
 
 ESL_SHIPPING_MODE
+-----------------
    This enables shipping mode feature. With this feature ESL Tag will enter system off mode right after everytime power cycle which keeps ESL Tag in very low power consumption. The ESL Tag could be waken up by selected method, e.g. NFC, button.
 
 .. _bt_esl_shipping_wake_by_nfc:
 
 ESL_SHIPPING_WAKE_BY_NFC
+------------------------
    This enables feature to wake up the ESL Tag by NFC. This feature could cooperate with :kconfig:option:`CONFIG_ESL_SHIPPING_MODE` to provide a way to wake the ESL Tag up.
 
 .. _bt_esl_shipping_wake_by_button:
 
 ESL_SHIPPING_WAKE_BY_BUTTON
+---------------------------
    This enables feature to wake up the ESL Tag by button. This feature could cooperate with :kconfig:option:`CONFIG_ESL_SHIPPING_MODE` to provide a way to wake the ESL Tag up.
 
 .. _bt_shipping_wake_by_both:
 
 ESL_SHIPPING_WAKE_BY_BOTH
+-------------------------
    This enables featrue to wake up the ESL Tag by both NFC and button. This feature could cooperate with :kconfig:option:`CONFIG_ESL_SHIPPING_MODE` to provide a way to wake the ESL Tag up.
 
 .. _bt_esl_nfc:
 
 ESL_NFC_SUPPORT
+---------------
    Enable NFC feature. With this feature NFC Tag will add BLE address when unassociated, or ESL address when associated. User could use NFC card read to read information from NFC antenna. This feature could cooperate with :kconfig:option:`CONFIG_ESL_SHIPPING_MODE` to provide a way to wake the ESL Tag up.
 
 .. _peripheral_esl_build_and_program:

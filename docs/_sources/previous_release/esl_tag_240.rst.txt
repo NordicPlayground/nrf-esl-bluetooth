@@ -1,4 +1,4 @@
-.. _peripheral_esl:
+.. _peripheral_esl_v240:
 
 Bluetooth: Peripheral ESL
 #########################
@@ -84,7 +84,7 @@ Button:
    Debug button to unassociate the tag from Access Point. Remove all stored images and configured ESL addr and key materials including bonding keys
 
 
-.. _peripheral_esl_sample_activating_epd_variants:
+.. _peripheral_esl_sample_activating_epd_variants_v240:
 
 EPD variant
 ===========
@@ -111,7 +111,7 @@ For more information about using configuration overlay files, see :ref:`zephyr:i
    To use EPD other than reference `WAVESHARE 250x122, 2.13inch E-Ink raw display panel`_ , please use display driver provided by manafacturer.
 
 
-.. _peripheral_esl_power_profiling_variant:
+.. _peripheral_esl_power_profiling_variant_v240:
 
 Power Profiling variant
 =======================
@@ -130,12 +130,12 @@ As alternative, using terminal, use the following build command:
 
 Please follow  :ref:`peripheral_esl_power_measure` to measure currents.
 
-.. _peripheral_esl_power_measure:
+.. _peripheral_esl_power_measure_v240:
 
 Power Consumption Measurement
 =============================
 
-Prerequisite: Read `Power optimization <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/app_dev/optimizing/power.html>`_ and get `Power Profiler Kit II (PPK2)`_
+Prerequisite: Read `Power optimization <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/nrf/app_dev/optimizing/power.html>`_ and get `Power Profiler Kit II (PPK2)`_
 
 1. Build and program the Tag (nRF52833DK) Power Profiling configuration by following :ref:`peripheral_esl_build_and_program` and :ref:`peripheral_esl_power_profiling_variant`
 
@@ -159,78 +159,69 @@ Prerequisite: Read `Power optimization <https://developer.nordicsemi.com/nRF_Con
 
 Once completed this procedure (i.e. if you don’t need to use the PPK2 and you want to power the ESL Tag DevKit from the same USB port as used for programming), put Jumper back on SB40.
 
-.. _peripheral_esl_config_options:
+.. _peripheral_esl_config_options_v240:
 
 Configuration options
 =====================
 
 Check and configure the following Kconfig options:
 
-.. _bt_esl_tag_security_enabled:
+.. _bt_esl_tag_security_enabled_v240:
 
 BT_ESL_SECURITY_ENABLED
------------------------
    This enables BT SMP and bonding which are security requirement of ESL Profile. Disable BLE security of the ESL service for debugging purposes.
 
-.. _esl_simulate_display:
+.. _esl_simulate_display_v240:
 
 ESL_SIMULATE_DISPLAY
---------------------
    This enable simulated display feature which uses **LED 2** on DK to simulate E-Paper display. DK will blinks few times times(:kconfig:option:`CONFIG_ESL_SIMULATE_DISPLAY_BLINK_TIMES` + Image index from Display Control OPcode) when receiving valid Display Control OPcode. This could be useful for those developers without real E-Paper display.
 
-.. _esl_simulate_display_blink_times:
+.. _esl_simulate_display_blink_times_v240:
 
 ESL_SIMULATE_DISPLAY_BLINK_TIMES
---------------------------------
    This configuration option specifies how many basic times to blink when receiving Display Control OPcode with :kconfig:option:`CONFIG_ESL_SIMULATE_DISPLAY` enabled.
 
-.. _bt_esl_pts:
+.. _bt_esl_pts_v240:
 
 BT_ESL_PTS
-----------
    Enable PTS feature. With this feature ESL Tag will uses static BLE address. This feature is used for PTS test only.
 
-.. _bt_esl_shipping_mode:
+.. _bt_esl_shipping_mode_v240:
 
 ESL_SHIPPING_MODE
------------------
    This enables shipping mode feature. With this feature ESL Tag will enter system off mode right after everytime power cycle which keeps ESL Tag in very low power consumption. The ESL Tag could be waken up by selected method, e.g. NFC, button.
 
-.. _bt_esl_shipping_wake_by_nfc:
+.. _bt_esl_shipping_wake_by_nfc_v240:
 
 ESL_SHIPPING_WAKE_BY_NFC
-------------------------
    This enables feature to wake up the ESL Tag by NFC. This feature could cooperate with :kconfig:option:`CONFIG_ESL_SHIPPING_MODE` to provide a way to wake the ESL Tag up.
 
-.. _bt_esl_shipping_wake_by_button:
+.. _bt_esl_shipping_wake_by_button_v240:
 
 ESL_SHIPPING_WAKE_BY_BUTTON
----------------------------
    This enables feature to wake up the ESL Tag by button. This feature could cooperate with :kconfig:option:`CONFIG_ESL_SHIPPING_MODE` to provide a way to wake the ESL Tag up.
 
-.. _bt_shipping_wake_by_both:
+.. _bt_shipping_wake_by_both_v240:
 
 ESL_SHIPPING_WAKE_BY_BOTH
--------------------------
    This enables featrue to wake up the ESL Tag by both NFC and button. This feature could cooperate with :kconfig:option:`CONFIG_ESL_SHIPPING_MODE` to provide a way to wake the ESL Tag up.
 
-.. _bt_esl_nfc:
+.. _bt_esl_nfc_v240:
 
 ESL_NFC_SUPPORT
----------------
    Enable NFC feature. With this feature NFC Tag will add BLE address when unassociated, or ESL address when associated. User could use NFC card read to read information from NFC antenna. This feature could cooperate with :kconfig:option:`CONFIG_ESL_SHIPPING_MODE` to provide a way to wake the ESL Tag up.
 
-.. _peripheral_esl_build_and_program:
+.. _peripheral_esl_build_and_program_v240:
 
 Building and running
 ********************
 
 .. |sample path| replace:: :file:`samples/peripheral_esl`
 
-To build the sample with Visual Studio Code, follow the steps listed on the `How to build an application`_ page in the nRF Connect for VS Code extension documentation. See `Building and programming an application <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/getting_started/programming.html#gs-programming>`_ for other building and programming scenarios and `Testing and debugging an application <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/getting_started/testing.html>`_ for general information about testing and debugging in the nRF Connect SDK.
+To build the sample with Visual Studio Code, follow the steps listed on the `How to build an application`_ page in the nRF Connect for VS Code extension documentation. See `Building and programming an application <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/nrf/getting_started/programming.html#gs-programming>`_ for other building and programming scenarios and `Testing and debugging an application <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/nrf/getting_started/testing.html>`_ for general information about testing and debugging in the nRF Connect SDK.
 
 
-.. _peripheral_esl_testing:
+.. _peripheral_esl_testing_v240:
 
 Testing
 =======
@@ -275,60 +266,6 @@ After programming the sample to your development kit, you can test it in combina
 
       esl_c pawr update_pawr 7 0
 
-FOTA update
-***********
-
-You can configure Firmware Over-The-Air (FOTA) upgrade to replace the applications. Please see `fota_updates`_ for background detail.
-
-Requirements for FOTA
-=====================
-
-To test Firmware Over-The-Air (FOTA), you need an Android or iOS device with the `nRF Connect Device Manager`_ app installed.
-
-Hardware requirements for external flash memory DFU
----------------------------------------------------
-
-To enable the external flash DFU, you need an additional flash memory shield.
-This sample uses WAVESHARE e-Paper Raw Panel Shield(B) as EPD and flash shield board which has MX25R6435F as the SPI NOR Flash. See the following table for the pin definitions.
-
-.. list-table:: Pin definitions
-   :header-rows: 1
-
-   * - Arduino pin
-     - SPI NOR Flash pin
-   * - D13
-     - SCK
-   * - D12
-     - MISO
-   * - D11
-     - MOSI
-   * - D6
-     - CS
-   * - D8
-     - Reset
-
-Enabling FOTA upgrade
----------------------
-
-We provides sample kconfig and dts overlay how to enable FOTA.
-
-``samples\peripheral_esl\conf\nrf52833dk_nrf52833\child_image\mcuboot\boards\nrf52833dk_nrf52833.conf`` demonstrates how to set Kconfig in `bootloader`_ to use external flash.
-
-``samples\peripheral_esl\conf\nrf52833dk_nrf52833\child_image\mcuboot\boards\nrf52833dk_nrf52833.overlay`` demonstrates how to set devicetree in `bootloader`_ to use external flash.
-
-``samples\peripheral_esl\conf\nrf52833dk_nrf52833\nrf52833dk_nrf52833_b2in13_epd.conf`` demonstrates how to set kconfig to enable `bootloader`_ and use external flash as secondary slot in application.
-
-``samples\peripheral_esl\conf\nrf52833dk_nrf52833\nrf52833dk_nrf52833_b2in13_epd.overlay`` demonstrates how to set devicetree to use external flash.
-
-For windows uses the following command.
-   .. code-block:: console
-
-      west build -p -b nrf52833dk_nrf52833 -- -DOVERLAY_CONFIG="nrf52833dk_nrf52833_b2in13_epd.conf" -DDTC_OVERLAY_FILE="conf/nrf52833dk_nrf52833/nrf52833dk_nrf52833_b2in13_epd.overlay" -Dmcuboot_DTS_ROOT=%CD%
-
-For linux uses the following command.
-   .. code-block:: console
-
-      west build -p -b nrf52833dk_nrf52833 -- -DOVERLAY_CONFIG="nrf52833dk_nrf52833_b2in13_epd.conf" -DDTC_OVERLAY_FILE="conf/nrf52833dk_nrf52833/nrf52833dk_nrf52833_b2in13_epd.overlay" -Dmcuboot_DTS_ROOT=$PWD
 
 Dependencies
 ************
@@ -341,11 +278,11 @@ In addition, it uses the following Zephyr libraries:
 
 * ``include/zephyr/types.h``
 * ``boards/arm/nrf*/board.h``
-* `Kernel Services <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/zephyr/kernel/services/index.html>`_
+* `Kernel Services <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/zephyr/kernel/services/index.html>`_
 
   * ``include/kernel.h``
 
-* `Bluetooth APIs <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/zephyr/connectivity/bluetooth/api/index.html>`_:
+* `Bluetooth APIs <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/zephyr/connectivity/bluetooth/api/index.html>`_:
 
   * ``include/bluetooth/bluetooth.h``
   * ``include/bluetooth/gatt.h``
@@ -357,5 +294,3 @@ References
 
 .. target-notes::
 
-.. _fota_updates: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/device_guides/working_with_nrf/nrf52/developing.html#fota-updates
-.. _bootloader: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0//nrf/config_and_build/bootloaders_and_dfu/bootloader_adding.html#adding-mcuboot-as-an-immutable-bootloader

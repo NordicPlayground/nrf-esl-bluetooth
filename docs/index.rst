@@ -23,7 +23,7 @@ In this documentation, you will find information about the `Nordic Semiconductor
    :glob:
    :caption: Previous release:
 
-   environment_setup_240.rst
+   previous_release/index_240.rst
 
 .. _nrf-esl-bluetooth: https://github.com/NordicPlayground/nrf-esl-bluetooth
 .. _nRF Connect SDK 2.5.0: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/index.html

@@ -398,21 +398,23 @@ Before activating auto onboarding (**Button 1**) or, anytime before sending imag
 If auto onboarding is started after the transfer of image (i.e. a new Tag is associated for the first time after transferring the image to the AP and after pushing **Button 1**), the AP will transfer automatically these images to the ESL Tag DevKit with EPD shield, during the associating procedure.
 
 
-.. _sample_config_options:
+.. _ap_sample_config_options:
 
 Configuration options
 =====================
 
 Check and configure the following Kconfig options:
 
-.. _bt_esl_security_enabled:
+.. _bt_esl_ap_security_enabled:
 
 BT_ESL_SECURITY_ENABLED
+-----------------------
    This enables BT SMP and bonding which are security requirement of ESL Profile. Disable BLE security of the ESL service for debugging purposes.
 
 .. _bt_esl_ap_auto_mode:
 
 BT_ESL_AP_AUTO_MODE
+-------------------
    Enable auto onboarding feature. With this feature AP will scan and connect unsynchonrized ESL Tag, configure and send predefined image to unsynchronized ESL Tag, send PAST info to unsynchronized ESL Tag automatically.
    This feature also stores response key material for all of associated ESL tags. The key material will be used to decrypt response EAD from ESL Tag when using predefined ESL packet.
 
@@ -423,6 +425,7 @@ BT_ESL_AP_AUTO_MODE
 .. _bt_esl_ap_auto_tag_per_group:
 
 BT_ESL_AP_AUTO_TAG_PER_GROUP
+----------------------------
    How many tags should keep in same group for auto onboarding. Tag number exceeds this number should be in next group. Otherwise, response key material slot is not enough for all tags in same group.
 	How to choose this number depends on what scenario we want to show.
 	Less or equal to :kconfig:option:`CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER` demostrates decrypts response EAD on-the-fly.
@@ -431,6 +434,7 @@ BT_ESL_AP_AUTO_TAG_PER_GROUP
 .. _bt_esl_ap_group_per_button:
 
 BT_ESL_AP_GROUP_PER_BUTTON
+--------------------------
    **Button 3** and **Button 4** could be used as user interface. **Button 3** will send :ref:`predefined_esl_packet` to all tags in group `x` to change image on display. **Button 4** will send predefined command to all tags in group `x` to flash LED in predefined pattern.
    This option defines how many groups should be used for this feature. For example, if this option is set to `2`, **Button 3** and **Button 4** will send :ref:`predefined_esl_packet` to all tags in group `0` and `1` alternatively.
 
@@ -438,6 +442,7 @@ BT_ESL_AP_GROUP_PER_BUTTON
 .. _bt_esl_ap_auto_past_tag:
 
 BT_ESL_AP_AUTO_PAST_TAG
+-----------------------
    Enable auto PAST feature. With this feature AP will send PAST automatically if connected ESL Tag is in database.
 
    .. note::
@@ -447,17 +452,20 @@ BT_ESL_AP_AUTO_PAST_TAG
 .. _bt_esl_ap_pts:
 
 BT_ESL_AP_PTS
+-------------
    Enable PTS feature. With this feature AP will send PTS command to connected ESL Tag. This feature is used for PTS test only.
 
 .. _bt_esl_ap_auto_ping:
 
 BT_ESL_AP_AUTO_PING
+-------------------
    Enable auto ping feature. With this feature AP will send ping command to all grounp of ESL Tag periodically through PAwR. This feature is used to keep tags in synchronized state automatically.
    Full ESL AP application should implement this feature to keep tags in synchronized state.
 
 .. _bt_esl_ap_ping_interval:
 
 BT_ESL_AP_PING_INTERVAL
+-----------------------
    Interval of auto PAwR ping command. This option is used when :ref:`bt_esl_ap_auto_ping` is enabled. Unit is second.
 
 Building and running

@@ -1,7 +1,7 @@
 .. _central_esl_desc_v240:
 
-Sample description for NCS V2.4.0
-#################################
+Sample description
+##################
 
 .. contents::
    :local:
@@ -10,7 +10,7 @@ Sample description for NCS V2.4.0
 The Central ESL sample acts as Access Point(AP) defined in `Electronic Shelf Label Profile <https://www.bluetooth.com/specifications/specs/electronic-shelf-label-profile-1-0/>`_ which controls and manages numbers of ESL Tag.
 It uses the library :ref:`esl_service_client_readme` to communicates with ESLs connectionlessly when one or more ESLs are in the Synchronized state.
 
-.. include:: esl_experimental.txt
+.. include:: ../esl_experimental.txt
 
 
 Requirements
@@ -48,7 +48,7 @@ When booting up, the Access Point starts periodic advertising with response(PAwR
 At this point, the AP is ready to scan for new tags, connect / configure / synchronize new tags, send encrypted commands, receive encrypted responses (refer to ESL Service and ESL profile). All such functionalities are exposed via :ref:`central_esl_subcommands`. However, since this process may involve many decisions and many shell commands inputs, in order to make testing / developing process easier, this sample provides also a :ref:`auto onboarding <bt_esl_ap_auto_mode>` feature.
 
 
-.. _central_esl_auto_onboarding_and_auto_past_240:
+.. _central_esl_auto_onboarding_and_auto_past_v240:
 
 Auto Onboarding and Auto PAST
 *****************************
@@ -133,10 +133,10 @@ Auto Onboarding feature , which associates Tags automatically to the AP, by cont
       Erase the AP database by using **Button 2** to clear all content of database or shell command to clear specified Tag to start the process again.
 
 
-Once tags are onboarded and synchronized to the AP, commands can be sent/received using the :ref:`central_esl_user_interface_240` (either using the DK buttons features in the DK and/or the :ref:`central_esl_subcommands` by shell commands ).
+Once tags are onboarded and synchronized to the AP, commands can be sent/received using the :ref:`central_esl_user_interface` (either using the DK buttons features in the DK and/or the :ref:`central_esl_subcommands` by shell commands ).
 Auto onboarding feature should be used only for testing/development or as a starting point for more complex applications. For production (ESL AP), shell commend is recommended.
 
-.. _central_esl_user_interface_240:
+.. _central_esl_user_interface_v240:
 
 User interface
 **************
@@ -398,19 +398,19 @@ Before activating auto onboarding (**Button 1**) or, anytime before sending imag
 If auto onboarding is started after the transfer of image (i.e. a new Tag is associated for the first time after transferring the image to the AP and after pushing **Button 1**), the AP will transfer automatically these images to the ESL Tag DevKit with EPD shield, during the associating procedure.
 
 
-.. _ap_sample_config_options_240:
+.. _ap_sample_config_options_v240:
 
 Configuration options
 =====================
 
 Check and configure the following Kconfig options:
 
-.. _bt_esl_ap_security_enabled_240:
+.. _bt_esl_ap_security_enabled_v240:
 
 BT_ESL_SECURITY_ENABLED
    This enables BT SMP and bonding which are security requirement of ESL Profile. Disable BLE security of the ESL service for debugging purposes.
 
-.. _bt_esl_ap_auto_mode_240:
+.. _bt_esl_ap_auto_mode_v240:
 
 BT_ESL_AP_AUTO_MODE
    Enable auto onboarding feature. With this feature AP will scan and connect unsynchonrized ESL Tag, configure and send predefined image to unsynchronized ESL Tag, send PAST info to unsynchronized ESL Tag automatically.
@@ -420,7 +420,7 @@ BT_ESL_AP_AUTO_MODE
 
       Auto onboarding feature is meant to be used for small scale testing and development purposes. For larger scale, :ref:`central_esl_subcommands` give more flexibility and control over the AP functionalities.
 
-.. _bt_esl_ap_auto_tag_per_group_240:
+.. _bt_esl_ap_auto_tag_per_group_v240:
 
 BT_ESL_AP_AUTO_TAG_PER_GROUP
    How many tags should keep in same group for auto onboarding. Tag number exceeds this number should be in next group. Otherwise, response key material slot is not enough for all tags in same group.
@@ -428,14 +428,14 @@ BT_ESL_AP_AUTO_TAG_PER_GROUP
 	Less or equal to :kconfig:option:`CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER` demostrates decrypts response EAD on-the-fly.
 	Greater than :kconfig:option:`CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER` demostrates ESL AP able to control large amount of tags at the same time."
 
-.. _bt_esl_ap_group_per_button_240:
+.. _bt_esl_ap_group_per_button_v240:
 
 BT_ESL_AP_GROUP_PER_BUTTON
    **Button 3** and **Button 4** could be used as user interface. **Button 3** will send :ref:`predefined_esl_packet` to all tags in group `x` to change image on display. **Button 4** will send predefined command to all tags in group `x` to flash LED in predefined pattern.
    This option defines how many groups should be used for this feature. For example, if this option is set to `2`, **Button 3** and **Button 4** will send :ref:`predefined_esl_packet` to all tags in group `0` and `1` alternatively.
 
 
-.. _bt_esl_ap_auto_past_tag_240:
+.. _bt_esl_ap_auto_past_tag_v240:
 
 BT_ESL_AP_AUTO_PAST_TAG
    Enable auto PAST feature. With this feature AP will send PAST automatically if connected ESL Tag is in database.
@@ -444,7 +444,7 @@ BT_ESL_AP_AUTO_PAST_TAG
 
       Auto PAST feature is meant to be used for small scale testing and development purposes. For larger scale, :ref:`central_esl_subcommands` give more flexibility and control over the AP functionalities.
 
-.. _bt_esl_ap_pts_240:
+.. _bt_esl_ap_pts_v240:
 
 BT_ESL_AP_PTS
    Enable PTS feature. With this feature AP will send PTS command to connected ESL Tag. This feature is used for PTS test only.
@@ -477,7 +477,7 @@ After programming the sample to your development kit, complete the following ste
 
 3. Optionally, connect the RTT console to display debug messages.
 #. Optionally (required for out of the box testing in combination ESL Tag sample with EPD), transfer the images from PC to the AP.
-#. Test the sample either by by auto onboarding feature or using :ref:`central_esl_subcommands_240` manually as described in :ref:`central_esl_user_interface_240`.
+#. Test the sample either by by auto onboarding feature or using :ref:`central_esl_subcommands` manually as described in :ref:`central_esl_user_interface`.
 
 Dependencies
 ************
