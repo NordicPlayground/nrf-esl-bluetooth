@@ -1,7 +1,7 @@
-.. _environment_setup:
+.. _environment_setup_v240:
 
-Requirements and setup
-######################
+Requirements and setup for NCS V2.4.0
+#####################################
 
 This page outlines the requirements that you need to meet before you start working with the ESL environment.
 Once completed, you will be able to run and test a sample ESL application.
@@ -37,12 +37,12 @@ To meet the software requirements, install the following tools:
   * `Mcumgr Command-line Tool`_
 
 Then:
-   Install `nRF Connect SDK v2.5.0`_
+   Install `nRF Connect SDK v2.4.0`_
 
 nRF Connect SDK
 ===============
 
-Perform the following steps to install `nRF Connect SDK v2.5.0`_ and setup boards:
+Perform the following steps to install `nRF Connect SDK v2.4.0`_ and setup boards:
 
 #. Set up your development environment by choosing one of the installation methods below:
 
@@ -58,9 +58,9 @@ Perform the following steps to install `nRF Connect SDK v2.5.0`_ and setup board
 
    .. code-block:: console
 
-      $ git clone https://github.com/NordicPlayground/nrf-esl-bluetooth -b v2.5-branch
+      $ git clone https://github.com/NordicPlayground/nrf-esl-bluetooth -b v2.4-branch
 
-   or Download the repository from `esl_archive_v2.5-branch`_ or `esl_archive_main`_ , and then unzip it:
+   or Download the repository from `esl_archive_v2.4-branch`_ , and then unzip it:
 
    .. code-block:: console
 
@@ -69,17 +69,16 @@ Perform the following steps to install `nRF Connect SDK v2.5.0`_ and setup board
 #. To build the samples using VS Code or Command line, follow this guide: `Building and programming an application`_.
 
 
-.. _nRF Connect SDK v2.5.0: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/index.html
+.. _nRF Connect SDK v2.4.0: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/nrf/index.html
 .. _Getting started with nRF52 Series: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/working_with_nrf/nrf52/gs.html
 .. _Getting started with nRF53 Series: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/working_with_nrf/nrf53/nrf5340_gs.html
 .. _Getting started with Thingy\:52: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/boards/arm/thingy52_nrf52832/doc/index.html
 .. _Getting started with Thingy\:53: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/working_with_nrf/nrf53/thingy53_gs.html
-.. _nRF Connect SDK Getting started guide: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/getting_started.html
-.. _Installing automatically: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/gs_assistant.html#installing-automatically
-.. _Installing manually: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/gs_installing.html#install-the-required-tools
+.. _nRF Connect SDK Getting started guide: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/nrf/getting_started.html
+.. _Installing automatically: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/nrf/gs_assistant.html#installing-automatically
+.. _Installing manually: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/nrf/gs_installing.html#install-the-required-tools
 .. _nRF Connect for Desktop: https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Connect-for-desktop
 .. _GO Language: https://go.dev/doc/install
-.. _Mcumgr Command-line Tool: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/zephyr/services/device_mgmt/mcumgr.html#command-line-tool
-.. _esl_archive_main: https://github.com/NordicPlayground/nrf-esl-bluetooth/archive/refs/heads/main.zip
-.. _esl_archive_v2.5-branch: https://github.com/NordicPlayground/nrf-esl-bluetooth/archive/refs/heads/v2.5-branch.zip
-.. _Building and programming an application: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/getting_started/programming.html
+.. _Mcumgr Command-line Tool: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/zephyr/services/device_mgmt/mcumgr.html#command-line-tool
+.. _esl_archive_v2.4-branch: https://github.com/NordicPlayground/nrf-esl-bluetooth/archive/refs/heads/v2.4-branch.zip
+.. _Building and programming an application: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/nrf/getting_started/programming.html

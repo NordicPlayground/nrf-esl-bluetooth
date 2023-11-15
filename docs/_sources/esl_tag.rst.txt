@@ -135,7 +135,7 @@ Please follow  :ref:`peripheral_esl_power_measure` to measure currents.
 Power Consumption Measurement
 =============================
 
-Prerequisite: Read `Power optimization <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/nrf/app_dev/optimizing/power.html>`_ and get `Power Profiler Kit II (PPK2)`_
+Prerequisite: Read `Power optimization <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/app_dev/optimizing/power.html>`_ and get `Power Profiler Kit II (PPK2)`_
 
 1. Build and program the Tag (nRF52833DK) Power Profiling configuration by following :ref:`peripheral_esl_build_and_program` and :ref:`peripheral_esl_power_profiling_variant`
 
@@ -218,7 +218,7 @@ Building and running
 
 .. |sample path| replace:: :file:`samples/peripheral_esl`
 
-To build the sample with Visual Studio Code, follow the steps listed on the `How to build an application`_ page in the nRF Connect for VS Code extension documentation. See `Building and programming an application <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/nrf/getting_started/programming.html#gs-programming>`_ for other building and programming scenarios and `Testing and debugging an application <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/nrf/getting_started/testing.html>`_ for general information about testing and debugging in the nRF Connect SDK.
+To build the sample with Visual Studio Code, follow the steps listed on the `How to build an application`_ page in the nRF Connect for VS Code extension documentation. See `Building and programming an application <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/getting_started/programming.html#gs-programming>`_ for other building and programming scenarios and `Testing and debugging an application <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/getting_started/testing.html>`_ for general information about testing and debugging in the nRF Connect SDK.
 
 
 .. _peripheral_esl_testing:
@@ -266,6 +266,60 @@ After programming the sample to your development kit, you can test it in combina
 
       esl_c pawr update_pawr 7 0
 
+FOTA update
+***********
+
+You can configure Firmware Over-The-Air (FOTA) upgrade to replace the applications. Please see `fota_updates`_ for background detail.
+
+Requirements for FOTA
+=====================
+
+To test Firmware Over-The-Air (FOTA), you need an Android or iOS device with the `nRF Connect Device Manager`_ app installed.
+
+Hardware requirements for external flash memory DFU
+---------------------------------------------------
+
+To enable the external flash DFU, you need an additional flash memory shield.
+This sample uses WAVESHARE e-Paper Raw Panel Shield(B) as EPD and flash shield board which has MX25R6435F as the SPI NOR Flash. See the following table for the pin definitions.
+
+.. list-table:: Pin definitions
+   :header-rows: 1
+
+   * - Arduino pin
+     - SPI NOR Flash pin
+   * - D13
+     - SCK
+   * - D12
+     - MISO
+   * - D11
+     - MOSI
+   * - D6
+     - CS
+   * - D8
+     - Reset
+
+Enabling FOTA upgrade
+---------------------
+
+We provides sample kconfig and dts overlay how to enable FOTA.
+
+``samples\peripheral_esl\conf\nrf52833dk_nrf52833\child_image\mcuboot\boards\nrf52833dk_nrf52833.conf`` demonstrates how to set Kconfig in `bootloader`_ to use external flash.
+
+``samples\peripheral_esl\conf\nrf52833dk_nrf52833\child_image\mcuboot\boards\nrf52833dk_nrf52833.overlay`` demonstrates how to set devicetree in `bootloader`_ to use external flash.
+
+``samples\peripheral_esl\conf\nrf52833dk_nrf52833\nrf52833dk_nrf52833_b2in13_epd.conf`` demonstrates how to set kconfig to enable `bootloader`_ and use external flash as secondary slot in application.
+
+``samples\peripheral_esl\conf\nrf52833dk_nrf52833\nrf52833dk_nrf52833_b2in13_epd.overlay`` demonstrates how to set devicetree to use external flash.
+
+For windows uses the following command.
+   .. code-block:: console
+
+      west build -p -b nrf52833dk_nrf52833 -- -DOVERLAY_CONFIG="nrf52833dk_nrf52833_b2in13_epd.conf" -DDTC_OVERLAY_FILE="conf/nrf52833dk_nrf52833/nrf52833dk_nrf52833_b2in13_epd.overlay" -Dmcuboot_DTS_ROOT=%CD%
+
+For linux uses the following command.
+   .. code-block:: console
+
+      west build -p -b nrf52833dk_nrf52833 -- -DOVERLAY_CONFIG="nrf52833dk_nrf52833_b2in13_epd.conf" -DDTC_OVERLAY_FILE="conf/nrf52833dk_nrf52833/nrf52833dk_nrf52833_b2in13_epd.overlay" -Dmcuboot_DTS_ROOT=$PWD
 
 Dependencies
 ************
@@ -278,11 +332,11 @@ In addition, it uses the following Zephyr libraries:
 
 * ``include/zephyr/types.h``
 * ``boards/arm/nrf*/board.h``
-* `Kernel Services <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/zephyr/kernel/services/index.html>`_
+* `Kernel Services <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/zephyr/kernel/services/index.html>`_
 
   * ``include/kernel.h``
 
-* `Bluetooth APIs <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/zephyr/connectivity/bluetooth/api/index.html>`_:
+* `Bluetooth APIs <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/zephyr/connectivity/bluetooth/api/index.html>`_:
 
   * ``include/bluetooth/bluetooth.h``
   * ``include/bluetooth/gatt.h``
@@ -294,3 +348,5 @@ References
 
 .. target-notes::
 
+.. _fota_updates: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/device_guides/working_with_nrf/nrf52/developing.html#fota-updates
+.. _bootloader: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0//nrf/config_and_build/bootloaders_and_dfu/bootloader_adding.html#adding-mcuboot-as-an-immutable-bootloader

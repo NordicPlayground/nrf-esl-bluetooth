@@ -102,6 +102,10 @@
 <li class="toctree-l1"><a class="reference internal" href="services.html">Services</a></li>
 <li class="toctree-l1"><a class="reference internal" href="additional_resources.html">Additional resources</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Previous release:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup_240.html">Requirements and setup for NCS V2.4.0</a></li>
+</ul>
 
             
           
@@ -172,16 +176,16 @@
 <span id="id1"></span><h1>Central ESL subcommands<a class="headerlink" href="#central-esl-subcommands" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><p><a class="reference internal" href="#esl-client-subcommands" id="id12">ESL Client subcommands</a></p></li>
-<li><p><a class="reference internal" href="#ots-client-subcommands" id="id13">OTS Client subcommands</a></p></li>
-<li><p><a class="reference internal" href="#acl-subcommands" id="id14">ACL subcommands</a></p></li>
-<li><p><a class="reference internal" href="#pawr-subcommands" id="id15">PAWR subcommands</a></p></li>
-<li><p><a class="reference internal" href="#predefined-esl-sync-packet" id="id16">Predefined ESL sync packet</a></p></li>
+<li><p><a class="reference internal" href="#esl-client-subcommands" id="id13">ESL Client subcommands</a></p></li>
+<li><p><a class="reference internal" href="#ots-client-subcommands" id="id14">OTS Client subcommands</a></p></li>
+<li><p><a class="reference internal" href="#acl-subcommands" id="id15">ACL subcommands</a></p></li>
+<li><p><a class="reference internal" href="#pawr-subcommands" id="id16">PAWR subcommands</a></p></li>
+<li><p><a class="reference internal" href="#predefined-esl-sync-packet" id="id17">Predefined ESL sync packet</a></p></li>
 </ul>
 </div>
 <p id="esl-c-subcmds"><code class="docutils literal notranslate"><span class="pre">esl_c</span></code> is the ESL Access Point client shell command and it supports the following subcommands.</p>
 <section id="esl-client-subcommands">
-<h2><a class="toc-backref" href="#id12">ESL Client subcommands</a><a class="headerlink" href="#esl-client-subcommands" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id13">ESL Client subcommands</a><a class="headerlink" href="#esl-client-subcommands" title="Permalink to this headline">¶</a></h2>
 <table class="docutils align-default" id="id7">
 <caption><span class="caption-text">ESL Client subcommands</span><a class="headerlink" href="#id7" title="Permalink to this table">¶</a></caption>
 <colgroup>
@@ -204,14 +208,110 @@
 <td><p>connection index (0~CONFIG_BT_MAX_CONN)</p></td>
 <td><p>Unassociate connected tag</p></td>
 </tr>
+<tr class="row-even"><td><p>force_un</p></td>
+<td><p>connection index (0~CONFIG_BT_MAX_CONN)</p></td>
+<td><p>ESL service 3.9.2.2.2 request tag to response with Basic State. This command allows AP to Unassociate connected tag without waiting for response.</p></td>
+</tr>
+<tr class="row-odd"><td><p>bond_dump</p></td>
+<td><p>N/A</p></td>
+<td><p>Dump bonded ble address of ESL tags</p></td>
+</tr>
+<tr class="row-even"><td><p>unbond_all</p></td>
+<td><p>N/A</p></td>
+<td><p>Unbond all bonded ESL tags for debug.</p></td>
+</tr>
+<tr class="row-odd"><td><p>unbond_ble</p></td>
+<td><div class="line-block">
+<div class="line">&lt;address type&gt; (0 = public, 1 = random, 2 = public_id, 3 = private_id)</div>
+<div class="line">&lt;ble address&gt; (xx:xx:xx:xx:xx:xx)</div>
+</div>
+</td>
+<td><p>Unbond specific ESL tag by ble address.</p></td>
+</tr>
+<tr class="row-even"><td><p>ap_abs</p></td>
+<td><p>[&lt;abs value&gt;] (optional)</p></td>
+<td><p>Get or set (if input abs time value) local AP absolute time value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>update_abs</p></td>
+<td><div class="line-block">
+<div class="line">&lt;conn_idx&gt;  (0 ~ CONFIG_BT_MAX_CONN)</div>
+<div class="line">&lt;abs_value&gt;</div>
+</div>
+</td>
+<td><p>Update local AP and connected tag absolute time value.</p></td>
+</tr>
+<tr class="row-even"><td><p>factory</p></td>
+<td><p>&lt;esl_addr&gt;</p></td>
+<td><p>Send factory reset CP command to connected tag by esl address.</p></td>
+</tr>
+<tr class="row-odd"><td><p>default_esl_addr</p></td>
+<td><p>&lt;esl_addr&gt;</p></td>
+<td><p>Set default esl address for <a class="reference internal" href="esl_ap_sample_description_240.html#central-esl-auto-onboarding-and-auto-past"><span class="std std-ref">Auto Onboarding and Auto PAST</span></a> features .</p></td>
+</tr>
+<tr class="row-even"><td><p>update_complete</p></td>
+<td><div class="line-block">
+<div class="line">&lt;conn_idx&gt; (0 ~ CONFIG_BT_MAX_CONN)</div>
+<div class="line">[&lt;esl_addr&gt;] (optional)</div>
+</div>
+</td>
+<td><p>Send update complete CP command to connected tag by connection index or esl address.</p></td>
+</tr>
+<tr class="row-odd"><td><p>auto_ap</p></td>
+<td><p>[&lt;on/off&gt;]  (1/0) (optional)</p></td>
+<td><p>Get or set auto AP mode.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The following ESL tag database commands required <code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_BT_ESL_TAG_STORAGE</span></code> enabled.</p>
+</div>
+<table class="docutils align-default" id="id8">
+<caption><span class="caption-text">ESL Client subcommands (TAG_STORAGE)</span><a class="headerlink" href="#id8" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Subcommand</p></th>
+<th class="head"><p>Argument</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>remove_all_tags</p></td>
+<td><p>N/A</p></td>
+<td><p>Remove all ESL tags from database, including ESL address / bond data / ESL response key.</p></td>
+</tr>
+<tr class="row-odd"><td><p>list_tags_storage</p></td>
+<td><p>N/A</p></td>
+<td><p>List all ESL tags stored in database.</p></td>
+</tr>
+<tr class="row-even"><td><p>remove_tag</p></td>
+<td><p>&lt;esl_addr&gt;</p></td>
+<td><p>Remove tag from database by ESL address.</p></td>
+</tr>
+<tr class="row-odd"><td><p>tags_per_group</p></td>
+<td><p>&lt;tag_count&gt;</p></td>
+<td><p>Set <span class="xref std std-ref">bt_esl_ap_auto_tag_per_group</span> runtime.</p></td>
+</tr>
+<tr class="row-even"><td><p>groups_per_button</p></td>
+<td><p>&lt;group_count&gt;</p></td>
+<td><p>Set <span class="xref std std-ref">bt_esl_ap_group_per_button</span> runtime.</p></td>
+</tr>
+<tr class="row-odd"><td><p>unbond_esl</p></td>
+<td><p>&lt;esl_addr&gt;</p></td>
+<td><p>Unbond tag from database by ESL address. This is used when the bonding data of the AP and the ESL are out of sync, i.e. the AP will have an LTK while the ESL may not. If the reconnection fails due to a missing LTK, the AP may clear and attempt to create a new bond.</p></td>
+</tr>
 </tbody>
 </table>
 </section>
 <section id="ots-client-subcommands">
-<span id="obj-c-subcmds"></span><h2><a class="toc-backref" href="#id13">OTS Client subcommands</a><a class="headerlink" href="#ots-client-subcommands" title="Permalink to this headline">¶</a></h2>
+<span id="obj-c-subcmds"></span><h2><a class="toc-backref" href="#id14">OTS Client subcommands</a><a class="headerlink" href="#ots-client-subcommands" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">esl_c</span> <span class="pre">obj_c</span></code> is the Object Transfer client shell command and it supports the following subcommands.</p>
-<table class="docutils align-default" id="id8">
-<caption><span class="caption-text">Object Transfer client commands</span><a class="headerlink" href="#id8" title="Permalink to this table">¶</a></caption>
+<table class="docutils align-default" id="id9">
+<caption><span class="caption-text">Object Transfer client commands</span><a class="headerlink" href="#id9" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 33%" />
 <col style="width: 33%" />
@@ -254,10 +354,10 @@
 </table>
 </section>
 <section id="acl-subcommands">
-<span id="acl-subcmds"></span><h2><a class="toc-backref" href="#id14">ACL subcommands</a><a class="headerlink" href="#acl-subcommands" title="Permalink to this headline">¶</a></h2>
+<span id="acl-subcmds"></span><h2><a class="toc-backref" href="#id15">ACL subcommands</a><a class="headerlink" href="#acl-subcommands" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">esl_c</span> <span class="pre">acl</span></code> shell command is related to the ESL Access Point ACL and it supports the following subcommands.</p>
-<table class="docutils align-default" id="id9">
-<caption><span class="caption-text">ACL commands</span><a class="headerlink" href="#id9" title="Permalink to this table">¶</a></caption>
+<table class="docutils align-default" id="id10">
+<caption><span class="caption-text">ACL commands</span><a class="headerlink" href="#id10" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 33%" />
 <col style="width: 33%" />
@@ -332,9 +432,21 @@
 </tr>
 <tr class="row-odd"><td><p>connect_esl</p></td>
 <td><p>&lt;esl_addr&gt;</p></td>
-<td><p>Connect ESL service tag with esl addr.</p></td>
+<td><p>Connect ESL service tag with ESL address. This requires <code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_BT_ESL_TAG_STORAGE</span></code> enabled.</p></td>
 </tr>
-<tr class="row-even"><td><p>configure</p></td>
+<tr class="row-even"><td><p>load_bt_key_esl</p></td>
+<td><p>&lt;esl_addr&gt;</p></td>
+<td><p>Load bond data with ESL address from ESL . This requires <code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_BT_ESL_TAG_STORAGE</span></code> enabled.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ap_key_update</p></td>
+<td><p>&lt;conn_idx&gt;</p></td>
+<td><p>Write AP sync key to connected ESL tag.</p></td>
+</tr>
+<tr class="row-even"><td><p>rsp_key_update</p></td>
+<td><p>&lt;conn_idx&gt;</p></td>
+<td><p>Write response key to connected ESL tag.</p></td>
+</tr>
+<tr class="row-odd"><td><p>configure</p></td>
 <td><div class="line-block">
 <div class="line">&lt;connection index&gt;  (0 ~ CONFIG_BT_MAX_CONN)</div>
 <div class="line">&lt;esl_addr&gt;</div>
@@ -342,11 +454,11 @@
 </td>
 <td><p>Configure connected tag manually.</p></td>
 </tr>
-<tr class="row-odd"><td><p>discovery</p></td>
+<tr class="row-even"><td><p>discovery</p></td>
 <td><p>&lt;connection index&gt;  (0 ~ CONFIG_BT_MAX_CONN)</p></td>
 <td><p>Discovery connected tag manually.</p></td>
 </tr>
-<tr class="row-even"><td><p>write_esl_addr</p></td>
+<tr class="row-odd"><td><p>write_esl_addr</p></td>
 <td><div class="line-block">
 <div class="line">&lt;connection index&gt;  (0 ~ CONFIG_BT_MAX_CONN)</div>
 <div class="line">&lt;esl_addr&gt;</div>
@@ -355,11 +467,11 @@
 </td>
 <td><p>Write ESL address characteristic.</p></td>
 </tr>
-<tr class="row-odd"><td><p>subscribe</p></td>
+<tr class="row-even"><td><p>subscribe</p></td>
 <td><p>&lt;connection index&gt;  (0 ~ CONFIG_BT_MAX_CONN)</p></td>
 <td><p>Subscribe ECP notifiy manually.</p></td>
 </tr>
-<tr class="row-even"><td><p>past</p></td>
+<tr class="row-odd"><td><p>past</p></td>
 <td><p>&lt;connection index&gt;  (0 ~ CONFIG_BT_MAX_CONN)</p></td>
 <td><p>Commence PAST(Periodic Advertising Sync Transfer) to connected ESL tag .</p></td>
 </tr>
@@ -367,10 +479,10 @@
 </table>
 </section>
 <section id="pawr-subcommands">
-<span id="pawr-subcmds"></span><h2><a class="toc-backref" href="#id15">PAWR subcommands</a><a class="headerlink" href="#pawr-subcommands" title="Permalink to this headline">¶</a></h2>
+<span id="pawr-subcmds"></span><h2><a class="toc-backref" href="#id16">PAWR subcommands</a><a class="headerlink" href="#pawr-subcommands" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">esl_c</span> <span class="pre">pawr</span></code> shell command is related to the ESL Access Point periodic advertising with respones (PAwR) and it supports the following subcommands.</p>
-<table class="docutils align-default" id="id10">
-<caption><span class="caption-text">PAWR commands</span><a class="headerlink" href="#id10" title="Permalink to this table">¶</a></caption>
+<table class="docutils align-default" id="id11">
+<caption><span class="caption-text">PAWR commands</span><a class="headerlink" href="#id11" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 33%" />
 <col style="width: 33%" />
@@ -423,15 +535,15 @@
 </table>
 </section>
 <section id="predefined-esl-sync-packet">
-<span id="predefined-esl-packet"></span><h2><a class="toc-backref" href="#id16">Predefined ESL sync packet</a><a class="headerlink" href="#predefined-esl-sync-packet" title="Permalink to this headline">¶</a></h2>
+<span id="predefined-esl-packet"></span><h2><a class="toc-backref" href="#id17">Predefined ESL sync packet</a><a class="headerlink" href="#predefined-esl-sync-packet" title="Permalink to this headline">¶</a></h2>
 <p>This sample contains a few predefined ESL sync packets.
 The following table shows their content.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Index of elements in ESL starts with 0 which means 0 is the first instance of elements (display/LED/sensor).</p>
 </div>
-<table class="docutils align-default" id="id11">
-<caption><span class="caption-text">ESL Sync TLV commands</span><a class="headerlink" href="#id11" title="Permalink to this table">¶</a></caption>
+<table class="docutils align-default" id="id12">
+<caption><span class="caption-text">ESL Sync TLV commands</span><a class="headerlink" href="#id12" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 50%" />
 <col style="width: 50%" />
@@ -504,6 +616,12 @@ The following table shows their content.</p>
 </tr>
 <tr class="row-even"><td><p>0x14</p></td>
 <td><p>Tag default ESL_ID ~ ESL_ID + 10 Display img 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x15</p></td>
+<td><p>Send Vendor-specific command <code class="docutils literal notranslate"><span class="pre">0x1F</span></code> parameter <code class="docutils literal notranslate"><span class="pre">0x1</span></code> to tag default ESL_ID ~ ESL_ID + 10</p></td>
+</tr>
+<tr class="row-even"><td><p>0x16</p></td>
+<td><p>Send Vendor-specific command <code class="docutils literal notranslate"><span class="pre">0x1F</span></code> parameter <code class="docutils literal notranslate"><span class="pre">0x0</span></code> to tag default ESL_ID ~ ESL_ID + 10</p></td>
 </tr>
 </tbody>
 </table>

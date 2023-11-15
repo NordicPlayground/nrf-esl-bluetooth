@@ -26,7 +26,69 @@ ESL Client subcommands
    * - unassociated
      - connection index (0~CONFIG_BT_MAX_CONN)
      - Unassociate connected tag
+   * - force_un
+     - connection index (0~CONFIG_BT_MAX_CONN)
+     - ESL service 3.9.2.2.2 request tag to response with Basic State. This command allows AP to Unassociate connected tag without waiting for response.
+   * - bond_dump
+     - N/A
+     - Dump bonded ble address of ESL tags
+   * - unbond_all
+     - N/A
+     - Unbond all bonded ESL tags for debug.
+   * - unbond_ble
+     - | <address type> (0 = public, 1 = random, 2 = public_id, 3 = private_id)
+       | <ble address> (xx:xx:xx:xx:xx:xx)
+     - Unbond specific ESL tag by ble address.
+   * - ap_abs
+     - [<abs value>] (optional)
+     - Get or set (if input abs time value) local AP absolute time value.
+   * - update_abs
+     - | <conn_idx>  (0 ~ CONFIG_BT_MAX_CONN)
+       | <abs_value>
+     - Update local AP and connected tag absolute time value.
+   * - factory
+     - <esl_addr>
+     - Send factory reset CP command to connected tag by esl address.
+   * - default_esl_addr
+     - <esl_addr>
+     - Set default esl address for :ref:`central_esl_auto_onboarding_and_auto_past` features .
+   * - update_complete
+     - | <conn_idx> (0 ~ CONFIG_BT_MAX_CONN)
+       | [<esl_addr>] (optional)
+     - Send update complete CP command to connected tag by connection index or esl address.
+   * - auto_ap
+     - [<on/off>]  (1/0) (optional)
+     - Get or set auto AP mode.
 
+
+.. note::
+
+   The following ESL tag database commands required :kconifg:option:`CONFIG_BT_ESL_TAG_STORAGE` enabled.
+
+.. list-table:: ESL Client subcommands (TAG_STORAGE)
+   :header-rows: 1
+
+   * - Subcommand
+     - Argument
+     - Description
+   * - remove_all_tags
+     - N/A
+     - Remove all ESL tags from database, including ESL address / bond data / ESL response key.
+   * - list_tags_storage
+     - N/A
+     - List all ESL tags stored in database.
+   * - remove_tag
+     - <esl_addr>
+     - Remove tag from database by ESL address.
+   * - tags_per_group
+     - <tag_count>
+     - Set :ref:`bt_esl_ap_auto_tag_per_group` runtime.
+   * - groups_per_button
+     - <group_count>
+     - Set :ref:`bt_esl_ap_group_per_button` runtime.
+   * - unbond_esl
+     - <esl_addr>
+     - Unbond tag from database by ESL address. This is used when the bonding data of the AP and the ESL are out of sync, i.e. the AP will have an LTK while the ESL may not. If the reconnection fails due to a missing LTK, the AP may clear and attempt to create a new bond.
 
 .. _obj_c_subcmds:
 
@@ -111,7 +173,16 @@ ACL subcommands
      - Export serialized BT bonding key.
    * - connect_esl
      - <esl_addr>
-     - Connect ESL service tag with esl addr.
+     - Connect ESL service tag with ESL address. This requires :kconifg:option:`CONFIG_BT_ESL_TAG_STORAGE` enabled.
+   * - load_bt_key_esl
+     - <esl_addr>
+     - Load bond data with ESL address from ESL . This requires :kconifg:option:`CONFIG_BT_ESL_TAG_STORAGE` enabled.
+   * - ap_key_update
+     - <conn_idx>
+     - Write AP sync key to connected ESL tag.
+   * - rsp_key_update
+     - <conn_idx>
+     - Write response key to connected ESL tag.
    * - configure
      - | <connection index>  (0 ~ CONFIG_BT_MAX_CONN)
        | <esl_addr>
@@ -229,3 +300,7 @@ The following table shows their content.
      - Tag default ESL_ID ~ ESL_ID + 10 Display img 1.
    * - 0x14
      - Tag default ESL_ID ~ ESL_ID + 10 Display img 2
+   * - 0x15
+     - Send Vendor-specific command ``0x1F`` parameter ``0x1`` to tag default ESL_ID ~ ESL_ID + 10
+   * - 0x16
+     - Send Vendor-specific command ``0x1F`` parameter ``0x0`` to tag default ESL_ID ~ ESL_ID + 10

@@ -1,8 +1,8 @@
 .. |NCS| replace:: nRF Connect SDK
 
-.. |release| replace:: v2.4.0
-.. |release_tt| replace:: ``v2.4.0``
-.. |release_number_tt| replace:: ``2.4.0``
+.. |release| replace:: v2.5.0
+.. |release_tt| replace:: ``v2.5.0``
+.. |release_number_tt| replace:: ``2.5.0``
 
 .. ### Config shortcuts
 
@@ -32,7 +32,7 @@
 .. |connect_terminal_both| replace:: Connect to both kits with a terminal emulator (for example, PuTTY).
    See :ref:`putty` for the required settings.
 
-.. |connect_terminal_ANSI| replace:: Connect to the kit with a terminal emulator that supports VT100/ANSI escape characters (for example, PuTTY).
+.. |connect_terminal_ANSI| replace:: Open a serial port connection to the kit using a terminal emulator that supports VT100/ANSI escape characters (for example, PuTTY).
    See :ref:`putty` for the required settings.
 
 .. |connect_terminal_specific_ANSI| replace:: Connect to the kit that runs this sample with a terminal emulator that supports VT100/ANSI escape characters (for example, PuTTY).
@@ -147,7 +147,7 @@
 .. |matter_intro| replace:: `Matter`_ (formerly Project Connected Home over IP or Project CHIP) is an open-source application layer that aims at creating a unified communication standard across smart home devices, mobile applications, and cloud services.
    It supports a wide range of existing technologies, including Wi-Fi, Thread, and Bluetooth® LE, and uses IPv6-based transport protocols like TCP and UDP to ensure connectivity between different kinds of networks.
 .. |matter_gn_required_note| replace:: Matter requires the GN tool.
-   If you are updating from the |NCS| version earlier than v1.5.0, see the :ref:`GN installation instructions <gs_installing_gn>`.
+   If you are updating from the |NCS| version earlier than v1.5.0, see the :ref:`GN installation instructions <manual_installation_gn>`.
 .. |matter_controller_def| replace:: The Matter controller is a node in the Matter network and a role within the :ref:`Matter development environment <ug_matter_gs_testing>`.
    The controller device is used to pair and control the Matter accessory device remotely over a network, interacting with it using Bluetooth® LE and the regular IPv6 communication.
 .. |matter_controller_def_nolink| replace:: The Matter controller is a node in the Matter network and a role within the Matter development environment.
@@ -171,7 +171,7 @@
 
 .. |external_flash_size| replace:: external flash memory with minimum 4 MB
 
-.. |gps_tradeoffs| replace:: For more information on the various trade-offs of using A-GPS compared to using P-GPS, see the `nRF Cloud Location Services documentation`_.
+.. |gnss_tradeoffs| replace:: For more information on the various trade-offs of using A-GNSS compared to using P-GPS, see the `nRF Cloud Location Services documentation`_.
 
 .. |thingy53_sample_note| replace:: If you build this application for Thingy:53, it enables additional features. See :ref:`thingy53_app_guide` for details.
 
@@ -193,6 +193,8 @@
    The NFCT driver is part of the nrfx driver package.
    For more information about this driver, see the NFCT driver page in the `nrfx`_ repository.
 
-.. |Supported OS| replace:: The operating system versions that support the |NCS| tools are listed in the :ref:`gs_supported_OS` section.
+.. |Supported OS| replace:: The operating system versions that support the |NCS| tools are listed in the :ref:`supported_OS` section.
 
 .. |no_changes_yet_note| replace:: No changes since the latest |NCS| release.
+
+.. |serial_port_sec_tag| replace:: where ``<serial port>`` is the serial port of your device and ``<sec tag>`` is the previously chosen unused security tag.

@@ -20,7 +20,8 @@ For more information about ESL and nRF Connect SDK, refer to the links below:
 
 .. _What's new in Bluetooth v5.4: https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/whats-new-in-bluetooth-v5-4-an-overview
 .. _nRF Connect SDK Fundamentals - DevAcademy - Free Course: https://academy.nordicsemi.com/courses/nrf-connect-sdk-fundamentals/
-.. _nRF Connect SDK Documentation: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/nrf/index.html
+.. _nRF Connect SDK Documentation: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/index.html
+.. _nRF Connect SDK Documentation v2.4.0: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/nrf/index.html
 .. _Bluetooth LE Fundamentals - DevAcademy - Free Course: https://academy.nordicsemi.com/courses/bluetooth-low-energy-fundamentals/
 .. _Bluetooth LE SoftDevice Controller Documentation: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrfxlib/softdevice_controller/README.html
 .. _nRF52833DK: https://www.nordicsemi.com/Products/Development-hardware/nRF52833-DK

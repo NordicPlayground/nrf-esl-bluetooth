@@ -364,10 +364,10 @@ Setup - Transfer Images from PC to AP over USB
 ==============================================
 
 One of major task of Access Point is to provide images to ESL Tag in configuring and updating state.
-Before activating auto onboarding (**Button 1**) or, anytime before sending images using `Object Transfer Service <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/zephyr/connectivity/bluetooth/api/services.html>`_ via shell commands between AP and Tag, it is necessary to transfer the images from PC to the AP (in external flash) over USB.
-`mcumgr_smp_protocol_specification <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/zephyr/services/device_mgmt/smp_protocol.html>`_ is used over the other COM port available over USB. Here example:
+Before activating auto onboarding (**Button 1**) or, anytime before sending images using `Object Transfer Service <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/zephyr/connectivity/bluetooth/api/services.html>`_ via shell commands between AP and Tag, it is necessary to transfer the images from PC to the AP (in external flash) over USB.
+`mcumgr_smp_protocol_specification <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/zephyr/services/device_mgmt/smp_protocol.html>`_ is used over the other COM port available over USB. Here example:
 
-1. Install `Mcumgr Command-line Tool <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/zephyr/services/device_mgmt/mcumgr.html>`_ tool
+1. Install `Mcumgr Command-line Tool <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/zephyr/services/device_mgmt/mcumgr.html>`_ tool
 #. Prepare the images to be transferred. The image format is depending on what EPD and color depth your are using.
 
 .. note::
@@ -449,12 +449,22 @@ BT_ESL_AP_AUTO_PAST_TAG
 BT_ESL_AP_PTS
    Enable PTS feature. With this feature AP will send PTS command to connected ESL Tag. This feature is used for PTS test only.
 
+.. _bt_esl_ap_auto_ping:
+
+BT_ESL_AP_AUTO_PING
+   Enable auto ping feature. With this feature AP will send ping command to all grounp of ESL Tag periodically through PAwR. This feature is used to keep tags in synchronized state automatically.
+   Full ESL AP application should implement this feature to keep tags in synchronized state.
+
+.. _bt_esl_ap_ping_interval:
+
+BT_ESL_AP_PING_INTERVAL
+   Interval of auto PAwR ping command. This option is used when :ref:`bt_esl_ap_auto_ping` is enabled. Unit is second.
 
 Building and running
 ********************
 .. |sample path| replace:: :file:`samples/central_esl`
 
-To build the sample with Visual Studio Code, follow the steps listed on the `How to build an application`_ page in the nRF Connect for VS Code extension documentation. See `Building and programming an application <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/nrf/getting_started/programming.html#gs-programming>` for other building and programming scenarios and `Testing and debugging an application <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/nrf/getting_started/testing.html>`_ for general information about testing and debugging in the nRF Connect SDK.
+To build the sample with Visual Studio Code, follow the steps listed on the `How to build an application`_ page in the nRF Connect for VS Code extension documentation. See `Building and programming an application <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/getting_started/programming.html#gs-programming>` for other building and programming scenarios and `Testing and debugging an application <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/getting_started/testing.html>`_ for general information about testing and debugging in the nRF Connect SDK.
 
 Testing with other DevKits
 ==========================
@@ -490,11 +500,11 @@ In addition, it uses the following Zephyr libraries:
 
 * ``include/zephyr/types.h``
 * ``boards/arm/nrf*/board.h``
-* `Kernel Services <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/zephyr/kernel/services/index.html>`_
+* `Kernel Services <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/zephyr/kernel/services/index.html>`_
 
   * ``include/kernel.h``
 
-* `Bluetooth APIs <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.4.0/zephyr/connectivity/bluetooth/api/index.html>`_:
+* `Bluetooth APIs <https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/zephyr/connectivity/bluetooth/api/index.html>`_:
 
   * ``include/bluetooth/bluetooth.h``
   * ``include/bluetooth/gatt.h``

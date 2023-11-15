@@ -102,6 +102,10 @@
 <li class="toctree-l1"><a class="reference internal" href="services.html">Services</a></li>
 <li class="toctree-l1"><a class="reference internal" href="additional_resources.html">Additional resources</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Previous release:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup_240.html">Requirements and setup for NCS V2.4.0</a></li>
+</ul>
 
             
           
@@ -220,7 +224,7 @@ The more response slots, the more ESLs can be controlled in a single subevent.
 However, more response slots also means longer subevent interval and more memory is required.
 The AP should select values for <code class="docutils literal notranslate"><span class="pre">subeventInterval</span></code>, <code class="docutils literal notranslate"><span class="pre">responseSlotDelay</span></code>, and <code class="docutils literal notranslate"><span class="pre">responseSlotSpacing</span></code> that result in sufficient response slots to serve the maximum demand.
 The maximum possible demand for response slots occurs when each command present in the ESL payload requires a response from a different ESL, and the number of commands contained in the ESL payload is the highest possible.</p>
-<p>Use the following Kconfig options to set the <a class="reference internal" href="esl_ap_sample_description.html#central-esl-auto-onboarding-and-auto-past"><span class="std std-ref">Auto Onboarding and Auto PAST</span></a> features:</p>
+<p>Use the following Kconfig options to set the <a class="reference internal" href="esl_ap_sample_description_240.html#central-esl-auto-onboarding-and-auto-past"><span class="std std-ref">Auto Onboarding and Auto PAST</span></a> features:</p>
 <ul>
 <li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER</span></code> sets the maximum number of response slots that can be buffered in ESLS client.</p>
 <p>This value should be equal to or less than the number of response slots.</p>
@@ -238,7 +242,7 @@ The maximum possible demand for response slots occurs when each command present 
 <p>This report is sent periodically after the scanning begins.</p>
 </li>
 <li><p><code class="xref std std-option docutils literal notranslate"><span class="pre">CONFIG_BT_ESL_TAG_STORAGE</span></code> sets the tag information storage to non-volatile memory so that AP can retrieve the information when connected to the tag without prompting in a shell command.</p>
-<p>You can use this option along with <a class="reference internal" href="esl_ap_sample_description.html#central-esl-auto-onboarding-and-auto-past"><span class="std std-ref">Auto Onboarding and Auto PAST</span></a>.
+<p>You can use this option along with <a class="reference internal" href="esl_ap_sample_description_240.html#central-esl-auto-onboarding-and-auto-past"><span class="std std-ref">Auto Onboarding and Auto PAST</span></a>.
 The information saved to non-volatile memory includes the following:</p>
 <ul class="simple">
 <li><p>ESL address</p></li>
