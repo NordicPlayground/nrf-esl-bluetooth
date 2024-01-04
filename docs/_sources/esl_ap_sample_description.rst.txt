@@ -372,10 +372,15 @@ Before activating auto onboarding (**Button 1**) or, anytime before sending imag
 
 .. note::
 
-   Nordic provides two sample files that can be used with the :ref:`peripheral_esl` EPD variant.
+   Nordic provides two sample files that can be used with the :ref:`peripheral_esl` 2.13" EPD variant.
 
    * EPD format: Use this format on Access Point :download:`esl_image_bt <https://github.com/NordicPlayground/nrf-esl-bluetooth/raw/doc/docs/esl_sample_image/esl_image_bt>` :download:`esl_image_nordic <https://github.com/NordicPlayground/nrf-esl-bluetooth/raw/doc/docs/esl_sample_image/esl_image_nordic>`
    * BMP format: This format is only for reference :download:`esl_image_00_240x120_bt.BMP <https://github.com/NordicPlayground/nrf-esl-bluetooth/blob/doc/docs/esl_sample_image/esl_image_00_240x120_bt.BMP>` :download:`esl_image_01_240x120_nordic_logo.BMP <https://github.com/NordicPlayground/nrf-esl-bluetooth/blob/doc/docs/esl_sample_image/esl_image_01_240x120_nordic_logo.BMP>`
+
+   Nordic provides two sample files that can be used with the :ref:`peripheral_esl` 4.2" EPD variant.
+
+   * EPD format: Use this format on Access Point :download:`esl_image_empower <https://github.com/NordicPlayground/nrf-esl-bluetooth/raw/doc/docs/esl_sample_image/esl_image_empower>` :download:`esl_image_mcu_block <https://github.com/NordicPlayground/nrf-esl-bluetooth/raw/doc/docs/esl_sample_image/esl_image_mcu_block>`
+   * BMP format: This format is only for reference :download:`esl_image_09_400x300_empower.BMP <https://github.com/NordicPlayground/nrf-esl-bluetooth/blob/doc/docs/esl_sample_image/esl_image_09_400x300_empower.BMP>` :download:`esl_image_0A_400x300_mcu_block.BMP <https://github.com/NordicPlayground/nrf-esl-bluetooth/blob/doc/docs/esl_sample_image/esl_image_0A_400x300_mcu_block.BMP>`
 
 3. Transfer images from the PC to the AP: run from cmd /command line
 
@@ -383,6 +388,8 @@ Before activating auto onboarding (**Button 1**) or, anytime before sending imag
 
       mcumgr --conntype="serial" --connstring="COM4,baud=115200,mtu=512" fs upload esl_image_bt /ots_image/esl_image_00
       mcumgr --conntype="serial" --connstring="COM4,baud=115200,mtu=512" fs upload esl_image_nordic /ots_image/esl_image_01
+      mcumgr --conntype="serial" --connstring="COM4,baud=115200,mtu=512" fs upload esl_image_empower /ots_image/esl_image_09
+      mcumgr --conntype="serial" --connstring="COM4,baud=115200,mtu=512" fs upload esl_image_mcu_block /ots_image/esl_image_0A
 
    .. note::
 

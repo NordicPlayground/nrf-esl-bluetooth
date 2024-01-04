@@ -1,4 +1,4 @@
-.. _peripheral_esl_v240:
+.. _peripheral_esl_240:
 
 Bluetooth: Peripheral ESL
 #########################

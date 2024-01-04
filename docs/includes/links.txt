@@ -1331,6 +1331,7 @@
 .. _nRF5340 DK: https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK
 .. _nRF52840 Dongle: https://www.nordicsemi.com/Products/Development-hardware/nRF52840-Dongle
 .. _WAVESHARE e-Paper Raw Panel Shield: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/boards/shields/waveshare_epaper/doc/index.html
+.. _WAVESHARE e-Paper Raw Panel Shield(B): https://www.waveshare.com/e-paper-shield-b.htm
 .. _WAVESHARE 250x122, 2.13inch E-Ink raw display panel: https://www.waveshare.com/2.13inch-e-paper.htm
 .. _Preparing a DK for current measurement: https://infocenter.nordicsemi.com/topic/ug_nrf52833_dk/UG/dk/prepare_board.html
 .. _ssd1675a EPD display controller: https://docs.zephyrproject.org/latest/build/dts/api/bindings/display/solomon%2Cssd1675a.html#dtbinding-solomon-ssd1675a

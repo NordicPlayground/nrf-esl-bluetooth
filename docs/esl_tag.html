@@ -87,36 +87,36 @@
 <span id="peripheral-esl"></span><h1>Bluetooth: Peripheral ESL<a class="headerlink" href="#bluetooth-peripheral-esl" title="Permalink to this headline"></a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><p><a class="reference internal" href="#requirements" id="id36">Requirements</a></p></li>
-<li><p><a class="reference internal" href="#overview" id="id37">Overview</a></p></li>
-<li><p><a class="reference internal" href="#user-interface" id="id38">User interface</a></p>
+<li><p><a class="reference internal" href="#requirements" id="id37">Requirements</a></p></li>
+<li><p><a class="reference internal" href="#overview" id="id38">Overview</a></p></li>
+<li><p><a class="reference internal" href="#user-interface" id="id39">User interface</a></p>
 <ul>
-<li><p><a class="reference internal" href="#development-kits" id="id39">Development kits</a></p></li>
-<li><p><a class="reference internal" href="#thingy-52" id="id40">Thingy:52</a></p></li>
-<li><p><a class="reference internal" href="#epd-variant" id="id41">EPD variant</a></p></li>
-<li><p><a class="reference internal" href="#power-profiling-variant" id="id42">Power Profiling variant</a></p></li>
-<li><p><a class="reference internal" href="#power-consumption-measurement" id="id43">Power Consumption Measurement</a></p></li>
-<li><p><a class="reference internal" href="#configuration-options" id="id44">Configuration options</a></p></li>
+<li><p><a class="reference internal" href="#development-kits" id="id40">Development kits</a></p></li>
+<li><p><a class="reference internal" href="#thingy-52" id="id41">Thingy:52</a></p></li>
+<li><p><a class="reference internal" href="#epd-variant" id="id42">EPD variant</a></p></li>
+<li><p><a class="reference internal" href="#power-profiling-variant" id="id43">Power Profiling variant</a></p></li>
+<li><p><a class="reference internal" href="#power-consumption-measurement" id="id44">Power Consumption Measurement</a></p></li>
+<li><p><a class="reference internal" href="#configuration-options" id="id45">Configuration options</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#building-and-running" id="id45">Building and running</a></p>
+<li><p><a class="reference internal" href="#building-and-running" id="id46">Building and running</a></p>
 <ul>
-<li><p><a class="reference internal" href="#testing" id="id46">Testing</a></p></li>
+<li><p><a class="reference internal" href="#testing" id="id47">Testing</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#fota-update" id="id47">FOTA update</a></p>
+<li><p><a class="reference internal" href="#fota-update" id="id48">FOTA update</a></p>
 <ul>
-<li><p><a class="reference internal" href="#requirements-for-fota" id="id48">Requirements for FOTA</a></p></li>
+<li><p><a class="reference internal" href="#requirements-for-fota" id="id49">Requirements for FOTA</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#dependencies" id="id49">Dependencies</a></p></li>
-<li><p><a class="reference internal" href="#references" id="id50">References</a></p></li>
+<li><p><a class="reference internal" href="#dependencies" id="id50">Dependencies</a></p></li>
+<li><p><a class="reference internal" href="#references" id="id51">References</a></p></li>
 </ul>
 </div>
 <p>The Peripheral ESL sample acts as an ESL(Electronic Shelf Label) tag to work with ESL Access Point between a Bluetooth® LE connection and Periodic Advertising with Response synchronization.
 It uses <a class="reference internal" href="esl_service.html#esl-service-readme"><span class="std std-ref">Electronic Shelf Label Service (ESLS)</span></a> and implement callbacks for the service.</p>
 <div class="section" id="requirements">
-<h2><a class="toc-backref" href="#id36">Requirements</a><a class="headerlink" href="#requirements" title="Permalink to this headline"></a></h2>
+<h2><a class="toc-backref" href="#id37">Requirements</a><a class="headerlink" href="#requirements" title="Permalink to this headline"></a></h2>
 <p>The sample supports the following development kits:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -167,7 +167,7 @@ It uses <a class="reference internal" href="esl_service.html#esl-service-readme"
 </table>
 </div>
 <div class="section" id="overview">
-<h2><a class="toc-backref" href="#id37">Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline"></a></h2>
+<h2><a class="toc-backref" href="#id38">Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline"></a></h2>
 <p>You can use this sample as an ESL tag defined in <a class="reference external" href="https://www.bluetooth.com/specifications/specs/electronic-shelf-label-profile-1-0/">Electronic Shelf Label Profile</a> and <a class="reference external" href="https://www.bluetooth.com/specifications/specs/electronic-shelf-label-service-1-0/">Electronic Shelf Label Service</a> to work with the ESL Access Point.
 This sample uses <strong>LED</strong> on DK to simulate display on ESL tag. It also contains EPD variant to demonstrate how to work with real (E-Paper display) with shield board.</p>
 <p>The sample uses the <a class="reference internal" href="esl_service.html#esl-service-readme"><span class="std std-ref">Electronic Shelf Label Service (ESLS)</span></a> library to implement the Electronic Shelf Label Service which allows electronic shelf labels (ESLs) to be controlled and updated using Bluetooth wireless technology.
@@ -175,10 +175,10 @@ The sample implements callbacks for the ESL service to handle events from the ES
 Once the Tag is associated to an AP, it stores in internal non-volatile memory relevant parameters (e.g. ESL ID, bonding / key material, etc). Such material is kept after power cycle.</p>
 </div>
 <div class="section" id="user-interface">
-<h2><a class="toc-backref" href="#id38">User interface</a><a class="headerlink" href="#user-interface" title="Permalink to this headline"></a></h2>
+<h2><a class="toc-backref" href="#id39">User interface</a><a class="headerlink" href="#user-interface" title="Permalink to this headline"></a></h2>
 <p>The user interface of the sample depends on the hardware platform you are using.</p>
 <div class="section" id="development-kits">
-<h3><a class="toc-backref" href="#id39">Development kits</a><a class="headerlink" href="#development-kits" title="Permalink to this headline"></a></h3>
+<h3><a class="toc-backref" href="#id40">Development kits</a><a class="headerlink" href="#development-kits" title="Permalink to this headline"></a></h3>
 <dl class="simple">
 <dt>LED 1:</dt><dd><p>ESL LED 1: Flashing with specified pattern when received ESL LED control OP code.</p>
 </dd>
@@ -195,7 +195,7 @@ Stable ON when connected with Access Point.</p>
 </dl>
 </div>
 <div class="section" id="thingy-52">
-<h3><a class="toc-backref" href="#id40">Thingy:52</a><a class="headerlink" href="#thingy-52" title="Permalink to this headline"></a></h3>
+<h3><a class="toc-backref" href="#id41">Thingy:52</a><a class="headerlink" href="#thingy-52" title="Permalink to this headline"></a></h3>
 <dl class="simple">
 <dt>RGB LED:</dt><dd><p>The RGB LED channels are used independently to display the following information:</p>
 <ul class="simple">
@@ -211,8 +211,8 @@ Stable ON when connected with Access Point.</p></li>
 </dl>
 </div>
 <div class="section" id="epd-variant">
-<span id="peripheral-esl-sample-activating-epd-variants"></span><h3><a class="toc-backref" href="#id41">EPD variant</a><a class="headerlink" href="#epd-variant" title="Permalink to this headline"></a></h3>
-<p>This sample uses <a class="reference external" href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/boards/shields/waveshare_epaper/doc/index.html">WAVESHARE e-Paper Raw Panel Shield</a> <a class="footnote-reference brackets" href="#id24" id="id25">7</a> , <a class="reference external" href="https://www.waveshare.com/2.13inch-e-paper.htm">WAVESHARE 250x122, 2.13inch E-Ink raw display panel</a> <a class="footnote-reference brackets" href="#id26" id="id27">8</a> and Zephyr out-of-box display driver <a class="reference external" href="https://docs.zephyrproject.org/latest/build/dts/api/bindings/display/solomon%2Cssd1675a.html#dtbinding-solomon-ssd1675a">ssd1675a EPD display controller</a> <a class="footnote-reference brackets" href="#id32" id="id33">10</a> as reference to demonstrate how to display image on ESL.
+<span id="peripheral-esl-sample-activating-epd-variants"></span><h3><a class="toc-backref" href="#id42">EPD variant</a><a class="headerlink" href="#epd-variant" title="Permalink to this headline"></a></h3>
+<p>This sample uses <a class="reference external" href="https://www.waveshare.com/e-paper-shield-b.htm">WAVESHARE e-Paper Raw Panel Shield(B)</a> <a class="footnote-reference brackets" href="#id24" id="id25">7</a> , <a class="reference external" href="https://www.waveshare.com/2.13inch-e-paper.htm">WAVESHARE 250x122, 2.13inch E-Ink raw display panel</a> <a class="footnote-reference brackets" href="#id27" id="id28">8</a> and Zephyr out-of-box display driver <a class="reference external" href="https://docs.zephyrproject.org/latest/build/dts/api/bindings/display/solomon%2Cssd1675a.html#dtbinding-solomon-ssd1675a">ssd1675a EPD display controller</a> <a class="footnote-reference brackets" href="#id33" id="id34">10</a> as reference to demonstrate how to display image on ESL.
 For now, only <span class="xref std std-ref">nrf52dk_nrf52832</span> and <span class="xref std std-ref">nrf52833dk_nrf52833</span> support this optional feature.
 In VS Code with nRF Extension, select prj_release.conf and select “nrf52833dk_nrf52833_power_profiler_epd.conf” as Kconfig fragments. And add <code class="docutils literal notranslate"><span class="pre">-DDTC_OVERLAY_FILE=&quot;conf/nrf52833dk_nrf52833/nrf52833dk_nrf52833_release_epd.overlay&quot;</span></code> to <strong>Extra Cmake arguments</strong>.
 As alternative, using terminal, to activate the optional feature supported by this sample, use the following build command:</p>
@@ -225,15 +225,15 @@ As alternative, using terminal, to activate the optional feature supported by th
 For more information about using configuration overlay files, see <span class="xref std std-ref">zephyr:important-build-vars</span> in the Zephyr documentation.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Please refer to the original manufacturer’s documentation of the panel for selecting the shield board switch positions. For example, adjust to A0 for <a class="reference external" href="https://www.waveshare.com/2.13inch-e-paper.htm">WAVESHARE 250x122, 2.13inch E-Ink raw display panel</a> <a class="footnote-reference brackets" href="#id26" id="id28">8</a>.</p>
+<p>Please refer to the original manufacturer’s documentation of the panel for selecting the shield board switch positions. For example, adjust to A0 for <a class="reference external" href="https://www.waveshare.com/2.13inch-e-paper.htm">WAVESHARE 250x122, 2.13inch E-Ink raw display panel</a> <a class="footnote-reference brackets" href="#id27" id="id29">8</a>.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>To use EPD other than reference <a class="reference external" href="https://www.waveshare.com/2.13inch-e-paper.htm">WAVESHARE 250x122, 2.13inch E-Ink raw display panel</a> <a class="footnote-reference brackets" href="#id26" id="id29">8</a> , please use display driver provided by manafacturer.</p>
+<p>To use EPD other than reference <a class="reference external" href="https://www.waveshare.com/2.13inch-e-paper.htm">WAVESHARE 250x122, 2.13inch E-Ink raw display panel</a> <a class="footnote-reference brackets" href="#id27" id="id30">8</a> , please use display driver provided by manafacturer.</p>
 </div>
 </div>
 <div class="section" id="power-profiling-variant">
-<span id="peripheral-esl-power-profiling-variant"></span><h3><a class="toc-backref" href="#id42">Power Profiling variant</a><a class="headerlink" href="#power-profiling-variant" title="Permalink to this headline"></a></h3>
+<span id="peripheral-esl-power-profiling-variant"></span><h3><a class="toc-backref" href="#id43">Power Profiling variant</a><a class="headerlink" href="#power-profiling-variant" title="Permalink to this headline"></a></h3>
 <p>Power optimized overlay disables all of unnecessary peripheral to minimize power consumption. You can use power profiler overlay for <span class="xref std std-ref">nrf52833dk_nrf52833</span> to measure current. In VS Code with nRF Extension, select prj_release.conf and select “nrf52833dk_nrf52833_power_profiler_release_led.conf” as Kconfig fragments.
 As alternative, using terminal, use the following build command:</p>
 <blockquote>
@@ -243,16 +243,16 @@ As alternative, using terminal, use the following build command:</p>
 </div></blockquote>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Due to limitation of <a class="reference external" href="https://github.com/zephyrproject-rtos/zephyr/blob/main/drivers/display/ssd16xx.c">ssd16xx EPD display driver</a> <a class="footnote-reference brackets" href="#id34" id="id35">11</a> , user needs to modify the driver to make it able to re-initialize the display controller run-time. Please modify the file <code class="docutils literal notranslate"><span class="pre">zephyr/drivers/display/ssd16xx/ssd16xx.c</span></code>: from <code class="docutils literal notranslate"><span class="pre">static</span> <span class="pre">int</span> <span class="pre">ssd16xx_init(const</span> <span class="pre">struct</span> <span class="pre">device</span> <span class="pre">*dev)</span></code> to <code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">ssd16xx_init(const</span> <span class="pre">struct</span> <span class="pre">device</span> <span class="pre">*dev)</span></code>.</p>
+<p>Due to limitation of <a class="reference external" href="https://github.com/zephyrproject-rtos/zephyr/blob/main/drivers/display/ssd16xx.c">ssd16xx EPD display driver</a> <a class="footnote-reference brackets" href="#id35" id="id36">11</a> , user needs to modify the driver to make it able to re-initialize the display controller run-time. Please modify the file <code class="docutils literal notranslate"><span class="pre">zephyr/drivers/display/ssd16xx/ssd16xx.c</span></code>: from <code class="docutils literal notranslate"><span class="pre">static</span> <span class="pre">int</span> <span class="pre">ssd16xx_init(const</span> <span class="pre">struct</span> <span class="pre">device</span> <span class="pre">*dev)</span></code> to <code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">ssd16xx_init(const</span> <span class="pre">struct</span> <span class="pre">device</span> <span class="pre">*dev)</span></code>.</p>
 </div>
 <p>Please follow  <a class="reference internal" href="#peripheral-esl-power-measure"><span class="std std-ref">Power Consumption Measurement</span></a> to measure currents.</p>
 </div>
 <div class="section" id="power-consumption-measurement">
-<span id="peripheral-esl-power-measure"></span><h3><a class="toc-backref" href="#id43">Power Consumption Measurement</a><a class="headerlink" href="#power-consumption-measurement" title="Permalink to this headline"></a></h3>
+<span id="peripheral-esl-power-measure"></span><h3><a class="toc-backref" href="#id44">Power Consumption Measurement</a><a class="headerlink" href="#power-consumption-measurement" title="Permalink to this headline"></a></h3>
 <p>Prerequisite: Read <a class="reference external" href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/app_dev/optimizing/power.html">Power optimization</a> and get <a class="reference external" href="https://infocenter.nordicsemi.com/topic/ug_ppk2/UG/ppk/PPK_user_guide_Intro.html">Power Profiler Kit II (PPK2)</a> <a class="footnote-reference brackets" href="#id20" id="id21">5</a></p>
 <ol class="arabic">
 <li><p>Build and program the Tag (nRF52833DK) Power Profiling configuration by following <a class="reference internal" href="#peripheral-esl-build-and-program"><span class="std std-ref">Building and running</span></a> and <a class="reference internal" href="#peripheral-esl-power-profiling-variant"><span class="std std-ref">Power Profiling variant</span></a></p></li>
-<li><p>Follow <a class="reference external" href="https://infocenter.nordicsemi.com/topic/ug_nrf52833_dk/UG/dk/prepare_board.html">Preparing a DK for current measurement</a> <a class="footnote-reference brackets" href="#id30" id="id31">9</a> to prepare 52833DK for Power Consumption measurements</p>
+<li><p>Follow <a class="reference external" href="https://infocenter.nordicsemi.com/topic/ug_nrf52833_dk/UG/dk/prepare_board.html">Preparing a DK for current measurement</a> <a class="footnote-reference brackets" href="#id31" id="id32">9</a> to prepare 52833DK for Power Consumption measurements</p>
 <ol class="loweralpha simple">
 <li><p>Cut SB40.</p></li>
 <li><p>Connect VOUT of PPK2 to nRF current Measurement on DK, connect GND of PPK2 to External supply negative polarity pin (<cite>-</cite>). By doing so, PPK2 will provide power to only the nRF52 SoC.</p></li>
@@ -276,7 +276,7 @@ As alternative, using terminal, use the following build command:</p>
 <p>Once completed this procedure (i.e. if you don’t need to use the PPK2 and you want to power the ESL Tag DevKit from the same USB port as used for programming), put Jumper back on SB40.</p>
 </div>
 <div class="section" id="configuration-options">
-<span id="peripheral-esl-config-options"></span><h3><a class="toc-backref" href="#id44">Configuration options</a><a class="headerlink" href="#configuration-options" title="Permalink to this headline"></a></h3>
+<span id="peripheral-esl-config-options"></span><h3><a class="toc-backref" href="#id45">Configuration options</a><a class="headerlink" href="#configuration-options" title="Permalink to this headline"></a></h3>
 <p>Check and configure the following Kconfig options:</p>
 <div class="section" id="bt-esl-security-enabled">
 <span id="bt-esl-tag-security-enabled"></span><h4>BT_ESL_SECURITY_ENABLED<a class="headerlink" href="#bt-esl-security-enabled" title="Permalink to this headline"></a></h4>
@@ -335,10 +335,10 @@ As alternative, using terminal, use the following build command:</p>
 </div>
 </div>
 <div class="section" id="building-and-running">
-<span id="peripheral-esl-build-and-program"></span><h2><a class="toc-backref" href="#id45">Building and running</a><a class="headerlink" href="#building-and-running" title="Permalink to this headline"></a></h2>
+<span id="peripheral-esl-build-and-program"></span><h2><a class="toc-backref" href="#id46">Building and running</a><a class="headerlink" href="#building-and-running" title="Permalink to this headline"></a></h2>
 <p>To build the sample with Visual Studio Code, follow the steps listed on the <a class="reference external" href="https://nrfconnect.github.io/vscode-nrf-connect/get_started/build_app_ncs.html">How to build an application</a> <a class="footnote-reference brackets" href="#id16" id="id17">3</a> page in the nRF Connect for VS Code extension documentation. See <a class="reference external" href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/getting_started/programming.html#gs-programming">Building and programming an application</a> for other building and programming scenarios and <a class="reference external" href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/getting_started/testing.html">Testing and debugging an application</a> for general information about testing and debugging in the nRF Connect SDK.</p>
 <div class="section" id="testing">
-<span id="peripheral-esl-testing"></span><h3><a class="toc-backref" href="#id46">Testing</a><a class="headerlink" href="#testing" title="Permalink to this headline"></a></h3>
+<span id="peripheral-esl-testing"></span><h3><a class="toc-backref" href="#id47">Testing</a><a class="headerlink" href="#testing" title="Permalink to this headline"></a></h3>
 <p>After programming the sample to your development kit, you can test it in combination with a <a class="reference external" href="nrf5340dk_nrf5340">nRF5340 DevKit</a> running the ESL Access Point (<a class="reference internal" href="esl_ap.html#central-esl"><span class="std std-ref">Bluetooth: Central ESL</span></a>) by performing the following steps:</p>
 <ol class="arabic simple">
 <li><p>Turn on the ESL Tag power.</p></li>
@@ -384,15 +384,15 @@ b. if auto onboarding feature has been already activated on the AP to assoicate 
 </div>
 </div>
 <div class="section" id="fota-update">
-<h2><a class="toc-backref" href="#id47">FOTA update</a><a class="headerlink" href="#fota-update" title="Permalink to this headline"></a></h2>
+<h2><a class="toc-backref" href="#id48">FOTA update</a><a class="headerlink" href="#fota-update" title="Permalink to this headline"></a></h2>
 <p>You can configure Firmware Over-The-Air (FOTA) upgrade to replace the applications. Please see <a class="reference external" href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/device_guides/working_with_nrf/nrf52/developing.html#fota-updates">fota_updates</a> <a class="footnote-reference brackets" href="#id10" id="id11">1</a> for background detail.</p>
 <div class="section" id="requirements-for-fota">
-<h3><a class="toc-backref" href="#id48">Requirements for FOTA</a><a class="headerlink" href="#requirements-for-fota" title="Permalink to this headline"></a></h3>
+<h3><a class="toc-backref" href="#id49">Requirements for FOTA</a><a class="headerlink" href="#requirements-for-fota" title="Permalink to this headline"></a></h3>
 <p>To test Firmware Over-The-Air (FOTA), you need an Android or iOS device with the <a class="reference external" href="https://www.nordicsemi.com/Products/Development-tools/nrf-connect-device-manager">nRF Connect Device Manager</a> <a class="footnote-reference brackets" href="#id18" id="id19">4</a> app installed.</p>
 <div class="section" id="hardware-requirements-for-external-flash-memory-dfu">
 <h4>Hardware requirements for external flash memory DFU<a class="headerlink" href="#hardware-requirements-for-external-flash-memory-dfu" title="Permalink to this headline"></a></h4>
 <p>To enable the external flash DFU, you need an additional flash memory shield.
-This sample uses WAVESHARE e-Paper Raw Panel Shield(B) as EPD and flash shield board which has MX25R6435F as the SPI NOR Flash. See the following table for the pin definitions.</p>
+This sample uses <a class="reference external" href="https://www.waveshare.com/e-paper-shield-b.htm">WAVESHARE e-Paper Raw Panel Shield(B)</a> <a class="footnote-reference brackets" href="#id24" id="id26">7</a> as EPD and flash shield board which has MX25R6435F as the SPI NOR Flash. See the following table for the pin definitions.</p>
 <table class="docutils align-default" id="id9">
 <caption><span class="caption-text">Pin definitions</span><a class="headerlink" href="#id9" title="Permalink to this table"></a></caption>
 <colgroup>
@@ -444,7 +444,7 @@ This sample uses WAVESHARE e-Paper Raw Panel Shield(B) as EPD and flash shield b
 </div>
 </div>
 <div class="section" id="dependencies">
-<h2><a class="toc-backref" href="#id49">Dependencies</a><a class="headerlink" href="#dependencies" title="Permalink to this headline"></a></h2>
+<h2><a class="toc-backref" href="#id50">Dependencies</a><a class="headerlink" href="#dependencies" title="Permalink to this headline"></a></h2>
 <p>This sample uses the following nRF Connect SDK libraries:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="esl_service.html#esl-service-readme"><span class="std std-ref">Electronic Shelf Label Service (ESLS)</span></a></p></li>
@@ -469,7 +469,7 @@ This sample uses WAVESHARE e-Paper Raw Panel Shield(B) as EPD and flash shield b
 </ul>
 </div>
 <div class="section" id="references">
-<h2><a class="toc-backref" href="#id50">References</a><a class="headerlink" href="#references" title="Permalink to this headline"></a></h2>
+<h2><a class="toc-backref" href="#id51">References</a><a class="headerlink" href="#references" title="Permalink to this headline"></a></h2>
 <dl class="footnote brackets">
 <dt class="label" id="id10"><span class="brackets"><a class="fn-backref" href="#id11">1</a></span></dt>
 <dd><p><a class="reference external" href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/device_guides/working_with_nrf/nrf52/developing.html#fota-updates">https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.5.0/nrf/device_guides/working_with_nrf/nrf52/developing.html#fota-updates</a></p>
@@ -489,19 +489,19 @@ This sample uses WAVESHARE e-Paper Raw Panel Shield(B) as EPD and flash shield b
 <dt class="label" id="id22"><span class="brackets"><a class="fn-backref" href="#id23">6</a></span></dt>
 <dd><p><a class="reference external" href="https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK">https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK</a></p>
 </dd>
-<dt class="label" id="id24"><span class="brackets"><a class="fn-backref" href="#id25">7</a></span></dt>
-<dd><p><a class="reference external" href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/boards/shields/waveshare_epaper/doc/index.html">https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/boards/shields/waveshare_epaper/doc/index.html</a></p>
+<dt class="label" id="id24"><span class="brackets">7</span><span class="fn-backref">(<a href="#id25">1</a>,<a href="#id26">2</a>)</span></dt>
+<dd><p><a class="reference external" href="https://www.waveshare.com/e-paper-shield-b.htm">https://www.waveshare.com/e-paper-shield-b.htm</a></p>
 </dd>
-<dt class="label" id="id26"><span class="brackets">8</span><span class="fn-backref">(<a href="#id27">1</a>,<a href="#id28">2</a>,<a href="#id29">3</a>)</span></dt>
+<dt class="label" id="id27"><span class="brackets">8</span><span class="fn-backref">(<a href="#id28">1</a>,<a href="#id29">2</a>,<a href="#id30">3</a>)</span></dt>
 <dd><p><a class="reference external" href="https://www.waveshare.com/2.13inch-e-paper.htm">https://www.waveshare.com/2.13inch-e-paper.htm</a></p>
 </dd>
-<dt class="label" id="id30"><span class="brackets"><a class="fn-backref" href="#id31">9</a></span></dt>
+<dt class="label" id="id31"><span class="brackets"><a class="fn-backref" href="#id32">9</a></span></dt>
 <dd><p><a class="reference external" href="https://infocenter.nordicsemi.com/topic/ug_nrf52833_dk/UG/dk/prepare_board.html">https://infocenter.nordicsemi.com/topic/ug_nrf52833_dk/UG/dk/prepare_board.html</a></p>
 </dd>
-<dt class="label" id="id32"><span class="brackets"><a class="fn-backref" href="#id33">10</a></span></dt>
+<dt class="label" id="id33"><span class="brackets"><a class="fn-backref" href="#id34">10</a></span></dt>
 <dd><p><a class="reference external" href="https://docs.zephyrproject.org/latest/build/dts/api/bindings/display/solomon%2Cssd1675a.html#dtbinding-solomon-ssd1675a">https://docs.zephyrproject.org/latest/build/dts/api/bindings/display/solomon%2Cssd1675a.html#dtbinding-solomon-ssd1675a</a></p>
 </dd>
-<dt class="label" id="id34"><span class="brackets"><a class="fn-backref" href="#id35">11</a></span></dt>
+<dt class="label" id="id35"><span class="brackets"><a class="fn-backref" href="#id36">11</a></span></dt>
 <dd><p><a class="reference external" href="https://github.com/zephyrproject-rtos/zephyr/blob/main/drivers/display/ssd16xx.c">https://github.com/zephyrproject-rtos/zephyr/blob/main/drivers/display/ssd16xx.c</a></p>
 </dd>
 </dl>

@@ -89,7 +89,7 @@ Button:
 EPD variant
 ===========
 
-This sample uses `WAVESHARE e-Paper Raw Panel Shield`_ , `WAVESHARE 250x122, 2.13inch E-Ink raw display panel`_ and Zephyr out-of-box display driver `ssd1675a EPD display controller`_ as reference to demonstrate how to display image on ESL.
+This sample uses `WAVESHARE e-Paper Raw Panel Shield(B)`_ , `WAVESHARE 250x122, 2.13inch E-Ink raw display panel`_ and Zephyr out-of-box display driver `ssd1675a EPD display controller`_ as reference to demonstrate how to display image on ESL.
 For now, only :ref:`nrf52dk_nrf52832` and :ref:`nrf52833dk_nrf52833` support this optional feature.
 In VS Code with nRF Extension, select prj_release.conf and select “nrf52833dk_nrf52833_power_profiler_epd.conf” as Kconfig fragments. And add ``-DDTC_OVERLAY_FILE="conf/nrf52833dk_nrf52833/nrf52833dk_nrf52833_release_epd.overlay"`` to **Extra Cmake arguments**.
 As alternative, using terminal, to activate the optional feature supported by this sample, use the following build command:
@@ -289,7 +289,7 @@ Hardware requirements for external flash memory DFU
 ---------------------------------------------------
 
 To enable the external flash DFU, you need an additional flash memory shield.
-This sample uses WAVESHARE e-Paper Raw Panel Shield(B) as EPD and flash shield board which has MX25R6435F as the SPI NOR Flash. See the following table for the pin definitions.
+This sample uses `WAVESHARE e-Paper Raw Panel Shield(B)`_ as EPD and flash shield board which has MX25R6435F as the SPI NOR Flash. See the following table for the pin definitions.
 
 .. list-table:: Pin definitions
    :header-rows: 1

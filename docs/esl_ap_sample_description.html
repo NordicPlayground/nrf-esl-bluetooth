@@ -455,16 +455,23 @@ Before activating auto onboarding (<strong>Button 1</strong>) or, anytime before
 </ol>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Nordic provides two sample files that can be used with the <a class="reference internal" href="esl_tag.html#peripheral-esl"><span class="std std-ref">Bluetooth: Peripheral ESL</span></a> EPD variant.</p>
+<p>Nordic provides two sample files that can be used with the <a class="reference internal" href="esl_tag.html#peripheral-esl"><span class="std std-ref">Bluetooth: Peripheral ESL</span></a> 2.13” EPD variant.</p>
 <ul class="simple">
 <li><p>EPD format: Use this format on Access Point <a class="reference download external" download="" href="https://github.com/NordicPlayground/nrf-esl-bluetooth/raw/doc/docs/esl_sample_image/esl_image_bt"><code class="xref download docutils literal notranslate"><span class="pre">esl_image_bt</span></code></a> <a class="reference download external" download="" href="https://github.com/NordicPlayground/nrf-esl-bluetooth/raw/doc/docs/esl_sample_image/esl_image_nordic"><code class="xref download docutils literal notranslate"><span class="pre">esl_image_nordic</span></code></a></p></li>
 <li><p>BMP format: This format is only for reference <a class="reference download external" download="" href="https://github.com/NordicPlayground/nrf-esl-bluetooth/blob/doc/docs/esl_sample_image/esl_image_00_240x120_bt.BMP"><code class="xref download docutils literal notranslate"><span class="pre">esl_image_00_240x120_bt.BMP</span></code></a> <a class="reference download external" download="" href="https://github.com/NordicPlayground/nrf-esl-bluetooth/blob/doc/docs/esl_sample_image/esl_image_01_240x120_nordic_logo.BMP"><code class="xref download docutils literal notranslate"><span class="pre">esl_image_01_240x120_nordic_logo.BMP</span></code></a></p></li>
+</ul>
+<p>Nordic provides two sample files that can be used with the <a class="reference internal" href="esl_tag.html#peripheral-esl"><span class="std std-ref">Bluetooth: Peripheral ESL</span></a> 4.2” EPD variant.</p>
+<ul class="simple">
+<li><p>EPD format: Use this format on Access Point <a class="reference download external" download="" href="https://github.com/NordicPlayground/nrf-esl-bluetooth/raw/doc/docs/esl_sample_image/esl_image_empower"><code class="xref download docutils literal notranslate"><span class="pre">esl_image_empower</span></code></a> <a class="reference download external" download="" href="https://github.com/NordicPlayground/nrf-esl-bluetooth/raw/doc/docs/esl_sample_image/esl_image_mcu_block"><code class="xref download docutils literal notranslate"><span class="pre">esl_image_mcu_block</span></code></a></p></li>
+<li><p>BMP format: This format is only for reference <a class="reference download external" download="" href="https://github.com/NordicPlayground/nrf-esl-bluetooth/blob/doc/docs/esl_sample_image/esl_image_09_400x300_empower.BMP"><code class="xref download docutils literal notranslate"><span class="pre">esl_image_09_400x300_empower.BMP</span></code></a> <a class="reference download external" download="" href="https://github.com/NordicPlayground/nrf-esl-bluetooth/blob/doc/docs/esl_sample_image/esl_image_0A_400x300_mcu_block.BMP"><code class="xref download docutils literal notranslate"><span class="pre">esl_image_0A_400x300_mcu_block.BMP</span></code></a></p></li>
 </ul>
 </div>
 <ol class="arabic" start="3">
 <li><p>Transfer images from the PC to the AP: run from cmd /command line</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">mcumgr --conntype=&quot;serial&quot; --connstring=&quot;COM4,baud=115200,mtu=512&quot; fs upload esl_image_bt /ots_image/esl_image_00</span>
 <span class="go">mcumgr --conntype=&quot;serial&quot; --connstring=&quot;COM4,baud=115200,mtu=512&quot; fs upload esl_image_nordic /ots_image/esl_image_01</span>
+<span class="go">mcumgr --conntype=&quot;serial&quot; --connstring=&quot;COM4,baud=115200,mtu=512&quot; fs upload esl_image_empower /ots_image/esl_image_09</span>
+<span class="go">mcumgr --conntype=&quot;serial&quot; --connstring=&quot;COM4,baud=115200,mtu=512&quot; fs upload esl_image_mcu_block /ots_image/esl_image_0A</span>
 </pre></div>
 </div>
 <div class="admonition note">

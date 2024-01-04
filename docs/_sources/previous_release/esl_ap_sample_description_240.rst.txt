@@ -10,7 +10,7 @@ Sample description
 The Central ESL sample acts as Access Point(AP) defined in `Electronic Shelf Label Profile <https://www.bluetooth.com/specifications/specs/electronic-shelf-label-profile-1-0/>`_ which controls and manages numbers of ESL Tag.
 It uses the library :ref:`esl_service_client_readme` to communicates with ESLs connectionlessly when one or more ESLs are in the Synchronized state.
 
-.. include:: esl_experimental.txt
+.. include:: ../esl_experimental.txt
 
 
 Requirements
