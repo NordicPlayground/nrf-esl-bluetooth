@@ -148,7 +148,6 @@ int delete_imgs_from_storage(void)
 int ots_storage_init(void)
 {
 	char fname[MAX_PATH_LEN];
-	struct bt_esls *esl_obj = esl_get_esl_obj();
 	int rc;
 
 	/* Do not mount if auto-mount has been enabled */

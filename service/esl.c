@@ -1795,7 +1795,6 @@ static ssize_t ots_obj_write(struct bt_ots *ots, struct bt_conn *conn, uint64_t 
 {
 	char id_str[BT_OTS_OBJ_ID_STR_LEN];
 	uint8_t obj_index = id - BT_OTS_OBJ_ID_MIN;
-	int rc, retry = 0;
 
 	bt_ots_obj_id_to_str(id, id_str, sizeof(id_str));
 
@@ -1810,6 +1809,8 @@ static ssize_t ots_obj_write(struct bt_ots *ots, struct bt_conn *conn, uint64_t 
 	}
 #else /* USE littlefs*/
 #ifndef CONFIG_BT_ESL_UNSYNCHRONIZED_IMMEIDATELY
+	int rc, retry = 0;
+
 	memcpy(esl_obj_l->img_obj_buf, data, len);
 	if (esl_obj_l->cb.write_img_to_storage) {
 		do {
