@@ -490,6 +490,11 @@ static void esl_parse_sync_packet(struct net_buf_simple *buf)
 			if (esl_id != ESL_ADDR_BROADCAST) {
 				rsp_slot = tlv_slot;
 			}
+
+			/* need the work to complete before moving on */
+			while (k_work_busy_get(&esl_ecp_work.work) != 0) {
+				k_yield();
+			}
 		} else {
 			LOG_DBG("esl id is not for us 0x%02x 0x%02x", esl_id,
 				LOW_BYTE(esl_obj_l->esl_chrc.esl_addr));
@@ -1696,7 +1701,7 @@ struct ots_img_object *bt_esl_otc_inst(void)
 	return esl_obj_l->img_objects;
 }
 #endif /* CONFIG_ESL_SHELL */
- 
+
 static uint32_t obj_cnt;
 
 struct object_creation_data {
@@ -1803,7 +1808,7 @@ static ssize_t ots_obj_write(struct bt_ots *ots, struct bt_conn *conn, uint64_t 
 	} else {
 		LOG_ERR("no buffer_img cb");
 	}
-#else  /* USE littlefs*/
+#else /* USE littlefs*/
 #ifndef CONFIG_BT_ESL_UNSYNCHRONIZED_IMMEIDATELY
 	memcpy(esl_obj_l->img_obj_buf, data, len);
 	if (esl_obj_l->cb.write_img_to_storage) {
