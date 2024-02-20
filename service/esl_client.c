@@ -190,8 +190,8 @@ bool esl_c_auto_ap_mode =
 uint16_t esl_c_tags_per_group =
 	COND_CODE_1(CONFIG_BT_ESL_AP_AUTO_MODE, (CONFIG_BT_ESL_AP_AUTO_TAG_PER_GROUP),
 		    (CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER));
-uint8_t groups_per_button =
-	COND_CODE_1(CONFIG_BT_ESL_AP_AUTO_MODE, (CONFIG_BT_ESL_AP_GROUP_PER_BUTTON), 1);
+uint8_t groups_per_button = COND_CODE_1(IS_ENABLED(CONFIG_BT_ESL_AP_AUTO_MODE),
+					(CONFIG_BT_ESL_AP_GROUP_PER_BUTTON), (1));
 bool esl_c_write_wo_rsp;
 
 /**
@@ -787,7 +787,7 @@ static void esl_c_auto_configuring_tag(uint8_t conn_idx)
 			LOG_ERR("No space in the queue for qk_data");
 		}
 
-		break;		
+		break;
 	default:
 		LOG_WRN("Not predefied tag, should manually configuring");
 		break;
@@ -1145,9 +1145,9 @@ static void connected(struct bt_conn *conn, uint8_t conn_err)
 #if defined(CONFIG_BT_ESL_TAG_STORAGE)
 	esl_tag_load_work.ble_addr = peer;
 	esl_tag_load_work.conn_idx = conn_idx;
+	k_work_reschedule(&esl_tag_load_work.work, K_NO_WAIT);
 #endif /* CONFIG_BT_ESL_TAG_STORAGE */
 
-	k_work_reschedule(&esl_tag_load_work.work, K_NO_WAIT);
 
 	tag = esl_c_get_tag_addr(-1, peer);
 	if (tag) {

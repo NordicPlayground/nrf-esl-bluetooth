@@ -1198,6 +1198,7 @@ static void export_bt_key(const struct bt_bond_info *info, void *user_data)
 	}
 }
 
+#if defined(CONFIG_BT_ESL_TAG_BT_KEY_STORAGE)
 static int cmd_acl_bt_key_import(const struct shell *shell, size_t argc, char *argv[])
 {
 	if (argc < 3) {
@@ -1247,6 +1248,7 @@ static int cmd_acl_bt_key_import(const struct shell *shell, size_t argc, char *a
 
 	return err;
 }
+#endif
 
 static int cmd_acl_bt_key_export(const struct shell *shell, size_t argc, char *argv[])
 {
@@ -1408,8 +1410,10 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 	SHELL_CMD(connect, NULL, "Connect advertising ESL service tag", cmd_acl_connect),
 	SHELL_CMD(connect_addr, NULL, "Connect advertising ESL service or synced tag with ble addr",
 		  cmd_acl_connect_addr),
+#if defined(CONFIG_BT_ESL_TAG_BT_KEY_STORAGE)
 	SHELL_CMD(bt_key_import, NULL, "ESL AP import BT bonding key runtime",
 		  cmd_acl_bt_key_import),
+#endif /* CONFIG_BT_ESL_TAG_BT_KEY_STORAGE */
 	SHELL_CMD(bt_key_export, NULL, "ESL AP export bond key", cmd_acl_bt_key_export),
 	SHELL_CMD(bd_addr, NULL, "ESL AP BD Addr", cmd_bd_addr),
 #if defined(CONFIG_BT_ESL_TAG_STORAGE)
