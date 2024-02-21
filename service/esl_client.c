@@ -1274,8 +1274,12 @@ uint32_t esl_c_get_abs_time(void)
 void esl_list_tag_work_fn(struct k_work *work)
 {
 	esl_c_list_scanned(false);
-	k_work_reschedule(&esl_list_tag_work.work,
-			  K_MSEC(CONFIG_BT_ESL_SCAN_REPORT_INTERVAL * MSEC_PER_SEC));
+	/* Only prints scanned list periodically when scanning */
+	if (atomic_test_bit(&esl_c_obj_l->acl_state, ESL_C_SCANNING) ||
+	    atomic_test_bit(&esl_c_obj_l->acl_state, ESL_C_SCAN_PENDING)) {
+		k_work_reschedule(&esl_list_tag_work.work,
+				  K_MSEC(CONFIG_BT_ESL_SCAN_REPORT_INTERVAL * MSEC_PER_SEC));
+	}
 }
 
 BT_SCAN_CB_INIT(scan_cb, scan_filter_match, scan_filter_no_match, scan_connecting_error,
@@ -2849,6 +2853,7 @@ void esl_c_scan(bool onoff, bool oneshot)
 		}
 
 		atomic_clear_bit(&esl_c_obj_l->acl_state, ESL_C_SCANNING);
+		k_work_cancel_delayable(&esl_list_tag_work.work);
 
 		if (IS_ENABLED(CONFIG_BT_ESL_LED_INDICATION)) {
 			ind_led[0].blink = false;
