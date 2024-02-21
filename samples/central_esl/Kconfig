@@ -46,6 +46,7 @@ config BT_ESL_AP_GROUP_PER_BUTTON
 	  "The number of groups controlled by one button.
 	   If this number is greater than 1, an AP can control multiple groups by one button.
 	   Otherwise, an AP controls one group by one button."
+endif # BT_ESL_AP_AUTO_MODE
 
 config BT_ESL_AP_AUTO_PING
 	bool "AP auto ping mode"
@@ -60,7 +61,6 @@ config BT_ESL_AP_PING_INTERVAL
 	help
 	  "Ping interval in seconds. AP will send ping command to synchronized tag every
 	  BT_ESL_AP_PING_INTERVAL seconds."
-endif
 
 config BT_ESL_AP_AUTO_PAST_TAG
 	bool "AP auto past mode"
