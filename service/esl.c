@@ -868,14 +868,12 @@ void esl_stop_sync_pawr(void)
 
 static void ecp_notify_unassociated_cb(struct bt_conn *conn, void *user_data)
 {
-	LOG_DBG("");
 	bt_esl_unassociate();
 	esl_obj_l->ecp_notify_params.func = NULL;
 }
 
 void ecp_notify_cb(struct bt_conn *conn, void *user_data)
 {
-	LOG_DBG("");
 	uint8_t *buf = user_data;
 
 	LOG_HEXDUMP_DBG(buf, ESL_RESPONSE_MAX_LEN, "");
@@ -1957,8 +1955,8 @@ static int ots_init_func(void)
 void bt_esl_delete_images(void)
 {
 	int err;
+
 	/* call OTS or storage to delete image*/
-	LOG_DBG("");
 	if (esl_obj_l->cb.delete_imgs) {
 		esl_obj_l->cb.delete_imgs();
 		for (size_t idx = 0; idx < CONFIG_BT_ESL_IMAGE_MAX; idx++) {
@@ -2067,7 +2065,6 @@ void bt_esl_adv_start(enum esl_adv_mode mode)
 
 void bt_esl_adv_stop(void)
 {
-	LOG_DBG("");
 	bt_le_adv_stop();
 
 	if (IS_ENABLED(CONFIG_BT_ESL_LED_INDICATION)) {
@@ -2178,18 +2175,19 @@ static void display_dwork_init(struct bt_esls *esl_obj)
 /* 3.10.2.4 Factory Reset Looks the same with unassoiciated ,but delete image*/
 void bt_esl_factory_reset(void)
 {
-	LOG_DBG("");
+
 #if defined(CONFIG_BT_ESL_IMAGE_AVAILABLE)
 	bt_esl_delete_images();
 	ots_create_obj();
 #endif
-	esl_stop_sync_pawr();
 	bt_esl_unassociate();
 }
 
 void bt_esl_unassociate(void)
 {
-	LOG_DBG("");
+	if (atomic_test_bit(&esl_obj_l->basic_state, ESL_SYNCHRONIZED)) {
+		esl_stop_sync_pawr();
+	}
 
 	bt_esl_disconnect();
 	/* ESL tag can only pair and bond to one AP, so unpairing all devices is good*/
@@ -2209,8 +2207,6 @@ void bt_esl_unassociate(void)
 void bt_esl_disconnect(void)
 {
 	int err;
-
-	LOG_DBG("");
 
 	/* Diesonnect BLE connection*/
 	err = bt_conn_disconnect(esl_obj_l->conn, BT_HCI_ERR_REMOTE_USER_TERM_CONN);
