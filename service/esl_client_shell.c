@@ -379,6 +379,13 @@ static int cmd_acl_list_conn(const struct shell *shell, size_t argc, char *argv[
 	return 0;
 }
 
+static int cmd_acl_clear_scanned(const struct shell *shell, size_t argc, char *argv[])
+{
+	(void)esl_c_scanned_tag_remove(-1);
+
+	return 0;
+}
+
 static int cmd_acl_connect(const struct shell *shell, size_t argc, char *argv[])
 {
 	if (argc < 2) {
@@ -1407,6 +1414,7 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 	SHELL_CMD(gatt_flag, NULL, "ESL AP GATT read/write flag debug command", cmd_acl_gatt_flag),
 	SHELL_CMD(scan, NULL, "Scan ESL service tags", cmd_acl_scan),
 	SHELL_CMD(list_scanned, NULL, "List advertising ESL service tags", cmd_acl_list_scanned),
+	SHELL_CMD(clear_scanned, NULL, "Clear advertising ESL service tags", cmd_acl_clear_scanned),
 	SHELL_CMD(connect, NULL, "Connect advertising ESL service tag", cmd_acl_connect),
 	SHELL_CMD(connect_addr, NULL, "Connect advertising ESL service or synced tag with ble addr",
 		  cmd_acl_connect_addr),
