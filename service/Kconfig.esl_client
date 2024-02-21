@@ -117,13 +117,10 @@ config BT_ESL_TAG_STORAGE
 	  Save tag information to flash when connected can search tag information.
 	  TODO:Encrypt filename and content.
 
-if BT_ESL_TAG_STORAGE
 config BT_ESL_TAG_BT_KEY_STORAGE
 	bool "Save tag BT key to storage"
 	help
 	  Save tag BT key to flash when connected can search tag information.
-
-endif # BT_ESL_TAG_STORAGE
 
 config BT_ESL_DEMO_SECURITY
 	bool "DEMO security level"

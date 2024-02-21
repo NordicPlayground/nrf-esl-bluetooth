@@ -2575,6 +2575,8 @@ static void esl_tag_load_work_fn(struct k_work *work)
 				  &esl_c_obj_l->gatt[tag_work->conn_idx].esl_device);
 }
 
+#endif /* (CONFIG_BT_ESL_TAG_STORAGE) */
+
 int esl_c_import_bt_key(struct bt_keys *new_key)
 {
 	int err;
@@ -2589,8 +2591,6 @@ int esl_c_import_bt_key(struct bt_keys *new_key)
 
 	return err;
 }
-
-#endif /* (CONFIG_BT_ESL_TAG_STORAGE) */
 
 /* 6.1.1 Configure or reconfigure an ESL procedure */
 void esl_ap_config_work_fn(struct k_work *work)
@@ -2636,9 +2636,9 @@ void esl_ap_config_work_fn(struct k_work *work)
 	esl_c_obj_l->gatt[config_work->conn_idx].esl_device.past_needed = true;
 	/* Save tag */
 #if defined(CONFIG_BT_ESL_TAG_STORAGE)
-	LOG_INF("save tag begin");
+	LOG_DBG("save tag begin");
 	save_tag_in_storage(&esl_c_obj_l->gatt[config_work->conn_idx].esl_device);
-	LOG_INF("save tag end");
+	LOG_DBG("save tag end");
 #endif /* (CONFIG_BT_ESL_TAG_STORAGE) */
 
 	/* Update Complete */
@@ -3056,8 +3056,8 @@ int esl_c_connect(const bt_addr_le_t *peer_addr, uint16_t esl_addr)
 		esl_c_scan(false, esl_c_obj_l->scan_one_shot);
 	}
 
-	/* Load bt keys from tag DB since there is limitation of max paired device */
-#if defined(CONFIG_BT_ESL_TAG_BT_KEY_STORAGE)
+/* Load BT keys from Tag DB if Tag DB exists */
+#if defined(CONFIG_BT_ESL_TAG_STORAGE) && defined(CONFIG_BT_ESL_TAG_BT_KEY_STORAGE)
 	struct bt_keys bt_key;
 
 	ret = load_bt_key_in_storage(peer_addr, &bt_key);
@@ -3274,7 +3274,7 @@ int bt_esl_c_reset_ap(void)
 	}
 
 	(void)bt_c_esl_unbond_all();
-#if defined(BT_ESL_TAG_STORAGE)
+#if defined(CONFIG_BT_ESL_TAG_STORAGE)
 	err = remove_all_tags_in_storage();
 #endif /* (CONFIG_BT_ESL_TAG_STORAGE) */
 	return err;
