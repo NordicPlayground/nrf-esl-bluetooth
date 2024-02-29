@@ -135,9 +135,7 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 	 **/
 	uc81xx_init(display_dev);
 
-#endif /* DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8176) ||                                           \
-	*  DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8179)                                             \
-	*/
+#endif /* DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8176) || DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8179) */
 #endif /* ESL_POWER_PROFILE */
 
 	LOG_DBG("display %d img %d on/off %d", disp_idx, img_idx, enable);
@@ -259,7 +257,7 @@ void display_unassociated(uint8_t disp_idx)
 	 * zephyr/drivers/display/uc81xx.c
 	 **/
 	uc81xx_init(display_dev);
-#endif /* DT_HAS_COMPAT_STATUS_OKAY(solomon_ssd16xxfb) */
+#endif /* DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8176) || DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8179) */
 #endif /* CONFIG_ESL_POWER_PROFILE */
 
 	/* Use Font Paint lib to draw text*/
@@ -304,12 +302,14 @@ void display_associated(uint8_t disp_idx)
 	snprintk(tag_str, sizeof(tag_str), "ESL TAG 0x%04x", esl_obj->esl_chrc.esl_addr);
 #if defined(CONFIG_ESL_POWER_PROFILE)
 	display_epd_onoff(EPD_POWER_ON);
+#if DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8176) || DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8179)
 	/**
-	 * To optimize power remove static declaration of ssd16xx_init in
-	 * zephyr/drivers/display/ssd16xx.c
+	 * To optimize power remove static declaration of uc81xx_init in
+	 * zephyr/drivers/display/uc81xx.c
 	 **/
-	ssd16xx_init(display_dev);
-#endif
+	uc81xx_init(display_dev);
+#endif /* DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8176) || DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8179) */
+#endif /* CONFIG_ESL_POWER_PROFILE */
 	/* Use Font Paint lib to draw text*/
 #if defined(CONFIG_BT_ESL_PAINT_LIB)
 	int err;
