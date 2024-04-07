@@ -171,6 +171,10 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 	memset(esl_obj->img_obj_buf, 0, CONFIG_ESL_IMAGE_BUFFER_SIZE);
 	img_size = esl_obj->cb.read_img_size_from_storage(img_idx);
 	/* Read header first */
+	if (esl_obj->cb.open_image_from_storage) {
+		esl_obj->cb.open_image_from_storage(img_idx);
+	}
+
 	err = esl_obj->cb.read_img_from_storage(img_idx, esl_obj->img_obj_buf,
 						sizeof(struct waveshare_gray_head), 0);
 	if (err < 0) {
@@ -185,17 +189,20 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 	/* Check image header rational */
 	if (img_size < buf_desc.buf_size) {
 		LOG_ERR("Invalid file size %d, image size %d", img_size, buf_desc.buf_size);
-		return -EINVAL;
+		err = -EINVAL;
+		goto end;
 	}
 
 	if (img_head->w == 0 || img_head->h == 0) {
 		LOG_ERR("Invalid resolution width or height is zero");
-		return -EINVAL;
+		err = -EINVAL;
+		goto end;
 	}
 
 	if (img_head->w > capabilities.x_resolution || img_head->h > capabilities.y_resolution) {
 		LOG_ERR("Invalid resolution, width or height is over display resolution");
-		return -EINVAL;
+		err = -EINVAL;
+		goto end;
 	}
 
 	display_blanking_on(display_dev);
@@ -234,7 +241,7 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 		err = display_write(display_dev, 0, cur_y, &buf_desc, esl_obj->img_obj_buf);
 		if (err) {
 			LOG_ERR("display_write (err %d)", err);
-			return err;
+			goto end;
 		}
 
 		/**
@@ -261,7 +268,12 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 #if defined(CONFIG_ESL_POWER_PROFILE)
 	display_epd_onoff(EPD_POWER_OFF);
 #endif
-	return 0;
+end:
+	if (esl_obj->cb.close_image_from_storage) {
+		esl_obj->cb.close_image_from_storage();
+	}
+
+	return err;
 }
 
 void display_unassociated(uint8_t disp_idx)
