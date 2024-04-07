@@ -38,3 +38,15 @@ int ots_storage_init(void)
 	LOG_DBG("Dummy storage");
 	return 0;
 }
+
+int open_image_from_storage(uint8_t img_idx)
+{
+	LOG_DBG("Dummy storage");
+	return 0;
+}
+
+int close_image_from_storage(void)
+{
+	LOG_DBG("Dummy storage");
+	return 0;
+}

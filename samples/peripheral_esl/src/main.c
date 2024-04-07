@@ -283,6 +283,8 @@ static int start_execute(void)
 #endif /* CONFIG_CHARACTER_FRAMEBUFFER */
 #if defined(CONFIG_BT_ESL_IMAGE_AVAILABLE)
 	init_param.cb.buffer_img = buffer_img;
+	init_param.cb.open_image_from_storage = open_image_from_storage;
+	init_param.cb.close_image_from_storage = close_image_from_storage;
 	init_param.cb.write_img_to_storage = write_img_to_storage;
 	init_param.cb.read_img_from_storage = read_img_from_storage;
 	init_param.cb.read_img_size_from_storage = read_img_size_from_storage;

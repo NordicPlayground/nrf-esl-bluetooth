@@ -16,10 +16,12 @@
 
 #include <zephyr/types.h>
 #include <zephyr/kernel.h>
+
 #include <zephyr/bluetooth/conn.h>
 #include <zephyr/bluetooth/uuid.h>
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/smf.h>
+#include <zephyr/fs/fs.h>
 #include <bluetooth/gatt_pool.h>
 #include <bluetooth/conn_ctx.h>
 
@@ -206,6 +208,28 @@ struct bt_esl_cb {
 	 * @param[in]  offset Offset of OTS data.
 	 */
 	void (*buffer_img)(const void *data, size_t len, off_t offset);
+
+	/**
+	 * @brief Open file handle for image.
+	 *
+	 * This function opens a global file handle for the specified image idx.
+	 *
+	 * @param img_idx The index of the image to open the file handle for.
+	 * @param file A pointer to the file handle to open.
+	 *
+	 * @return 0 if the open is successful, or a negative error code if the open fails.
+	 */
+	int (*open_image_from_storage)(uint8_t img_idx);
+
+	/**
+	 * @brief Close file handle for image.
+	 *
+	 * This function closes the global file handle.
+	 * @param file A pointer to the file handle to close.
+	 *
+	 * @return 0 if the close is successful, or a negative error code if the close fails.
+	 */
+	int (*close_image_from_storage)(void);
 
 	/** @brief Write img_obj_buf to storage callback.
 	 * Write image data to storage backend when all of fragments from OTS is received.

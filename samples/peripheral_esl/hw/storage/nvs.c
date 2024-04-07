@@ -17,6 +17,16 @@ LOG_MODULE_DECLARE(peripheral_esl);
 #define IMG_SIZE_OFFSET 0x100
 static struct nvs_fs *fs;
 
+int open_image_from_storage(uint8_t img_idx)
+{
+	return 0;
+}
+
+int close_image_from_storage(void)
+{
+	return 0;
+}
+
 int write_img_to_storage(uint8_t img_idx, size_t len, off_t offset)
 {
 	int rc;

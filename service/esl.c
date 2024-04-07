@@ -165,6 +165,7 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 #if defined(CONFIG_BT_ESL_DEMO_SECURITY)
 	bt_unpair(BT_ID_DEFAULT, bt_conn_get_dst(conn));
 #endif
+
 	printk("#DISCONNECTED:0x%02x\n", reason);
 	if (auth_conn) {
 		LOG_INF("unref auth_conn");
@@ -1753,8 +1754,12 @@ static int ots_obj_created(struct bt_ots *ots, struct bt_conn *conn, uint64_t id
 static void ots_obj_selected(struct bt_ots *ots, struct bt_conn *conn, uint64_t id)
 {
 	char id_str[BT_OTS_OBJ_ID_STR_LEN];
+	uint8_t obj_index = id - BT_OTS_OBJ_ID_MIN;
 
 	bt_ots_obj_id_to_str(id, id_str, sizeof(id_str));
+	if (esl_obj_l->cb.open_image_from_storage) {
+		esl_obj_l->cb.open_image_from_storage(obj_index);
+	}
 
 	LOG_INF("Object with %s ID has been selected", id_str);
 }
@@ -1796,7 +1801,7 @@ static ssize_t ots_obj_write(struct bt_ots *ots, struct bt_conn *conn, uint64_t 
 
 	bt_ots_obj_id_to_str(id, id_str, sizeof(id_str));
 
-	LOG_INF("Object with %s ID %d obj_index is being written "
+	LOG_DBG("Object with %s ID %d obj_index is being written "
 		"Offset = %lu, Length = %zu, Remaining = %zu",
 		id_str, obj_index, (long)offset, len, rem);
 #if (CONFIG_ESL_OTS_NVS)
@@ -1818,6 +1823,11 @@ static ssize_t ots_obj_write(struct bt_ots *ots, struct bt_conn *conn, uint64_t 
 	} else {
 		LOG_ERR("no write_img_to_storage cb");
 	}
+
+	if (esl_obj_l->cb.close_image_from_storage) {
+		esl_obj_l->cb.close_image_from_storage();
+	}
+
 #endif /* CONFIG_BT_ESL_UNSYNCHRONIZED_IMMEIDATELY */
 #endif /* (CONFIG_ESL_OTS_NVS) */
 
@@ -1857,6 +1867,10 @@ int ots_obj_cal_checksum(struct bt_ots *ots, struct bt_conn *conn, uint64_t id, 
 	}
 
 	*data = &esl_obj_l->img_obj_buf;
+
+	if (esl_obj_l->cb.close_image_from_storage) {
+		esl_obj_l->cb.close_image_from_storage();
+	}
 
 	return 0;
 }

@@ -38,23 +38,60 @@ struct fs_mount_t *mp =
 	&lfs_storage_mnt
 #endif
 	;
-int write_img_to_storage(uint8_t img_idx, size_t len, off_t offset)
+
+struct fs_file_t file;
+
+int open_image_from_storage(uint8_t img_idx)
 {
-	struct fs_file_t file;
 	int rc;
 	char fname[MAX_PATH_LEN];
-	struct bt_esls *esl_obj = esl_get_esl_obj();
 
-	LOG_DBG("%s len %d offset %ld", __func__, len, offset);
-	fs_file_t_init(&file);
-	snprintf(fname, sizeof(fname), OBJECT_IDX_FULLNAME_TEMPLETE, mp->mnt_point, img_idx);
-	rc = fs_open(&file, fname, FS_O_CREATE | FS_O_RDWR);
-
-	if (rc < 0) {
-		LOG_ERR("FAIL: open %s: %d\n", fname, rc);
-		goto out;
+	if (file.mp != NULL) {
+		fs_close(&file);
 	}
 
+	fs_file_t_init(&file);
+	snprintf(fname, sizeof(fname), OBJECT_IDX_FULLNAME_TEMPLETE, mp->mnt_point, img_idx);
+	LOG_DBG("open %s", fname);
+	rc = fs_open(&file, fname, FS_O_CREATE | FS_O_RDWR);
+	if (rc < 0) {
+		LOG_ERR("FAIL: open %s: %d\n", fname, rc);
+	}
+
+	return rc;
+}
+
+int close_image_from_storage(void)
+{
+	int rc;
+
+	if (file.mp == NULL) {
+		return 0;
+	}
+
+	rc = fs_sync(&file);
+	if (rc < 0) {
+		LOG_ERR("fs_sync failed %d", rc);
+	}
+
+	rc = fs_close(&file);
+	if (rc < 0) {
+		LOG_ERR("FAIL: close: %d\n", rc);
+	}
+
+	return rc;
+}
+
+int write_img_to_storage(uint8_t img_idx, size_t len, off_t offset)
+{
+	int rc;
+	struct bt_esls *esl_obj = esl_get_esl_obj();
+
+	if (file.mp == NULL) {
+		open_image_from_storage(img_idx);
+	}
+
+	LOG_DBG("%s len %d offset %ld", __func__, len, offset);
 	rc = fs_seek(&file, offset, FS_SEEK_SET);
 	if (rc < 0) {
 		LOG_ERR("seek to offset %ld failed", offset);
@@ -66,24 +103,18 @@ int write_img_to_storage(uint8_t img_idx, size_t len, off_t offset)
 		LOG_ERR("fs_write len %d failed %d", len, rc);
 		goto out;
 	}
+
 out:
-	fs_close(&file);
 	return rc;
 }
 
 int read_img_from_storage(uint8_t img_idx, void *data, size_t len, off_t offset)
 {
-	struct fs_file_t file;
 	int rc;
-	char fname[MAX_PATH_LEN];
 
 	LOG_DBG("%s len %d offset %ld", __func__, len, offset);
-	fs_file_t_init(&file);
-	snprintf(fname, sizeof(fname), OBJECT_IDX_FULLNAME_TEMPLETE, mp->mnt_point, img_idx);
-	rc = fs_open(&file, fname, FS_O_READ);
-	if (rc < 0) {
-		LOG_ERR("FAIL: open %s: %d\n", fname, rc);
-		goto out;
+	if (file.mp == NULL) {
+		open_image_from_storage(img_idx);
 	}
 
 	rc = fs_seek(&file, offset, FS_SEEK_SET);
@@ -98,20 +129,17 @@ int read_img_from_storage(uint8_t img_idx, void *data, size_t len, off_t offset)
 		goto out;
 	}
 out:
-	fs_close(&file);
 	return rc;
 }
 
 size_t read_img_size_from_storage(uint8_t img_idx)
 {
 	size_t size;
-	struct fs_file_t file;
 	struct fs_dirent dirent;
 
 	int rc;
 	char fname[MAX_PATH_LEN];
 
-	fs_file_t_init(&file);
 	snprintf(fname, sizeof(fname), OBJECT_IDX_FULLNAME_TEMPLETE, mp->mnt_point, img_idx);
 	rc = fs_stat(fname, &dirent);
 	LOG_DBG("%s fs_stat %d", fname, rc);
