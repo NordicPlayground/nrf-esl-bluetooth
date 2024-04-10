@@ -52,7 +52,7 @@ IMAGE_LIST_FILE = CURRENT_FOLDER / 'image_list.txt'
 TAG_DATA_FOLDER = CURRENT_FOLDER / 'tag_data'
 TAG_BLE_FOLDER = TAG_DATA_FOLDER / 'tag_ble'
 COM_PORT = ''
-SMP_ECHO_CMD = 'mcumgr --conntype="serial" --connstring="{},baud=115200" echo hello -t 2'
+SMP_ECHO_CMD = 'newtmgr --conntype="serial" --connstring="{},baud=115200" echo hello -t 2'
 
 def find_com_port():
     global COM_PORT
@@ -73,6 +73,9 @@ def find_com_port():
     elif sys.platform.startswith('linux'):
         print('Linux not supported yet')
         exit(1)
+    COM_PORT = ''
+    print('No SMP COM port found')
+    exit(1)
 
 def get_tag_from_ap():
     print('Getting tags esl_addr from AP')
@@ -91,7 +94,7 @@ def get_tag_from_ap():
         print('Getting tags from tag list')
         for esl_addr_str in tag_list:
             print(f'dl tag 0x{esl_addr_str}')
-            proc = subprocess.Popen(f'mcumgr --conntype="serial" --connstring="{COM_PORT},baud=115200" fs download /ots_image/esl/{esl_addr_str} {TAG_DATA_FOLDER}/{esl_addr_str}',
+            proc = subprocess.Popen(f'newtmgr --conntype="serial" --connstring="{COM_PORT},baud=115200" fs download /ots_image/esl/{esl_addr_str} {TAG_DATA_FOLDER}/{esl_addr_str}',
                 stdout = subprocess.PIPE,
                 stderr = subprocess.PIPE,
             )
@@ -102,7 +105,7 @@ def get_tag_from_ap():
         esl_addr = 0
         for i in range(0, 32768):
             esl_addr_str = f'{esl_addr:04x}'
-            proc = subprocess.Popen(f'mcumgr --conntype="serial" --connstring="{COM_PORT},baud=115200" fs download /ots_image/esl/{esl_addr_str} {TAG_DATA_FOLDER}/{esl_addr_str}',
+            proc = subprocess.Popen(f'newtmgr --conntype="serial" --connstring="{COM_PORT},baud=115200" fs download /ots_image/esl/{esl_addr_str} {TAG_DATA_FOLDER}/{esl_addr_str}',
                 stdout = subprocess.PIPE,
                 stderr = subprocess.PIPE,
             )
@@ -130,7 +133,7 @@ def get_tag_from_ap():
                 ble_addr_str_filename = ble_addr_str.replace(':', '_')
             else:
                 ble_addr_str_filename = ble_addr_str_filename
-            proc = subprocess.Popen(f'mcumgr --conntype="serial" --connstring="{COM_PORT},baud=115200" fs download /ots_image/ble/{ble_addr_str} {TAG_BLE_FOLDER}/{ble_addr_str_filename}',
+            proc = subprocess.Popen(f'newtmgr --conntype="serial" --connstring="{COM_PORT},baud=115200" fs download /ots_image/ble/{ble_addr_str} {TAG_BLE_FOLDER}/{ble_addr_str_filename}',
                 stdout = subprocess.PIPE,
                 stderr = subprocess.PIPE,
             )
@@ -143,7 +146,8 @@ def upload_image_to_ap():
         image_list = csv.reader(file)
         for row in image_list:
             print(f'Uploading {row[0]} to {row[1]}')
-            proc = subprocess.Popen(f'mcumgr --conntype="serial" --connstring="{COM_PORT},baud=115200" fs upload {row[0]} {row[1]}',
+            print(f'newtmgr --conntype="serial" --connstring="{COM_PORT},baud=115200" fs upload {row[0]} {row[1]}')
+            proc = subprocess.Popen(f'newtmgr --conntype="serial" --connstring="{COM_PORT},baud=115200" fs upload {row[0]} {row[1]}',
                 stdout = subprocess.PIPE,
                 stderr = subprocess.PIPE,
             )
@@ -154,7 +158,7 @@ def upload_tag_to_ap():
     print('Uploading tag data to AP')
     for filename in os.listdir(TAG_DATA_FOLDER):
         if os.path.isfile(os.path.join(TAG_DATA_FOLDER, filename)):
-            cmd_str = f'mcumgr --conntype="serial" --connstring="{COM_PORT},baud=115200" fs upload {TAG_DATA_FOLDER}/{filename} /ots_image/esl/{filename}'
+            cmd_str = f'newtmgr --conntype="serial" --connstring="{COM_PORT},baud=115200" fs upload {TAG_DATA_FOLDER}/{filename} /ots_image/esl/{filename}'
             print (cmd_str)
             proc = subprocess.Popen(cmd_str,
                 stdout = subprocess.PIPE,
@@ -169,7 +173,7 @@ def upload_tag_to_ap():
                 ble_addr_str = filename.replace('_', ':')
             else:
                 ble_addr_str = filename
-            cmd_str = f'mcumgr --conntype="serial" --connstring="{COM_PORT},baud=115200" fs upload {TAG_BLE_FOLDER}/{filename} /ots_image/ble/{ble_addr_str}'
+            cmd_str = f'newtmgr --conntype="serial" --connstring="{COM_PORT},baud=115200" fs upload {TAG_BLE_FOLDER}/{filename} /ots_image/ble/{ble_addr_str}'
             print (cmd_str)
             proc = subprocess.Popen(cmd_str,
                 stdout = subprocess.PIPE,
