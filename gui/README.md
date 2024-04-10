@@ -2,6 +2,7 @@
 
 This folder contains python scripts for working with ESL access point.
 
+## Scripts
 `ap_smp_util.py` - A python script to perform SMP operations on an ESL access point. It could be used to for the following feature.
 Upload EPD images to the storage of an ESL access point.
 Download ESL Tag data including ESL address / BLE address / response key from an ESL access point.
@@ -10,9 +11,18 @@ Download ESL Tag data including ESL address / BLE address / response key from an
 
 `esl_tlv_generator.py` - A GUI python script to compose ESL payload TLVs. This script demonstrates how one can use this script to create multiple ECP commands and supply response key for each response slot.
 
+`epd_simulator.py` - A python script to generate pixel mapped imagefiles for EPD display.
+
 # ap_smp_util.py Usage
 
 This script is used to interact with an ESL Access Point. It provides functionalities to download tag data from the Access Point, upload images to the Access Point, and upload tag data to the Access Point.
+
+## Prerequisites
+Newt Manager (newtmgr)
+
+https://dlcdn.apache.org/mynewt/
+
+https://dlcdn.apache.org/mynewt/apache-mynewt-1.12.0/
 
 ## Usage
 
@@ -92,3 +102,53 @@ The `esl_tlv_generator_ui` is a graphical user interface (GUI) tool for generati
 
 - Python 3.x
 - PySide6
+
+# `epd_simulator.py` Image file generator Usage
+
+The `epd_simulator.py` script is used to convert monochrome bmp to pixel-mapped image files for EPD displays.
+
+Prepare monochrome bmp files for EPD displays.
+
+## Instructions
+For most of EPD, the pixel of first frame(black frame) is inverted which means bit on in BMP will be pixel off on EPD. So this script will invert pixel automatically.
+
+The script takes several command-line arguments:
+
+- `-i` or `--input_file`: Path to the input file.
+- `-i2` or `--input_file2`: Path to the input file for the second frame.
+- `-n` or `--not_inverted`: If present, the pixel of the first frame will not be inverted.
+- `-o` or `--output_file`: Path to the output file.
+- `-a` or `--action`: Action to perform. Options are:
+  - `d`: Draw
+  - `g`: Generate binary file from bmp
+  - `b`: Generate binary file from c array
+  - `a`: Generate c array from binary file
+  - `c`: Generate checksum of input file
+- `-s` or `--scan`: Scan mode (0-7).
+- `-c` or `--color`: Color mode. Options are:
+  - `1`: Monochrome black white
+  - `3`: Monochrome red white
+- `-t` or `--transform`: Transformations to apply to the data. Options are `no`, `lr`, `ud`, `udlr`.
+- `-r` or `--red`: If present, the image will be generated with a red frame.
+
+
+    #### To generate single black frame image, follow these steps:
+
+    1. python epd_simulator.py -i `BMP file name` -a g -o `output file name`
+
+    #### To generate single black frame image without inverted pixel follow these steps:
+
+    1. python epd_simulator.py -i `BMP file name` -a g -o `output file name` -n
+
+    #### To generate single red frame image, , follow these steps:
+
+    1. python epd_simulator.py -i `BMP file name` -a g -o `output file name` -r
+
+    #### To generate two frame image, follow these steps:
+
+    1. python epd_simulator.py -i `black frame BMP file name` -i2 `red frame BMP file name` -a g -o `output file name`
+
+    #### To generate c array from binary file, follow these steps:
+
+    1. Generate binary file from bmp file with above steps.
+    2. python epd_simulator.py -i `binary file name` -a a -o `output header file name`
