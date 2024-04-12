@@ -187,7 +187,7 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 	}
 
 	err = display_write(display_dev, 0, 0, &buf_desc,
-			    (esl_obj->img_obj_buf + sizeof(struct display_buffer_descriptor)));
+			    (esl_obj->img_obj_buf + sizeof(struct waveshare_gray_head)));
 	if (err) {
 		LOG_ERR("display_write (err %d)", err);
 	}
