@@ -1,0 +1,37 @@
+/*
+ * Copyright (c) 2023 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+ &arduino_spi {
+	cs-gpios = <&arduino_header 16 GPIO_ACTIVE_LOW>; /* D10 */
+	status="okay";
+	max-frequency = < 1000000 >;
+
+	epd: epd@0 {
+		compatible = "generic,epd";
+		reg = <0>;
+		status = "okay";
+		spi-max-frequency = <400000>;
+		reg = <0>;
+		dc-gpios = <&arduino_header 15 GPIO_ACTIVE_HIGH>;        /* D9 EPD driver use raw instead of logical level */
+		reset-gpios = <&arduino_header 14 GPIO_ACTIVE_HIGH>;     /* D8 EPD driver use raw instead of logical level */
+		busy-gpios = <&arduino_header 13 GPIO_ACTIVE_HIGH>;      /* D7 EPD driver use raw instead of logical level */
+	};
+ };
+/* 4.2" Panel need more rom to store image */
+/delete-node/ &storage_partition;
+&flash0 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		storage_partition: partition@74000 {
+			label = "storage";
+			reg = < 0x74000 0xc000 >;
+		};
+
+	};
+};

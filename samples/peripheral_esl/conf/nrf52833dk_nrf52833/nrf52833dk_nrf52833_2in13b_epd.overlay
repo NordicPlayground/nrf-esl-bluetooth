@@ -1,0 +1,27 @@
+/*
+ * Copyright (c) 2023 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+ / {
+	chosen {
+		zephyr,display = &uc8176_waveshare_epaper_E0213A20;
+	};
+};
+
+&arduino_spi {
+	status = "okay";
+	cs-gpios = <&arduino_header 16 GPIO_ACTIVE_LOW>;	/* D10 */
+
+	uc8176_waveshare_epaper_E0213A20: uc8176@0 {
+		compatible = "ultrachip,uc8176";
+		spi-max-frequency = <4000000>;
+		reg = <0>;
+		width = <104>;
+		height = <212>;
+		dc-gpios = <&arduino_header 15 GPIO_ACTIVE_LOW>;	/* D9 */
+		reset-gpios = <&arduino_header 14 GPIO_ACTIVE_LOW>;	/* D8 */
+		busy-gpios = <&arduino_header 13 GPIO_ACTIVE_LOW>;	/* D7 */
+	};
+};

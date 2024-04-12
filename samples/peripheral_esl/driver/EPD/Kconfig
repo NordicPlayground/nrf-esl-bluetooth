@@ -1,0 +1,19 @@
+
+config EPD_4IN2_V1
+	bool "Waveshare 4.2 inch e-paper display V1"
+
+config EPD_4IN2_V2
+	bool "Waveshare 4.2 inch e-paper display V2"
+
+config EPD_1IN54B_V2
+	bool "Waveshare 1.54 inch 3 color e-paper display V2"
+
+config EPD_2IN9B_V3
+	bool "Waveshare 2.9 inch 3 color e-paper display V3"
+
+config EPD_2IN13B_V3
+	bool "Waveshare 2.13 inch 3 color e-paper display V3"
+
+module = EPD_DRIVER
+module-str = EPD_DRIVER
+source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
