@@ -92,3 +92,4 @@ source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
 endmenu
 
 rsource "../../service/Kconfig.esl"
+rsource "driver/EPD/Kconfig"
