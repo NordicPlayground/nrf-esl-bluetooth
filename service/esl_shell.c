@@ -237,7 +237,7 @@ static int cmd_esl_display(const struct shell *shell, size_t argc, char *argv[])
 	return 0;
 }
 
-#if defined(CONFIG_CHARACTER_FRAMEBUFFER)
+#if defined(CONFIG_CHARACTER_FRAMEBUFFER) || defined(CONFIG_BT_ESL_JF_PAINT_LIB)
 static int cmd_esl_print_on_display(const struct shell *shell, size_t argc, char *argv[])
 {
 	shell_fprintf(shell, SHELL_NORMAL, "%s\n", __func__);
@@ -307,7 +307,7 @@ static int cmd_esl_update_display(const struct shell *shell, size_t argc, char *
 
 	return 0;
 }
-#endif /* CONFIG_CHARACTER_FRAMEBUFFER */
+#endif /* CONFIG_CHARACTER_FRAMEBUFFER  || CONFIG_BT_ESL_JF_PAINT_LIB */
 
 static int cmd_esl_led_work_dump(const struct shell *shell, size_t argc, char *argv[])
 {
@@ -593,7 +593,7 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 	SHELL_CMD(adv, NULL, "ESL advertising start/stop", cmd_esl_adv),
 	SHELL_CMD(led, NULL, "LED control for debugging", cmd_esl_led),
 	SHELL_CMD(display, NULL, "DISPLAY control for debugging", cmd_esl_display),
-#if defined(CONFIG_CHARACTER_FRAMEBUFFER)
+#if defined(CONFIG_CHARACTER_FRAMEBUFFER) || defined(CONFIG_BT_ESL_JF_PAINT_LIB)
 	SHELL_CMD(print_on_display, NULL, "Print text to display framebuffer",
 		  cmd_esl_print_on_display),
 	SHELL_CMD(clear_display, NULL, "Clear display framebuffer", cmd_esl_clear_display),

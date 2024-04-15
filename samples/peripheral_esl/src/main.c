@@ -280,6 +280,10 @@ static int start_execute(void)
 	init_param.cb.display_update_font = display_update_cfb;
 	init_param.cb.display_clear_font = display_clear_cfb;
 	init_param.cb.display_print_font = display_print_cfb;
+#elif defined(CONFIG_BT_ESL_PAINT_LIB) || defined(CONFIG_BT_ESL_JF_PAINT_LIB)
+	init_param.cb.display_update_font = display_update_paint;
+	init_param.cb.display_clear_font = display_clear_paint;
+	init_param.cb.display_print_font = display_print_paint;
 #endif /* CONFIG_CHARACTER_FRAMEBUFFER */
 #if defined(CONFIG_BT_ESL_IMAGE_AVAILABLE)
 	init_param.cb.buffer_img = buffer_img;

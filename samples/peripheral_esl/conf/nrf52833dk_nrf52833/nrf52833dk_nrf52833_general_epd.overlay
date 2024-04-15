@@ -13,7 +13,6 @@
 		reg = <0>;
 		status = "okay";
 		spi-max-frequency = <4000000>;
-		reg = <0>;
 		dc-gpios = <&arduino_header 15 GPIO_ACTIVE_HIGH>;        /* D9 EPD driver use raw instead of logical level */
 		reset-gpios = <&arduino_header 14 GPIO_ACTIVE_HIGH>;     /* D8 EPD driver use raw instead of logical level */
 		busy-gpios = <&arduino_header 13 GPIO_ACTIVE_HIGH>;      /* D7 EPD driver use raw instead of logical level */

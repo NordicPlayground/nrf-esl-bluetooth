@@ -136,7 +136,7 @@ int display_print_cfb(uint8_t disp_idx, const char *text, uint16_t x, uint16_t y
 int display_update_cfb(uint8_t disp_idx);
 #endif /* CONFIG_CHARACTER_FRAMEBUFFER */
 
-#if defined(CONFIG_BT_ESL_PAINT_LIB)
+#if defined(CONFIG_BT_ESL_JF_PAINT_LIB)
 
 /**
  * @brief Callback @ref display_clear_font() implementation with Font Paint API.
@@ -175,7 +175,7 @@ int display_print_paint(uint8_t disp_idx, const char *text, uint16_t x, uint16_t
  */
 int display_update_paint(uint8_t disp_idx);
 
-#endif /* CONFIG_BT_ESL_PAINT_LIB */
+#endif /* CONFIG_BT_ESL_JF_PAINT_LIB || CONFIG_BT_ESL_JF_PAINT_LIB */
 /**
  * @brief Initializes the sensor hardware.
  *
