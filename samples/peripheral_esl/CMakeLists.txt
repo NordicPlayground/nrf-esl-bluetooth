@@ -53,6 +53,17 @@ if ((CONFIG_EPD_4IN2_V1) OR (CONFIG_EPD_4IN2_V2) OR (CONFIG_EPD_1IN54B_V2) OR (C
   target_sources(app PRIVATE hw/display/epd_display.c)
 endif()
 
+if (CONFIG_BT_ESL_JF_PAINT_LIB)
+  FILE(GLOB paint_lib_sources hw/display/paint_lib/*.c)
+  target_sources(app PRIVATE hw/display/paint_lib/font8.c)
+  target_sources(app PRIVATE hw/display/paint_lib/font12.c)
+  target_sources(app PRIVATE hw/display/paint_lib/font16.c)
+  target_sources(app PRIVATE hw/display/paint_lib/font20.c)
+  target_sources(app PRIVATE hw/display/paint_lib/font24.c)
+  target_sources(app PRIVATE hw/display/paint_lib/jfpaint.c)
+  zephyr_library_include_directories(hw/display/paint_lib/include)
+endif()
+
 # Sensor HW implementation
 target_sources(app PRIVATE hw/sensor/sensor.c)
 

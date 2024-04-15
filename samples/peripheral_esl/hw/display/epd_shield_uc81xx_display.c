@@ -9,11 +9,12 @@
 #include <zephyr/pm/device.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/pinctrl.h>
-#if (CONFIG_BT_ESL_PAINT_LIB)
-#include "epdpaint.h"
-#include "fonts.h"
-static Paint paint_black;
-#endif /* CONFIG_BT_ESL_PAINT_LIB */
+#if (CONFIG_BT_ESL_JF_PAINT_LIB)
+#include <jfpaint.h>
+// uint8_t wb_data[CONFIG_ESL_DISPLAY_WIDTH / 8 * CONFIG_ESL_DISPLAY_HEIGHT];
+uint8_t wb_data[CONFIG_ESL_DISPLAY_WIDTH / 8 * CONFIG_ESL_DISPLAY_HEIGHT];
+uint8_t rw_data[0];
+#endif /* CONFIG_BT_ESL_JF_PAINT_LIB */
 #include <zephyr/logging/log.h>
 
 #include "esl.h"
@@ -102,12 +103,17 @@ int display_epd_onoff(uint8_t mode)
 
 int display_init(void)
 {
+	struct bt_esls *esl_obj = esl_get_esl_obj();
+
 	display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
 	if (!device_is_ready(display_dev)) {
 		LOG_ERR("Display is not ready, aborting test");
 		return -ENODEV;
 	}
-
+#if defined(CONFIG_BT_ESL_JF_PAINT_LIB)
+	jfpaint_init((void *)wb_data, (void *)rw_data);
+	setscan(SCAN_NORMAL);
+#endif /* CONFIG_BT_ESL_JF_PAINT_LIB */
 	display_get_capabilities(display_dev, &capabilities);
 
 	if (display_set_pixel_format(display_dev, PIXEL_FORMAT_MONO10) != 0) {
@@ -253,6 +259,7 @@ void display_unassociated(uint8_t disp_idx)
 {
 	char tag_str[BT_ADDR_LE_STR_LEN] = {0};
 	struct bt_le_oob oob;
+
 	/* print bt addr on display*/
 #if defined(CONFIG_BT_ESL_PTS)
 	bt_id_read_public_addr(&oob.addr);
@@ -272,34 +279,32 @@ void display_unassociated(uint8_t disp_idx)
 #endif /* DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8176) || DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8179) */
 #endif /* CONFIG_ESL_POWER_PROFILE */
 
-	/* Use Font Paint lib to draw text*/
-#if defined(CONFIG_BT_ESL_PAINT_LIB)
-	struct bt_esls *esl_obj = esl_get_esl_obj();
+#if defined(CONFIG_BT_ESL_JF_PAINT_LIB)
 	int err;
 
 	buf_desc.width = capabilities.x_resolution;
 	buf_desc.height = capabilities.y_resolution;
 	buf_desc.pitch = capabilities.x_resolution;
 	buf_desc.buf_size = (buf_desc.width * buf_desc.height) / EPD_MONO_NUMOF_ROWS_PER_PAGE;
-	Paint_Init(&paint_black, esl_obj->img_obj_buf, capabilities.x_resolution,
-		   capabilities.y_resolution);
-	Paint_Clear(&paint_black, UNCOLORED);
-	Paint_SetRotate(&paint_black, 0);
-	Paint_DrawStringAt(&paint_black, 10, 10, "Hello Nordic!", &Font16, COLORED);
-	Paint_DrawStringAt(&paint_black, 10, 30, "UNAssociated", &Font16, COLORED);
-	Paint_DrawStringAt(&paint_black, 10, 50, "ESL TAG", &Font16, COLORED);
-	Paint_DrawStringAt(&paint_black, 10, 70, tag_str, &Font16, COLORED);
-	Paint_DrawStringAt(&paint_black, 10, 90, "APAC", &Font16, COLORED);
-	Paint_DrawStringAt(&paint_black, 10, 110, CONFIG_BT_DIS_MODEL, &Font16, COLORED);
+
+	/* Use JF Paint lib to draw text */
+	fill(WHITE); // clear the screen with white
+	drawString("Hello Nordic", &Font16, BLACK, 10, 10);
+	drawString("UNAssociated", &Font16, BLACK, 10, 30);
+	drawString("ESL TAG", &Font16, BLACK, 10, 50);
+	drawString(tag_str, &Font16, BLACK, 10, 70);
+	drawString("APAC", &Font16, BLACK, 10, 90);
+	drawString(CONFIG_BT_DIS_MODEL, &Font16, BLACK, 10, 110);
+
 	display_blanking_on(display_dev);
-	err = display_write(display_dev, 0, 0, &buf_desc, paint_black.image);
+	err = display_write(display_dev, 0, 0, &buf_desc, wb_data);
 	if (err) {
 		LOG_ERR("display_write (rc %d)", err);
 	}
 
 	display_blanking_off(display_dev);
 
-#endif /* CONFIG_BT_ESL_PAINT_LIB */
+#endif /* CONFIG_BT_ESL_JF_PAINT_LIB */
 
 #if defined(CONFIG_ESL_POWER_PROFILE)
 	display_epd_onoff(EPD_POWER_OFF);
@@ -323,37 +328,36 @@ void display_associated(uint8_t disp_idx)
 #endif /* DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8176) || DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8179) */
 #endif /* CONFIG_ESL_POWER_PROFILE */
 	/* Use Font Paint lib to draw text*/
-#if defined(CONFIG_BT_ESL_PAINT_LIB)
+#if defined(CONFIG_BT_ESL_JF_PAINT_LIB)
 	int err;
 
 	buf_desc.width = capabilities.x_resolution;
 	buf_desc.height = capabilities.y_resolution;
 	buf_desc.pitch = capabilities.x_resolution;
 	buf_desc.buf_size = (buf_desc.width * buf_desc.height) / EPD_MONO_NUMOF_ROWS_PER_PAGE;
-	Paint_Init(&paint_black, esl_obj->img_obj_buf, capabilities.x_resolution,
-		   capabilities.y_resolution);
-	Paint_Clear(&paint_black, UNCOLORED);
-	Paint_SetRotate(&paint_black, 0);
-	Paint_DrawStringAt(&paint_black, 10, 10, "Hello Nordic!", &Font16, COLORED);
-	Paint_DrawStringAt(&paint_black, 10, 30, "Associated", &Font16, COLORED);
-	Paint_DrawStringAt(&paint_black, 10, 50, tag_str, &Font16, COLORED);
-	Paint_DrawStringAt(&paint_black, 10, 70, "APAC", &Font16, COLORED);
-	Paint_DrawStringAt(&paint_black, 10, 90, CONFIG_BT_DIS_MODEL, &Font16, COLORED);
+	/* Use JF Paint lib to draw text */
+	fill(WHITE); // clear the screen with white
+	drawString("Hello Nordic", &Font16, BLACK, 10, 10);
+	drawString("Associated", &Font16, BLACK, 10, 30);
+	drawString(tag_str, &Font16, BLACK, 10, 50);
+	drawString("APAC", &Font16, BLACK, 10, 70);
+	drawString(CONFIG_BT_DIS_MODEL, &Font16, BLACK, 10, 90);
+
 	display_blanking_on(display_dev);
-	err = display_write(display_dev, 0, 0, &buf_desc, paint_black.image);
+	err = display_write(display_dev, 0, 0, &buf_desc, wb_data);
 	if (err) {
 		LOG_ERR("display_write (rc %d)", err);
 	}
 
 	display_blanking_off(display_dev);
-#endif /* CONFIG_BT_ESL_PAINT_LIB */
+#endif /* CONFIG_BT_ESL_JF_PAINT_LIB */
 
 #if defined(CONFIG_ESL_POWER_PROFILE)
 	display_epd_onoff(EPD_POWER_OFF);
 #endif /* CONFIG_ESL_POWER_PROFILE */
 }
 
-#if defined(CONFIG_BT_ESL_PAINT_LIB)
+#if defined(CONFIG_BT_ESL_JF_PAINT_LIB)
 int display_clear_paint(uint8_t disp_idx)
 {
 	int err;
@@ -368,9 +372,9 @@ int display_clear_paint(uint8_t disp_idx)
 	buf_desc.pitch = capabilities.x_resolution;
 	buf_desc.buf_size = (buf_desc.width * buf_desc.height) / EPD_MONO_NUMOF_ROWS_PER_PAGE;
 
-	Paint_Clear(&paint_black, UNCOLORED);
+	fill(WHITE);
 	display_blanking_on(display_dev);
-	err = display_write(display_dev, 0, 0, &buf_desc, paint_black.image);
+	err = display_write(display_dev, 0, 0, &buf_desc, wb_data);
 	if (err) {
 		LOG_ERR("display_write (rc %d)", err);
 	}
@@ -386,7 +390,8 @@ int display_clear_paint(uint8_t disp_idx)
 int display_print_paint(uint8_t disp_idx, const char *text, uint16_t x, uint16_t y)
 {
 	ARG_UNUSED(disp_idx);
-	Paint_DrawStringAt(&paint_black, x, y, text, &Font16, COLORED);
+	printk("%s x %d y %d\n", __func__, x, y);
+	drawString(text, &Font16, BLACK, x, y);
 
 	return 0;
 }
@@ -394,7 +399,6 @@ int display_print_paint(uint8_t disp_idx, const char *text, uint16_t x, uint16_t
 int display_update_paint(uint8_t disp_idx)
 {
 	int err;
-
 #if defined(CONFIG_ESL_POWER_PROFILE)
 	display_epd_onoff(EPD_POWER_ON);
 #endif /* CONFIG_ESL_POWER_PROFILE */
@@ -403,8 +407,9 @@ int display_update_paint(uint8_t disp_idx)
 	buf_desc.height = capabilities.y_resolution;
 	buf_desc.pitch = capabilities.x_resolution;
 	buf_desc.buf_size = (buf_desc.width * buf_desc.height) / EPD_MONO_NUMOF_ROWS_PER_PAGE;
+
 	display_blanking_on(display_dev);
-	err = display_write(display_dev, 0, 0, &buf_desc, paint_black.image);
+	err = display_write(display_dev, 0, 0, &buf_desc, wb_data);
 	if (err) {
 		LOG_ERR("display_write (rc %d)", err);
 	}
@@ -414,6 +419,6 @@ int display_update_paint(uint8_t disp_idx)
 #if defined(CONFIG_ESL_POWER_PROFILE)
 	display_epd_onoff(EPD_POWER_OFF);
 #endif /* CONFIG_ESL_POWER_PROFILE */
-	return err;
+	return 0;
 }
-#endif /* CONFIG_BT_ESL_PAINT_LIB */
+#endif /* CONFIG_BT_ESL_JF_PAINT_LIB */

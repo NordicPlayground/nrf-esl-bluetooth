@@ -22,6 +22,11 @@ config BT_ESL_SECURITY_ENABLED
 	help
 	  "Enable BLE security for the ESL service"
 
+config BT_ESL_JF_PAINT_LIB
+	bool "ESL peripheral has simple font paint library"
+	help
+	  ESL has capability to draw text ifself instead of accepting image only
+
 config ESL_SIMULATE_DISPLAY
 	bool "Use LED2 on DK board to simulate display"
 	help
