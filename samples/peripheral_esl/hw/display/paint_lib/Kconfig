@@ -1,0 +1,33 @@
+config PAINT_COLORS
+    int "Number of colors"
+    default 3 if ESL_DISPLAY_TYPE = 6
+    default 2
+    help
+      Number of colors to use in the paint application.
+
+config PAINT_WB_ON
+    int "white black frame bit value indicating to which color"
+    range 0 1
+    default 0
+    help
+      0 means bit on white color, bit off black color
+      1 means bit on black color, bit off white color
+
+config PAINT_RW_ON
+    int "red white frame bit value indicating to which color"
+    range 0 1
+    default 0
+    help
+      0 means bit on white color, bit off red color
+      1 means bit on red color, bit off white color
+
+config PAINT_MSB_FIRST
+    bool "MSB first"
+    default y
+    help
+      If set, the paint application will draw the most significant bit first.
+      Otherwise, the least significant bit will be drawn first.
+
+module = JF_PAINT
+module-str = JF_PAINT
+source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"

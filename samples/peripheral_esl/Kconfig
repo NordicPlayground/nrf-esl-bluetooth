@@ -98,3 +98,4 @@ endmenu
 
 rsource "../../service/Kconfig.esl"
 rsource "driver/EPD/Kconfig"
+rsource "hw/display/paint_lib/Kconfig"

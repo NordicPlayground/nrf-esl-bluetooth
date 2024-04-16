@@ -60,7 +60,7 @@ if (CONFIG_BT_ESL_JF_PAINT_LIB)
   target_sources(app PRIVATE hw/display/paint_lib/font16.c)
   target_sources(app PRIVATE hw/display/paint_lib/font20.c)
   target_sources(app PRIVATE hw/display/paint_lib/font24.c)
-  target_sources(app PRIVATE hw/display/paint_lib/jfpaint.c)
+  target_sources(app PRIVATE hw/display/paint_lib/paint.c)
   zephyr_library_include_directories(hw/display/paint_lib/include)
 endif()
 
