@@ -24,30 +24,18 @@
 
 
 const unsigned char gImage_1[] = {0};
-
-#if defined(CONFIG_BT_ESL_PAINT_LIB) || defined(CONFIG_BT_ESL_PAINT_LIB_BINARY)
-#include "epdpaint.h"
-unsigned char frame_buffer_black_arr[CONFIG_ESL_DISPLAY_WIDTH * CONFIG_ESL_DISPLAY_HEIGHT / 8];
-unsigned char *frame_buffer_black = frame_buffer_black_arr;
-Paint paint_black;
-/* red black white 3 color panel need red frame */
-#if (CONFIG_ESL_DISPLAY_TYPE == 6)
-unsigned char frame_buffer_red_arr[CONFIG_ESL_DISPLAY_WIDTH * CONFIG_ESL_DISPLAY_HEIGHT / 8];
-unsigned char *frame_buffer_red = frame_buffer_red_arr;
-Paint paint_red;
-#endif /* CONFIG_ESL_DISPLAY_TYPE == 6 */
-
-#else
-#include <jfpaint.h>
+#if defined(CONFIG_BT_ESL_JF_PAINT_LIB)
+#include <paint.h>
+static paint_obj_t paint_obj;
 uint8_t wb_data[CONFIG_ESL_DISPLAY_WIDTH / 8 * CONFIG_ESL_DISPLAY_HEIGHT];
 #if (CONFIG_ESL_DISPLAY_TYPE == 6)
 uint8_t rw_data[CONFIG_ESL_DISPLAY_WIDTH / 8 * CONFIG_ESL_DISPLAY_HEIGHT];
 #else
-uint8_t rw_data[0];
+uint8_t rw_data[] = {0};
 
 #endif /* CONFIG_ESL_DISPLAY_TYPE == 6 */
 
-#endif /* CONFIG_BT_ESL_PAINT_LIB */
+#endif /* CONFIG_BT_ESL_JF_PAINT_LIB */
 struct epd_display_fn_t {
 	void (*epd_init)(void);
 	void (*epd_clear)(void);
@@ -151,15 +139,14 @@ int display_init(void)
 	capabilities.y_resolution = CONFIG_ESL_DISPLAY_HEIGHT;
 
 #if defined(CONFIG_BT_ESL_JF_PAINT_LIB)
-	jfpaint_init((void *)wb_data, (void *)rw_data);
-	setscan(SCAN_NORMAL);
-#elif defined(CONFIG_BT_ESL_PAINT_LIB) || defined(CONFIG_BT_ESL_PAINT_LIB_BINARY)
+	paint_obj.width = CONFIG_ESL_DISPLAY_WIDTH;
+	paint_obj.height = CONFIG_ESL_DISPLAY_HEIGHT;
+	paint_obj.wb_buffer = wb_data;
 #if (CONFIG_ESL_DISPLAY_TYPE == 6)
-	Paint_Init(&paint_red, frame_buffer_red, CONFIG_ESL_DISPLAY_WIDTH,
-		   CONFIG_ESL_DISPLAY_HEIGHT);
-	Paint_Clear(&paint_red, UNCOLORED);
+	paint_obj.rw_buffer = rw_data;
 #endif
-
+	paint_obj.scanmode = PAINT_SCAN_MODE_1;
+	paint_Init(&paint_obj);
 #endif /* CONFIG_BT_ESL_JF_PAINT_LIB */
 	DEV_Module_Init();
 	if (IS_ENABLED(CONFIG_EPD_4IN2_V1)) {
@@ -191,20 +178,18 @@ int display_init(void)
 		epd_display_fn.epd_clear = EPD_5in83_V2_Clear;
 		epd_display_fn.epd_display_full = EPD_5in83_V2_Display;
 		epd_display_fn.epd_sleep = EPD_5in83_V2_Sleep;
-		setcolorlevel(BIT_OFF, BIT_OFF);
 	} else if (IS_ENABLED(CONFIG_EPD_2IN9B_V3)) {
 		epd_display_fn.epd_init = EPD_2IN9B_V3_Init;
 		epd_display_fn.epd_clear = EPD_2IN9B_V3_Clear;
 		epd_display_fn.epd_display_full = EPD_2IN9B_V3_Display;
 		epd_display_fn.epd_sleep = EPD_2IN9B_V3_Sleep;
-		setcolorlevel(BIT_OFF, BIT_OFF);
+		paint_SetDirection(PAINT_DIRECTION_90);
 	} else if (IS_ENABLED(CONFIG_EPD_2IN13B_V3)) {
 		epd_display_fn.epd_init = EPD_2IN13B_V3_Init;
 		epd_display_fn.epd_clear = EPD_2IN13B_V3_Clear;
 		epd_display_fn.epd_display_full = EPD_2IN13B_V3_Display;
 		epd_display_fn.epd_sleep = EPD_2IN13B_V3_Sleep;
-		setcolorlevel(BIT_OFF, BIT_OFF);
-
+		paint_SetDirection(PAINT_DIRECTION_90);
 	} else {
 		LOG_ERR("No EPD driver found");
 		return -ENODEV;
@@ -225,6 +210,7 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 
 #if defined(CONFIG_ESL_POWER_PROFILE)
 	display_epd_onoff(EPD_POWER_ON);
+	DEV_Module_Init();
 	epd_display_fn.epd_init();
 #endif /* ESL_POWER_PROFILE */
 
@@ -262,7 +248,7 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 		return -EINVAL;
 	}
 
-	if(epd_display_fn.epd_clear) {
+	if (epd_display_fn.epd_clear) {
 		epd_display_fn.epd_clear();
 	}
 
@@ -360,13 +346,13 @@ void display_unassociated(uint8_t disp_idx)
 
 #if defined(CONFIG_BT_ESL_JF_PAINT_LIB)
 	/* Use JF Paint lib to draw text */
-	fill(WHITE); // clear the screen with white
-	drawString("Hello Nordic", &Font16, BLACK, 10, 10);
-	drawString("UNAssociated", &Font16, BLACK, 10, 30);
-	drawString("ESL TAG", &Font16, BLACK, 10, 50);
-	drawString(tag_str, &Font16, BLACK, 10, 70);
-	drawString("APAC", &Font16, (CONFIG_ESL_DISPLAY_TYPE == 6) ? RED : BLACK, 10, 90);
-	drawString(CONFIG_BT_DIS_MODEL, &Font16, BLACK, 10, 110);
+	paint_Fill(WHITE); // clear the screen with white
+	paint_DrawString("Hello Nordic", &Font16, BLACK, 10, 10);
+	paint_DrawString("UNAssociated", &Font16, BLACK, 10, 30);
+	paint_DrawString("ESL TAG", &Font16, BLACK, 10, 50);
+	paint_DrawString(tag_str, &Font16, BLACK, 10, 70);
+	paint_DrawString("APAC", &Font16, (CONFIG_ESL_DISPLAY_TYPE == 6) ? RED : BLACK, 10, 90);
+	paint_DrawString(CONFIG_BT_DIS_MODEL, &Font16, BLACK, 10, 110);
 
 	if (epd_display_fn.epd_display_full) {
 #if (CONFIG_ESL_DISPLAY_TYPE == 6)
@@ -396,12 +382,12 @@ void display_associated(uint8_t disp_idx)
 
 #if defined(CONFIG_BT_ESL_JF_PAINT_LIB)
 	/* Use JF Paint lib to draw text */
-	fill(WHITE); // clear the screen with white
-	drawString("Hello Nordic", &Font16, BLACK, 10, 10);
-	drawString("Associated", &Font16, BLACK, 10, 30);
-	drawString(tag_str, &Font16, BLACK, 10, 50);
-	drawString("APAC", &Font16, BLACK, 10, 70);
-	drawString(CONFIG_BT_DIS_MODEL, &Font16, BLACK, 10, 90);
+	paint_Fill(WHITE); // clear the screen with white
+	paint_DrawString("Hello Nordic", &Font16, BLACK, 10, 10);
+	paint_DrawString("Associated", &Font16, BLACK, 10, 30);
+	paint_DrawString(tag_str, &Font16, BLACK, 10, 50);
+	paint_DrawString("APAC", &Font16, BLACK, 10, 70);
+	paint_DrawString(CONFIG_BT_DIS_MODEL, &Font16, BLACK, 10, 90);
 
 	if (epd_display_fn.epd_display_full) {
 #if (CONFIG_ESL_DISPLAY_TYPE == 6)
@@ -417,60 +403,6 @@ void display_associated(uint8_t disp_idx)
 #endif /* CONFIG_ESL_POWER_PROFILE */
 }
 
-#if defined(CONFIG_BT_ESL_PAINT_LIB)
-int display_clear_paint(uint8_t disp_idx)
-{
-#if defined(CONFIG_ESL_POWER_PROFILE)
-	display_epd_onoff(EPD_POWER_ON);
-	epd_display_fn.epd_init();
-#endif /* CONFIG_ESL_POWER_PROFILE */
-
-	epd_display_fn.epd_clear();
-	Paint_Clear(&paint_black, UNCOLORED);
-#if (CONFIG_ESL_DISPLAY_TYPE == 6)
-	Paint_Clear(&paint_red, UNCOLORED);
-#endif
-
-#if defined(CONFIG_ESL_POWER_PROFILE)
-	display_epd_onoff(EPD_POWER_OFF);
-#endif /* CONFIG_ESL_POWER_PROFILE */
-	return 0;
-}
-
-int display_print_paint(uint8_t disp_idx, const char *text, uint16_t x, uint16_t y)
-{
-	ARG_UNUSED(disp_idx);
-	printk("%s x %d y %d\n", __func__, x, y);
-	Paint_DrawStringAt(&paint_black, x, y, text, &Font16, COLORED);
-
-	return 0;
-}
-
-int display_update_paint(uint8_t disp_idx)
-{
-#if defined(CONFIG_ESL_POWER_PROFILE)
-	display_epd_onoff(EPD_POWER_ON);
-#endif /* CONFIG_ESL_POWER_PROFILE */
-	ARG_UNUSED(disp_idx);
-	buf_desc.width = capabilities.x_resolution;
-	buf_desc.height = capabilities.y_resolution;
-	buf_desc.pitch = capabilities.x_resolution;
-	buf_desc.buf_size = (buf_desc.width * buf_desc.height) / EPD_MONO_NUMOF_ROWS_PER_PAGE;
-
-	if (epd_display_fn.epd_display_full) {
-#if (CONFIG_ESL_DISPLAY_TYPE == 6)
-		epd_display_fn.epd_display_full(frame_buffer_black, frame_buffer_red);
-#else
-		epd_display_fn.epd_display_full(frame_buffer_black);
-#endif
-	}
-#if defined(CONFIG_ESL_POWER_PROFILE)
-	display_epd_onoff(EPD_POWER_OFF);
-#endif /* CONFIG_ESL_POWER_PROFILE */
-	return 0;
-}
-#endif /* CONFIG_BT_ESL_PAINT_LIB */
-
 #if defined(CONFIG_BT_ESL_JF_PAINT_LIB)
 int display_clear_paint(uint8_t disp_idx)
 {
@@ -480,7 +412,7 @@ int display_clear_paint(uint8_t disp_idx)
 #endif /* CONFIG_ESL_POWER_PROFILE */
 
 	epd_display_fn.epd_clear();
-	fill(WHITE);
+	paint_Fill(WHITE);
 #if defined(CONFIG_ESL_POWER_PROFILE)
 	display_epd_onoff(EPD_POWER_OFF);
 #endif /* CONFIG_ESL_POWER_PROFILE */
@@ -491,7 +423,7 @@ int display_print_paint(uint8_t disp_idx, const char *text, uint16_t x, uint16_t
 {
 	ARG_UNUSED(disp_idx);
 	printk("%s x %d y %d\n", __func__, x, y);
-	drawString(text, &Font16, BLACK, x, y);
+	paint_DrawString(text, &Font16, BLACK, x, y);
 
 	return 0;
 }
