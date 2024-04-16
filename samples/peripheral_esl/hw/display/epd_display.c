@@ -24,6 +24,7 @@
 
 
 const unsigned char gImage_1[] = {0};
+#define DT_DRV_COMPAT generic_epd
 #if defined(CONFIG_BT_ESL_JF_PAINT_LIB)
 #include <paint.h>
 static paint_obj_t paint_obj;
@@ -47,7 +48,7 @@ struct epd_display_fn_t {
 } epd_display_fn;
 
 LOG_MODULE_DECLARE(peripheral_esl);
-#define SSD16XX_FULL_UPDATE_TIME 3500
+#define EPD_FULL_UPDATE_TIME 3500
 
 /* nRF52 family Devkit has arduino header as SPI interface */
 #if IS_ENABLED(CONFIG_DT_HAS_ARDUINO_HEADER_R3_ENABLED)
@@ -79,18 +80,6 @@ int display_epd_onoff(uint8_t mode)
 	int err;
 
 	if (mode == EPD_POWER_ON) {
-		err = gpio_pin_configure_dt(&reset_gpio, GPIO_OUTPUT_INACTIVE);
-		if (err < 0) {
-			LOG_ERR("Failed to configure reset GPIO");
-			return err;
-		}
-
-		err = gpio_pin_configure_dt(&dc_gpio, GPIO_OUTPUT_INACTIVE);
-		if (err < 0) {
-			LOG_ERR("Failed to configure DC GPIO");
-			return err;
-		}
-
 		(void)pm_device_action_run(spi, PM_DEVICE_ACTION_RESUME);
 	} else if (mode == EPD_POWER_OFF || mode == EPD_POWER_OFF_IMMEDIATELY) {
 		(void)pm_device_action_run(spi, PM_DEVICE_ACTION_SUSPEND);
@@ -100,10 +89,11 @@ int display_epd_onoff(uint8_t mode)
 
 		/* turn off EPD after full update otherwise immediately */
 		if (mode == EPD_POWER_OFF) {
-			k_msleep(SSD16XX_FULL_UPDATE_TIME);
+			k_msleep(EPD_FULL_UPDATE_TIME);
 		}
 
-		err = gpio_pin_set_dt(&reset_gpio, 1);
+		/* Waveshare driver framework use absolute level for reset pin */
+		err = gpio_pin_set_dt(&reset_gpio, 0);
 
 		if (err < 0) {
 			LOG_ERR("Failed to configure reset GPIO disconneted");
@@ -290,7 +280,7 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 
 		if (epd_display_fn.epd_write_display) {
 			epd_display_fn.epd_write_display(0, cur_y, chunk_size, buf_desc.height,
-							   esl_obj->img_obj_buf);
+							 esl_obj->img_obj_buf);
 		} else {
 			epd_display_fn.epd_display_full(esl_obj->img_obj_buf);
 		}
