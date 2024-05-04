@@ -21,6 +21,7 @@
 #include "EPD_5in83_V2.h"
 #include "EPD_2in9b_V3.h"
 #include "EPD_2in13b_V3.h"
+#include "EPD_2in13_V4.h"
 
 
 const unsigned char gImage_1[] = {0};
@@ -180,6 +181,11 @@ int display_init(void)
 		epd_display_fn.epd_display_full = EPD_2IN13B_V3_Display;
 		epd_display_fn.epd_sleep = EPD_2IN13B_V3_Sleep;
 		paint_SetDirection(PAINT_DIRECTION_90);
+	} else if (IS_ENABLED(CONFIG_EPD_2IN13_V4)) {
+		epd_display_fn.epd_init = EPD_2in13_V4_Init_Fast;
+		epd_display_fn.epd_clear = EPD_2in13_V4_Clear;
+		epd_display_fn.epd_display_full = EPD_2in13_V4_Display_Fast;
+		epd_display_fn.epd_sleep = EPD_2in13_V4_Sleep;
 	} else {
 		LOG_ERR("No EPD driver found");
 		return -ENODEV;

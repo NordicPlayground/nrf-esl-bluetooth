@@ -14,6 +14,9 @@ config EPD_2IN9B_V3
 config EPD_2IN13B_V3
 	bool "Waveshare 2.13 inch 3 color e-paper display V3"
 
+config EPD_2IN13_V4
+	bool "Waveshare 2.13 inch e-paper display V4"
+
 module = EPD_DRIVER
 module-str = EPD_DRIVER
 source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"

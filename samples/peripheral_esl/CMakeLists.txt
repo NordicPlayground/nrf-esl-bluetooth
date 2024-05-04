@@ -48,7 +48,7 @@ if (CONFIG_BT_ESL_DISPLAY_MAX EQUAL 0)
   target_sources(app PRIVATE hw/display/dummy_display.c)
 endif()
 
-if ((CONFIG_EPD_4IN2_V1) OR (CONFIG_EPD_4IN2_V2) OR (CONFIG_EPD_1IN54B_V2) OR (CONFIG_EPD_2IN9B_V3) OR (CONFIG_EPD_2IN13B_V3))
+if ((CONFIG_EPD_4IN2_V1) OR (CONFIG_EPD_4IN2_V2) OR (CONFIG_EPD_1IN54B_V2) OR (CONFIG_EPD_2IN9B_V3) OR (CONFIG_EPD_2IN13B_V3) OR (CONFIG_EPD_2IN13_V4))
   add_subdirectory(driver/EPD)
   target_sources(app PRIVATE hw/display/epd_display.c)
 endif()
