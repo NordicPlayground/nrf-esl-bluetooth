@@ -1481,7 +1481,7 @@ static ssize_t esl_addr_write(struct bt_conn *conn, struct bt_gatt_attr const *a
 	}
 
 	struct bt_esls *esl_obj =
-		CONTAINER_OF((uint8_t *)attr->user_data, struct bt_esls, esl_chrc.esl_addr);
+		CONTAINER_OF(attr->user_data, struct bt_esls, esl_chrc.esl_addr);
 
 	LOG_INF("new esl_addr 0x%04x", new_esl_addr);
 	*esl_addr = new_esl_addr;
@@ -1516,7 +1516,7 @@ static ssize_t ap_key_write(struct bt_conn *conn, struct bt_gatt_attr const *att
 
 	struct bt_esl_key_material *ap_sync_key = attr->user_data;
 	struct bt_esls *esl_obj =
-		CONTAINER_OF((uint8_t *)attr->user_data, struct bt_esls, esl_chrc.esl_ap_key);
+		CONTAINER_OF(attr->user_data, struct bt_esls, esl_chrc.esl_ap_key);
 	memcpy(ap_sync_key->key_v, buf, EAD_KEY_MATERIAL_LEN);
 	/* Reverse endiness of session key to in advance to avoid change endiness everytime use it
 	 */
@@ -1555,7 +1555,7 @@ static ssize_t esl_rsp_key_write(struct bt_conn *conn, struct bt_gatt_attr const
 
 	struct bt_esl_key_material *esl_resp_key = attr->user_data;
 	struct bt_esls *esl_obj =
-		CONTAINER_OF((uint8_t *)attr->user_data, struct bt_esls, esl_chrc.esl_rsp_key);
+		CONTAINER_OF(attr->user_data, struct bt_esls, esl_chrc.esl_rsp_key);
 
 	memcpy(esl_resp_key->key_v, buf, EAD_KEY_MATERIAL_LEN);
 	/* Reverse endiness of session key to in advance to avoid change endiness everytime use it
@@ -2018,7 +2018,7 @@ static ssize_t esl_control_write(struct bt_conn *conn, struct bt_gatt_attr const
 	 *	uint8_t *cont_point = attr->user_data;
 	 */
 	struct bt_esls *esl_obj =
-		CONTAINER_OF((uint8_t *)attr->user_data, struct bt_esls, cont_point);
+		CONTAINER_OF(attr->user_data, struct bt_esls, cont_point);
 	LOG_DBG("esl_control_write len %d", len);
 	LOG_HEXDUMP_DBG(buf, len, "esl_control_write");
 
