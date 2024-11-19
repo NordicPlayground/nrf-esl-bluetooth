@@ -425,7 +425,7 @@ void esl_c_auto_ap_toggle(bool onoff);
  * @param[in] img_idx		Image index stored in AP storage. Equals to esl_image_<img_idx>.
  *
  */
-void esl_c_obj_write(uint16_t conn_idx, uint8_t tag_img_idx, uint16_t img_idx);
+void esl_c_obj_write(uint8_t conn_idx, uint8_t tag_img_idx, uint16_t img_idx);
 
 /** @brief Write Image to TAG.
  *
@@ -439,7 +439,7 @@ void esl_c_obj_write(uint16_t conn_idx, uint8_t tag_img_idx, uint16_t img_idx);
  * @retval (-ENOBUFS) Special error code used when there is no memory for list node.
  * @retval Otherwise, a negative error code is returned.
  */
-int esl_c_obj_write_by_name(uint16_t conn_idx, uint8_t tag_img_idx, uint8_t *img_name);
+int esl_c_obj_write_by_name(uint8_t conn_idx, uint8_t tag_img_idx, uint8_t *img_name);
 
 uint32_t esl_c_get_abs_time(void);
 #ifdef __cplusplus

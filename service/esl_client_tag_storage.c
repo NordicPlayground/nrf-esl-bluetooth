@@ -176,6 +176,48 @@ out:
 	return rc;
 }
 
+int find_tag_in_storage_with_ble_addr(uint16_t *esl_addr, bt_addr_le_t *ble_addr)
+{
+	struct fs_dirent dirent;
+	struct fs_file_t file;
+	int rc;
+	char fname[CONFIG_MCUMGR_GRP_FS_PATH_LEN];
+	char addr[BT_ADDR_LE_STR_LEN];
+
+	/* Save tag with ble addr */
+	bt_addr_to_str(&ble_addr->a, addr, BT_ADDR_LE_STR_LEN);
+
+	snprintk(fname, CONFIG_MCUMGR_GRP_FS_PATH_LEN, "%s/%s", TAG_BLE_ADDR_ROOT, addr);
+	fs_file_t_init(&file);
+	rc = fs_open(&file, fname, FS_O_READ);
+	if (rc < 0) {
+		LOG_ERR("FAIL: open %s: %d", fname, rc);
+		goto out;
+	}
+
+	rc = fs_stat(fname, &dirent);
+	if (rc < 0) {
+		LOG_ERR("FAIL: stat %s: %d", fname, rc);
+		goto out;
+	}
+
+	if (rc == 0 && dirent.type == FS_DIR_ENTRY_FILE && dirent.size == 0) {
+		LOG_INF("Tag file: %s empty found. New tag", fname);
+		rc = -ENOENT;
+		goto out;
+	}
+
+	fs_read(&file, esl_addr, ESL_ADDR_LEN);
+
+out:
+	(void)fs_close(&file);
+	if (rc < 0) {
+		LOG_ERR("FAIL: close %s: %d", fname, rc);
+	}
+
+	return rc;
+}
+
 int remove_all_tags_in_storage(void)
 {
 	int rc;
@@ -344,7 +386,7 @@ int load_all_tags_in_storage(uint8_t group_id)
 	return rc;
 }
 
-int list_tags_in_storage(uint8_t type)
+int list_tags_in_storage_type(uint8_t type)
 {
 	int rc;
 	struct fs_dir_t dirp;
@@ -392,6 +434,54 @@ int list_tags_in_storage(uint8_t type)
 	return rc;
 }
 
+int list_tags_in_storage(void)
+{
+	int rc;
+	struct fs_dir_t dirp;
+	static struct fs_dirent entry;
+	uint8_t path[CONFIG_MCUMGR_GRP_FS_PATH_LEN];
+
+	snprintk(path, CONFIG_MCUMGR_GRP_FS_PATH_LEN, "%s", TAG_ESL_ADDR_ROOT);
+
+	fs_dir_t_init(&dirp);
+	/* Verify fs_opendir() */
+	rc = fs_opendir(&dirp, path);
+	if (rc) {
+		LOG_WRN("Error opening dir %s (rc %d)", path, rc);
+		return rc;
+	}
+
+	printk("#TAG_IN:\n");
+
+	LOG_INF("Recursive open files in dir %s ...\n", path);
+	for (;;) {
+		uint16_t esl_addr;
+		bt_addr_le_t peer_addr;
+		char addr[BT_ADDR_LE_STR_LEN];
+
+		/* Verify fs_readdir() */
+		rc = fs_readdir(&dirp, &entry);
+		/* entry.name[0] == 0 means end-of-dir */
+		if (rc || entry.name[0] == 0) {
+			break;
+		}
+
+		if (entry.type == FS_DIR_ENTRY_FILE) {
+			LOG_INF("[FILE] %s ", entry.name);\
+			esl_addr = strtol(entry.name, NULL, 16);
+			find_tag_in_storage_with_esl_addr(esl_addr, &peer_addr);
+			bt_addr_le_to_str(&peer_addr, addr, BT_ADDR_STR_LEN);
+
+			printk("%s \t%s\n", entry.name, addr);
+		}
+	}
+
+	/* Verify fs_closedir() */
+	fs_closedir(&dirp);
+
+	return rc;
+}
+
 int remove_tag_in_storage(uint16_t esl_addr, const bt_addr_le_t *peer_addr)
 {
 	int rc;
@@ -408,12 +498,16 @@ int remove_tag_in_storage(uint16_t esl_addr, const bt_addr_le_t *peer_addr)
 			return rc;
 		}
 
-		bt_addr_to_str(&ble_addr.a, addr, BT_ADDR_STR_LEN);
 		LOG_INF("find addr %s", addr);
 	} else {
+		if (esl_addr == 0xffff) {
+			find_tag_in_storage_with_ble_addr(&esl_addr, peer_addr);
+		}
+
 		bt_addr_le_copy(&ble_addr, peer_addr);
 	}
 
+	bt_addr_to_str(&ble_addr.a, addr, BT_ADDR_STR_LEN);
 	rc = bt_c_esl_unbond(&ble_addr);
 	if (rc) {
 		LOG_ERR("FAIL: bt_c_esl_unbond %s: %d", addr, rc);

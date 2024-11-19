@@ -47,7 +47,7 @@ int save_tag_in_storage(const struct bt_esl_chrc_data *tag);
 int load_tag_in_storage(const bt_addr_le_t *ble_addr, struct bt_esl_chrc_data *tag);
 
 /**
- * Searches for a ESL Bluetooth address in the storage with the given ESL address
+ * Searches for a BLE address in the storage with the given ESL address
  *
  * @param [in] esl_addr The ESL address to search for.
  * @param [out] ble_addr The Bluetooth address to search for.
@@ -55,6 +55,15 @@ int load_tag_in_storage(const bt_addr_le_t *ble_addr, struct bt_esl_chrc_data *t
  */
 int find_tag_in_storage_with_esl_addr(uint16_t esl_addr, bt_addr_le_t *ble_addr);
 
+
+/**
+ * Searches for an ESL address in the storage with the given BLE address
+ *
+ * @param [out] esl_addr The ESL address to search for.
+ * @param [in] ble_addr The Bluetooth address to search for.
+ * @return 0 if found, or negative value if not found.
+ */
+int find_tag_in_storage_with_ble_addr(uint16_t *esl_addr, bt_addr_le_t *ble_addr);
 /**
  * @brief Lists all the tags in the storage directory based on the type.
  *
@@ -62,7 +71,15 @@ int find_tag_in_storage_with_esl_addr(uint16_t esl_addr, bt_addr_le_t *ble_addr)
  *
  * @return Returns 0 on success or an error code on failure.
  */
-int list_tags_in_storage(uint8_t type);
+int list_tags_in_storage_type(uint8_t type);
+
+/**
+ * @brief Lists all the tags in the storage directory and ESL/BLE addr mapping.
+ *
+ * @return Returns 0 on success or an error code on failure.
+ */
+int list_tags_in_storage(void);
+
 
 /**
  * @brief Removes a tag from storage based on its ESL address and peer address.

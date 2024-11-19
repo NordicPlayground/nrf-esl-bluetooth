@@ -45,12 +45,14 @@ config ESL_PAWR_INTERVAL_MIN
 	range 6 65535
 	help
 	  Periodic_Advertising_Interval_Min of 7.8.61 LE Set Periodic Advertising Parameters command[V2]
+	  Time = N × 1.25 ms
 
 config ESL_PAWR_INTERVAL_MAX
 	int "Maximum advertising interval for periodic advertising."
 	range 6 65535
 	help
 	  Periodic_Advertising_Interval_Max of 7.8.61 LE Set Periodic Advertising Parameters command[V2]
+	  Time = N × 1.25 ms
 
 config ESL_CLIENT_MAX_GROUP
 	int "Number of subevents. How many groups of ESL in AP."
@@ -63,18 +65,21 @@ config ESL_SUBEVENT_INTERVAL
 	range 6 255
 	help
 	  Subevent_Interval of 7.8.61 LE Set Periodic Advertising Parameters command[V2]
+	  Time = N × 1.25 ms
 
 config ESL_RESPONSE_SLOT_DELAY
 	int "Time between the advertising packet in a subevent and the first response slot"
 	range 1 254
 	help
 	  Response_Slot_Delay of 7.8.61 LE Set Periodic Advertising Parameters command[V2]
+	  Time = N × 1.25 ms
 
 config ESL_RESPONSE_SLOT_SPACING
 	int "Time between response slots"
 	range 2 255
 	help
 	  Response_Slot_Spacing of 7.8.61 LE Set Periodic Advertising Parameters command[V2]
+	  Time = N × 0.125 ms
 
 config ESL_NUM_RESPONSE_SLOTS
 	int "Number of subevent response slots."

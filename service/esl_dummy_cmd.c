@@ -17,12 +17,13 @@ void esl_dummy_ap_ad_data(uint8_t sync_pkt_type, uint8_t group_id)
 {
 	uint8_t buf[ESL_ENCRTYPTED_DATA_MAX_LEN], len;
 	struct bt_esl_client *esl_c_obj = esl_c_get_esl_c_obj();
+	size_t idx;
 
 	buf[0] = group_id;
 	switch (sync_pkt_type) {
 	/* type 0 NO OP pkt ,send no operation to broadcast 0xFF */
 	case 0:
-		LOG_DBG("type 0 NO OP pkt ,send no operation to broadcast 0xFF");
+		LOG_INF("type 0 NO OP pkt ,send no operation to broadcast 0xFF");
 		buf[1] = OP_PING;
 		buf[2] = ESL_ADDR_BROADCAST;
 		len = 2 + sizeof(uint8_t);
@@ -163,9 +164,10 @@ void esl_dummy_ap_ad_data(uint8_t sync_pkt_type, uint8_t group_id)
 		buf[3] = 0; /* sensor index 0*/
 		len = 3 + sizeof(uint8_t);
 		break;
-	/* type A ping esl_id 0x38 0x39 0x3a 0x3b 0x3c */
+	/* type A ping esl_id~esl_id+7 */
 	case 0xA:
-		LOG_INF("type A ping esl_id 0x38 0x39 0x3a 0x3b 0x3c");
+		LOG_INF("type A ping esl_id 0x%x~0x%x", CONFIG_ESL_CLIENT_DEFAULT_ESL_ID,
+			CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 7);
 		buf[1] = OP_PING;
 		buf[2] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID;
 		buf[3] = OP_PING;
@@ -176,11 +178,24 @@ void esl_dummy_ap_ad_data(uint8_t sync_pkt_type, uint8_t group_id)
 		buf[8] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 3;
 		buf[9] = OP_PING;
 		buf[10] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 4;
-		len = 10 + sizeof(uint8_t);
+		buf[11] = OP_PING;
+		buf[12] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 5;
+		buf[13] = OP_PING;
+		buf[14] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 6;
+		buf[15] = OP_PING;
+		buf[16] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 7;
+		len = 16 + sizeof(uint8_t);
+		/* Fill in expected esl addr */
+		for(idx = 0; idx < (MIN(8, CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER)); idx++) {
+			esl_c_obj->sync_buf[group_id].rsp_buffer[idx].expect_esl_addr = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + idx;
+		}
+
 		break;
-	/* type B led 0 flashing 0x38,0x39,0x3a */
+
+	/* type B led 0 flashing esl_id~esl_id+2 */
 	case 0xB:
-		LOG_INF("type B led 0 flashing 0x38,0x39,0x3a");
+		LOG_DBG("type B led 0 flashing 0x%x~0x%x", CONFIG_ESL_CLIENT_DEFAULT_ESL_ID,
+			CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 2);
 		buf[1] = OP_LED_CONTROL;
 		buf[2] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID;
 		buf[3] = 0; /* LED 0*/
@@ -221,12 +236,19 @@ void esl_dummy_ap_ad_data(uint8_t sync_pkt_type, uint8_t group_id)
 		buf[38] = 0x1f;
 		buf[39] = 0x00;
 		len = 39 + sizeof(uint8_t);
+
+		/* Fill in expected esl addr */
+		for(idx = 0; idx <  (MIN(3, CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER)); idx++) {
+			esl_c_obj->sync_buf[group_id].rsp_buffer[idx].expect_esl_addr = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + idx;
+		}
+
 		break;
 	/** type C led 0 flashing 0x3b,0x3c
 	 *  Fill first 2 slots with broadcast ping to make response slot begin with 2
 	 */
 	case 0xC:
-		LOG_INF("type C led 0 flashing 0x3b,0x3c");
+		LOG_DBG("type C led 0 flashing 0x%x,0x%x", CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 3,
+			CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 4);
 		buf[1] = OP_PING;
 		buf[2] = ESL_ADDR_BROADCAST;
 		buf[3] = OP_PING;
@@ -258,10 +280,16 @@ void esl_dummy_ap_ad_data(uint8_t sync_pkt_type, uint8_t group_id)
 		buf[29] = 0x1f;
 		buf[30] = 0x00;
 		len = 30 + sizeof(uint8_t);
+
+		/* Fill in expected esl addr */
+		esl_c_obj->sync_buf[group_id].rsp_buffer[2].expect_esl_addr = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 3;
+		esl_c_obj->sync_buf[group_id].rsp_buffer[3].expect_esl_addr = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 4;
+
 		break;
 	/* type D led 1 flashing 0x38,0x39,0x3a */
 	case 0xD:
-		LOG_INF("type D led 1 flashing 0x38,0x39,0x3a");
+		LOG_DBG("type D led 1 flashing 0x%x~0x%x", CONFIG_ESL_CLIENT_DEFAULT_ESL_ID,
+			CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 2);
 		buf[1] = OP_LED_CONTROL;
 		buf[2] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID;
 		buf[3] = 1; /* LED 0*/
@@ -302,12 +330,19 @@ void esl_dummy_ap_ad_data(uint8_t sync_pkt_type, uint8_t group_id)
 		buf[38] = 0x1f;
 		buf[39] = 0x00;
 		len = 39 + sizeof(uint8_t);
+
+		/* Fill in expected esl addr */
+		for(idx = 0; idx < (MIN(3, CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER)); idx++) {
+			esl_c_obj->sync_buf[group_id].rsp_buffer[idx].expect_esl_addr = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + idx;
+		}
+
 		break;
 	/** type E led 1 flashing 0x3b,0x3c
 	 *  Fill first 2 slots with broadcast ping to make response slot begin with 2
 	 */
 	case 0xE:
-		LOG_INF("type E led 1 flashing 0x3b,0x3c");
+		LOG_DBG("type E led 1 flashing 0x%x,0x%x", CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 3,
+			CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 4);
 		buf[1] = OP_PING;
 		buf[2] = ESL_ADDR_BROADCAST;
 		buf[3] = OP_PING;
@@ -339,12 +374,18 @@ void esl_dummy_ap_ad_data(uint8_t sync_pkt_type, uint8_t group_id)
 		buf[29] = 0x1f;
 		buf[30] = 0x00;
 		len = 30 + sizeof(uint8_t);
+
+		/* Fill in expected esl addr */
+		esl_c_obj->sync_buf[group_id].rsp_buffer[2].expect_esl_addr = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 3;
+		esl_c_obj->sync_buf[group_id].rsp_buffer[3].expect_esl_addr = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 4;
+
 		break;
 	/** type f read sensor 0 0x38,0x39,0x3a,0x3b,0x3c
 	 *
 	 **/
 	case 0xf:
-		LOG_INF("type f read sensor 0 0x38,0x39,0x3a,0x3b,0x3c");
+		LOG_DBG("type f read sensor 0 0x%0x~0x%x", CONFIG_ESL_CLIENT_DEFAULT_ESL_ID,
+			CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 7);
 		buf[1] = OP_READ_SENSOR_DATA;
 		buf[2] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID;
 		buf[3] = 0; /* sensor index 0*/
@@ -360,12 +401,27 @@ void esl_dummy_ap_ad_data(uint8_t sync_pkt_type, uint8_t group_id)
 		buf[13] = OP_READ_SENSOR_DATA;
 		buf[14] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 4;
 		buf[15] = 0; /* sensor index 0*/
-		len = 15 + sizeof(uint8_t);
+		buf[16] = OP_READ_SENSOR_DATA;
+		buf[17] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 5;
+		buf[18] = 0; /* sensor index 0*/
+		buf[19] = OP_READ_SENSOR_DATA;
+		buf[20] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 6;
+		buf[21] = 0; /* sensor index 0*/
+		buf[22] = OP_READ_SENSOR_DATA;
+		buf[23] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 7;
+		buf[24] = 0; /* sensor index 0*/
+		len = 24 + sizeof(uint8_t);
+
+		/* Fill in expected esl addr */
+		for(idx = 0; idx < (MIN(8, CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER)); idx++) {
+			esl_c_obj->sync_buf[group_id].rsp_buffer[idx].expect_esl_addr = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + idx;
+		}
+
 		break;
 
 	/* type 0x10 ESLP/ESL/SYNC/BI-03-I [Response TLV Too Long] */
 	case 0x10:
-		LOG_INF("type 0x10 ESLP/ESL/SYNC/BI-03-I [Response TLV Too Long]");
+		LOG_DBG("type 0x10 ESLP/ESL/SYNC/BI-03-I [Response TLV Too Long]");
 		buf[1] = OP_SERVICE_RESET;
 		buf[2] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID;
 		buf[3] = OP_SERVICE_RESET;
@@ -401,12 +457,15 @@ void esl_dummy_ap_ad_data(uint8_t sync_pkt_type, uint8_t group_id)
 		buf[33] = OP_SERVICE_RESET;
 		buf[34] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID;
 		len = 34 + sizeof(uint8_t);
+
+		/* Special case, don't fill esl addr*/
+
 		break;
 	/** type 0x11 middle of 24 pings
 	 *  This command generally won't send a response, since we don't have enough response slot.
 	 */
 	case 0x11:
-		LOG_INF("type 0x11 middle of 24 pings");
+		LOG_DBG("type 0x11 middle of 24 pings");
 		buf[1] = OP_PING;
 		buf[2] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 1;
 		buf[3] = OP_PING;
@@ -454,10 +513,12 @@ void esl_dummy_ap_ad_data(uint8_t sync_pkt_type, uint8_t group_id)
 		buf[45] = OP_PING;
 		buf[46] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 1;
 		len = 46 + sizeof(uint8_t);
+		/* Special case, don't fill esl addr*/
+
 		break;
 	/* type 0X12 Tag 0~10 Display Img 0 */
 	case 0x12:
-		LOG_INF("type 0X12 Tag 0~10 Display Img 0");
+		LOG_DBG("type 0X12 Tag 0~10 Display Img 0");
 		buf[1] = OP_DISPLAY_IMAGE;
 		buf[2] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID;
 		buf[3] = 0x00;
@@ -503,10 +564,16 @@ void esl_dummy_ap_ad_data(uint8_t sync_pkt_type, uint8_t group_id)
 		buf[43] = 0x00;
 		buf[44] = 0x00;
 		len = 44 + sizeof(uint8_t);
+
+		/* Fill in expected esl addr */
+		for(idx = 0; idx < (MIN(11, CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER)); idx++) {
+			esl_c_obj->sync_buf[group_id].rsp_buffer[idx].expect_esl_addr = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + idx;
+		}
+
 		break;
 	/* type 0X13 Tag 0~10 Display img 1 */
 	case 0x13:
-		LOG_INF("type 0X13 Tag 0~10 Display img 1");
+		LOG_DBG("type 0X13 Tag 0~10 Display img 1");
 		buf[1] = OP_DISPLAY_IMAGE;
 		buf[2] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID;
 		buf[3] = 0x00;
@@ -552,10 +619,16 @@ void esl_dummy_ap_ad_data(uint8_t sync_pkt_type, uint8_t group_id)
 		buf[43] = 0x00;
 		buf[44] = 0x01;
 		len = 44 + sizeof(uint8_t);
+
+		/* Fill in expected esl addr */
+		for(idx = 0; idx < (MIN(11, CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER)); idx++) {
+			esl_c_obj->sync_buf[group_id].rsp_buffer[idx].expect_esl_addr = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + idx;
+		}
+
 		break;
 	/* type 0X14 Tag 0~10 Display img 2 */
 	case 0x14:
-		LOG_INF("type 0X14 Tag 0~10 Display img 2");
+		LOG_DBG("type 0X14 Tag 0~10 Display img 2");
 		buf[1] = OP_DISPLAY_IMAGE;
 		buf[2] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID;
 		buf[3] = 0x00;
@@ -601,13 +674,19 @@ void esl_dummy_ap_ad_data(uint8_t sync_pkt_type, uint8_t group_id)
 		buf[43] = 0x00;
 		buf[44] = 0x02;
 		len = 44 + sizeof(uint8_t);
+
+		/* Fill in expected esl addr */
+		for(idx = 0; idx < (MIN(11, CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER)); idx++) {
+			esl_c_obj->sync_buf[group_id].rsp_buffer[idx].expect_esl_addr = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + idx;
+		}
+
 		break;
 	/* type 0x15 Tag 0~10 Enable DFU
 	 * Vendor-specific command VS_DFU_REQ = 0x1F, parameter 0x00 = disable DFU, 0x01 = enable
 	 * DFU
 	 */
 	case 0x15:
-		LOG_INF("type 0x15 Tag 0~10 Enable DFU");
+		LOG_DBG("type 0x15 Tag 0~10 Enable DFU");
 		buf[1] = 0x1F;
 		buf[2] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID;
 		buf[3] = 1;
@@ -642,13 +721,19 @@ void esl_dummy_ap_ad_data(uint8_t sync_pkt_type, uint8_t group_id)
 		buf[32] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 10;
 		buf[33] = 1;
 		len = 33 + sizeof(uint8_t);
+
+		/* Fill in expected esl addr */
+		for(idx = 0; idx < (MIN(11, CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER)); idx++) {
+			esl_c_obj->sync_buf[group_id].rsp_buffer[idx].expect_esl_addr = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + idx;
+		}
+
 		break;
 	/* type 0x16 Tag 0~10 Disable DFU
 	 * Vendor-specific command VS_DFU_REQ = 0x1F, parameter 0x00 = disable DFU, 0x01 = enable
 	 * DFU
 	 */
 	case 0x16:
-		LOG_INF("type 0x16 Tag 0~10 Disable DFU");
+		LOG_DBG("type 0x16 Tag 0~10 Disable DFU");
 		buf[1] = 0x1F;
 		buf[2] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID;
 		buf[3] = 0; /*  change this to 0 to disable DFU */
@@ -683,6 +768,12 @@ void esl_dummy_ap_ad_data(uint8_t sync_pkt_type, uint8_t group_id)
 		buf[32] = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + 10;
 		buf[33] = 0;
 		len = 33 + sizeof(uint8_t);
+
+		/* Fill in expected esl addr */
+		for(idx = 0; idx < (MIN(11, CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER)); idx++) {
+			esl_c_obj->sync_buf[group_id].rsp_buffer[idx].expect_esl_addr = CONFIG_ESL_CLIENT_DEFAULT_ESL_ID + idx;
+		}
+
 		break;
 	default:
 		LOG_ERR("invalid sync_pkt_type");

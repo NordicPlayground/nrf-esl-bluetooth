@@ -158,6 +158,11 @@ static int cmd_esl_c_unbond_ble(const struct shell *shell, size_t argc, char *ar
 	int err;
 	bt_addr_le_t peer_addr;
 
+	if (argc < 3) {
+		shell_fprintf(shell, SHELL_ERROR, "no valid parameter <address_type><address>\n");
+		return -ENOEXEC;
+	}
+
 	err = esl_c_argv_to_ble_addr(argv, &peer_addr);
 	if (err) {
 		shell_fprintf(shell, SHELL_ERROR, "Create BLE Addr failed %d %s %d", peer_addr.type,
@@ -205,6 +210,58 @@ static int cmd_pawr_sync_buf_status(const struct shell *shell, size_t argc, char
 
 /* Parameter <group_id><paylod_hex_string><response_slot><response_key 0><response_key 1>... */
 static int cmd_pawr_push_sync_buf(const struct shell *shell, size_t argc, char *argv[])
+{
+	uint8_t sync_buf_idx;
+	int err;
+	uint8_t data[ESL_SYNC_PKT_PAYLOAD_MAX_LEN];
+	size_t len;
+
+	if (argc < 3) {
+		shell_fprintf(shell, SHELL_ERROR,
+			      "no valid parameter <group_id><paylod_hex_string>\n");
+		return -ENOEXEC;
+	}
+
+	sync_buf_idx = strtol(argv[1], NULL, 16);
+	data[0] = sync_buf_idx;
+	len = hex2bin(argv[2], strlen(argv[2]), (data + 1), ESL_SYNC_PKT_PAYLOAD_MAX_LEN) + 1;
+
+	if (len == 0) {
+		shell_fprintf(shell, SHELL_ERROR,
+			      "#PUSH_SYNC_BUF:%03d failed payload out of length\n", sync_buf_idx);
+		return -EINVAL;
+	}
+
+	if (argc > 4) {
+		struct bt_esl_rsp_buffer rsp_buffer[CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER];
+		size_t idx = 0;
+
+		memset(rsp_buffer, 0,
+		       sizeof(struct bt_esl_rsp_buffer) *
+			       CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER);
+		while ((idx < CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER) && (idx + 3) < argc) {
+			hex2bin(argv[idx + 3], strlen(argv[idx + 3]), rsp_buffer[idx].rsp_key.key_v,
+				ESL_SYNC_PKT_PAYLOAD_MAX_LEN);
+			idx++;
+		}
+
+		esl_c_push_rsp_key(rsp_buffer, sync_buf_idx);
+	}
+
+	err = esl_c_push_sync_buf(data, len, sync_buf_idx);
+	if (err != 0) {
+		shell_fprintf(shell, SHELL_ERROR, "#PUSH_SYNC_BUF:%03d failed (%d)\n", sync_buf_idx,
+			      err);
+	} else {
+		shell_fprintf(shell, SHELL_NORMAL, "#PUSH_SYNC_BUF:%03d len %d\n", sync_buf_idx,
+			      len);
+	}
+
+	return 0;
+}
+
+/* Parameter <group_id><paylod_hex_string><response_slot><response_key 0><response_key 1>... */
+static int cmd_pawr_push_sync_buf_tag(const struct shell *shell, size_t argc, char *argv[])
 {
 	uint8_t sync_buf_idx;
 	int err;
@@ -477,7 +534,7 @@ static int cmd_acl_discovery(const struct shell *shell, size_t argc, char *argv[
 		return -ENOEXEC;
 	}
 
-	uint16_t conn_idx = strtol(argv[1], NULL, 16);
+	uint8_t conn_idx = strtol(argv[1], NULL, 16);
 
 	shell_fprintf(shell, SHELL_NORMAL, "Discover conn_idx 0x%04x\n", conn_idx);
 	esl_discovery_start(conn_idx);
@@ -962,7 +1019,7 @@ static int cmd_esl_c_remove_all_tags(const struct shell *shell, size_t argc, cha
 	return err;
 }
 
-static int cmd_esl_c_list_tags(const struct shell *shell, size_t argc, char *argv[])
+static int cmd_esl_c_list_tags_by_type(const struct shell *shell, size_t argc, char *argv[])
 {
 	uint8_t type;
 
@@ -972,7 +1029,14 @@ static int cmd_esl_c_list_tags(const struct shell *shell, size_t argc, char *arg
 		type = 0;
 	}
 
-	list_tags_in_storage(type);
+	list_tags_in_storage_type(type);
+
+	return 0;
+}
+
+static int cmd_esl_c_list_tags(const struct shell *shell, size_t argc, char *argv[])
+{
+	list_tags_in_storage();
 
 	return 0;
 }
@@ -990,6 +1054,57 @@ static int cmd_esl_c_remove_tag(const struct shell *shell, size_t argc, char *ar
 	err = remove_tag_in_storage(esl_addr, NULL);
 	shell_fprintf(shell, SHELL_NORMAL, "#REMOVETAGDATA:%d,0x%04x\n", (err == 0) ? 1 : 0,
 		      esl_addr);
+
+	return err;
+}
+
+static int cmd_esl_c_remove_tag_ble(const struct shell *shell, size_t argc, char *argv[])
+{
+	if (argc < 3) {
+		shell_fprintf(shell, SHELL_ERROR, "no valid parameter <address_type><address>\n");
+		return -ENOEXEC;
+	}
+
+	bt_addr_le_t peer_addr;
+	char addr[BT_ADDR_LE_STR_LEN];
+	int err;
+
+	err = esl_c_argv_to_ble_addr(argv, &peer_addr);
+	if (err) {
+		shell_fprintf(shell, SHELL_ERROR, "Create BLE Addr failed %d %s %d", peer_addr.type,
+			      argv[2], err);
+	}
+
+	bt_addr_le_to_str(&peer_addr, addr, sizeof(addr));
+	err = remove_tag_in_storage(0xffff, &peer_addr);
+	shell_fprintf(shell, SHELL_NORMAL, "#REMOVETAGDATA:%d,%s\n", (err == 0) ? 1 : 0, addr);
+
+
+	return err;
+}
+
+static int cmd_esl_c_find_tags_esl_addr(const struct shell *shell, size_t argc, char *argv[])
+{
+	if (argc < 3) {
+		shell_fprintf(shell, SHELL_ERROR, "no valid parameter <address_type><address>\n");
+		return -ENOEXEC;
+	}
+
+	uint16_t esl_addr = 0xffff;
+	bt_addr_le_t peer_addr;
+	char addr[BT_ADDR_LE_STR_LEN];
+	int err;
+
+	err = esl_c_argv_to_ble_addr(argv, &peer_addr);
+	if (err) {
+		shell_fprintf(shell, SHELL_ERROR, "Create BLE Addr failed %d %s %d", peer_addr.type,
+			      argv[2], err);
+	}
+
+	bt_addr_le_to_str(&peer_addr, addr, sizeof(addr));
+	err = find_tag_in_storage_with_ble_addr(&esl_addr, &peer_addr);
+	shell_fprintf(shell, SHELL_NORMAL, "ESL 0x%04x\n", esl_addr);
+
 
 	return err;
 }
@@ -1445,6 +1560,7 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 	SHELL_CMD(sync_buf_status, NULL, "ESL AP dump sync buffer status",
 		  cmd_pawr_sync_buf_status),
 	SHELL_CMD(push_sync_buf, NULL, "ESL AP push sync buffer", cmd_pawr_push_sync_buf),
+	SHELL_CMD(push_sync_buf_tag, NULL, "ESL AP push sync buffer", cmd_pawr_push_sync_buf_tag),
 	SHELL_CMD(dump_sync_buf, NULL, "ESL AP dump sync buffer content", cmd_pawr_dump_sync_buf),
 	SHELL_CMD(dump_resp_buf, NULL, "ESL AP dump response buffer content",
 		  cmd_pawr_dump_resp_buf),
@@ -1478,9 +1594,13 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 #if defined(CONFIG_BT_ESL_TAG_STORAGE)
 	SHELL_CMD(remove_all_tags, NULL, "ESL AP remove tags esl address in storage DB",
 		  cmd_esl_c_remove_all_tags),
-	SHELL_CMD(list_tags_storage, NULL, "ESL AP list Tag in ESL address format",
+	SHELL_CMD(list_tags_storage_map, NULL, "ESL AP list Tag in storage with ESL or BLE address format",
 		  cmd_esl_c_list_tags),
+	SHELL_CMD(list_tags_storage, NULL, "ESL AP list Tag in stroage in ESL / BLE address mapping table",
+		  cmd_esl_c_list_tags_by_type),
 	SHELL_CMD(remove_tag, NULL, "ESL AP remove tag in storage DB", cmd_esl_c_remove_tag),
+	SHELL_CMD(remove_tag_ble, NULL, "ESL AP remove tag in storage DB", cmd_esl_c_remove_tag_ble),
+	SHELL_CMD(find_tags_esl_addr, NULL, "ESL AP show esl address from ble address", cmd_esl_c_find_tags_esl_addr),
 	SHELL_CMD(tags_per_group, NULL, "ESL AP set/get how many tags in group for AP Auto mode",
 		  cmd_tags_per_group),
 	SHELL_CMD(groups_per_button, NULL,

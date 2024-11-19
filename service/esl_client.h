@@ -137,6 +137,8 @@ struct bt_esl_rsp_buffer {
 	uint8_t data[ESL_ENCRTYPTED_DATA_MAX_LEN];
 	uint8_t rsp_len;
 	uint8_t rsp_slot;
+	uint8_t expect_esl_addr;
+	enum AP_SYNC_BUFFER_STATUS status;
 };
 
 /** @brief ESL AP command buffer for each ESL group. */

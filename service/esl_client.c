@@ -295,23 +295,33 @@ static void esl_ap_resp_fill_buf_work_fn(struct k_work *work)
 		return;
 	}
 
+	esl_c_obj_l->sync_buf[group_id].rsp_buffer[response_slot].status = SYNC_RESP_FULL;
+
 	esl_payload_len = BT_EAD_DECRYPTED_PAYLOAD_SIZE(buf.len) - AD_HEADER_LEN;
 	net_buf_simple_pull(&buf, AD_HEADER_LEN);
 	err = bt_ead_decrypt(
 		esl_c_obj_l->sync_buf[group_id].rsp_buffer[response_slot].rsp_key.key.session_key,
 		esl_c_obj_l->sync_buf[group_id].rsp_buffer[response_slot].rsp_key.key.iv, buf.data,
 		buf.len, decrypted_data);
-	if (err != 0) {
-		LOG_ERR("Decrypt EAD (err %d)", err);
+
+	if (err == 0) {
+		/* Copy decrypted plaintext to response buffer */
+		memcpy(esl_c_obj_l->sync_buf[group_id].rsp_buffer[response_slot].data,
+		       decrypted_data, esl_payload_len);
+		esl_c_obj_l->sync_buf[group_id].rsp_buffer[response_slot].rsp_len = esl_payload_len;
+
+		printk("#RESPONSE:%03d", group_id);
+		printk("#SLOT:%d,0x", esl_c_obj_l->sync_buf[group_id].rsp_buffer[response_slot].rsp_slot);
+		print_hex(decrypted_data, esl_payload_len);
+
+		LOG_HEXDUMP_DBG(esl_c_obj_l->sync_buf[group_id].rsp_buffer[response_slot].data,
+				esl_c_obj_l->sync_buf[group_id].rsp_buffer[response_slot].rsp_len,
+				"response data");
+
+	} else {
+		LOG_WRN("Decrypt EAD (err %d)", err);
 	}
 
-	printk("#RESPONSE:%03d", group_id);
-	printk("#SLOT:%d,0x", esl_c_obj_l->sync_buf[group_id].rsp_buffer[response_slot].rsp_slot);
-	print_hex(decrypted_data, esl_payload_len);
-
-	LOG_HEXDUMP_INF(esl_c_obj_l->sync_buf[group_id].rsp_buffer[response_slot].data,
-			esl_c_obj_l->sync_buf[group_id].rsp_buffer[response_slot].rsp_len,
-			"response data");
 }
 /* OTS client related start */
 static struct bt_ots_client_cb otc_cb;
@@ -389,7 +399,7 @@ static void bt_otc_init(void)
 	}
 }
 
-void esl_c_obj_write(uint16_t conn_idx, uint8_t tag_img_idx, uint16_t img_idx)
+void esl_c_obj_write(uint8_t conn_idx, uint8_t tag_img_idx, uint16_t img_idx)
 {
 	char fname[CONFIG_MCUMGR_GRP_FS_PATH_LEN];
 
@@ -397,13 +407,18 @@ void esl_c_obj_write(uint16_t conn_idx, uint8_t tag_img_idx, uint16_t img_idx)
 	(void)esl_c_obj_write_by_name(conn_idx, tag_img_idx, fname);
 }
 
-int esl_c_obj_write_by_name(uint16_t conn_idx, uint8_t tag_img_idx, uint8_t *img_name)
+int esl_c_obj_write_by_name(uint8_t conn_idx, uint8_t tag_img_idx, uint8_t *img_name)
 {
 	int err;
 	size_t size;
 	uint64_t obj_id = BT_OTS_OBJ_ID_MIN + tag_img_idx;
 	char id_str[BT_OTS_OBJ_ID_STR_LEN];
 	char fname[CONFIG_MCUMGR_GRP_FS_PATH_LEN];
+
+	if (conn_idx >= CONFIG_BT_MAX_CONN) {
+		LOG_ERR("conn_idx %d out of range", conn_idx);
+		return -EINVAL;
+	}
 
 	bt_ots_obj_id_to_str(obj_id, id_str, sizeof(id_str));
 	UNSET_FLAG(esl_ots_select_flag);
@@ -460,7 +475,7 @@ static void lookup_bond_peer(const struct bt_bond_info *info, void *user_data)
 	char addr[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(&info->addr, addr, sizeof(addr));
-	printk("Bonded TAG\t\t%s", addr);
+	printk("\nBonded TAG\t\t%s", addr);
 }
 
 void bt_esl_c_bond_dump(void *user_data)
@@ -1048,6 +1063,11 @@ static void discovery_work_init(void)
 
 void esl_discovery_start(uint8_t conn_idx)
 {
+	if (conn_idx >= CONFIG_BT_MAX_CONN) {
+		LOG_ERR("conn_idx %d out of range", conn_idx);
+		return;
+	}
+
 	disc_state = DISCOVERY_STATE_START;
 	esl_ap_disc_work.conn_idx = conn_idx;
 	k_work_schedule(&esl_ap_disc_work.work, K_NO_WAIT);
@@ -1302,7 +1322,7 @@ static int esl_c_scan_init(void)
 	uint8_t mode = BT_SCAN_UUID_FILTER;
 	struct bt_le_scan_param *scan_param =
 		BT_LE_SCAN_PARAM(BT_LE_SCAN_TYPE_PASSIVE, BT_LE_SCAN_OPT_FILTER_DUPLICATE,
-				 CONFIG_ESL_SUBEVENT_INTERVAL, CONFIG_ESL_SUBEVENT_INTERVAL / 2);
+				 CONFIG_ESL_SUBEVENT_INTERVAL, CONFIG_ESL_SUBEVENT_INTERVAL);
 	struct bt_scan_init_param scan_init = {
 		.scan_param = scan_param,
 		.conn_param = BT_LE_CONN_PARAM_DEFAULT,
@@ -2113,6 +2133,11 @@ int bt_esl_c_read_chrc(struct bt_esl_client *esl_c, uint8_t conn_idx)
 /* Prerequisitere connect and discover service */
 void bt_esl_configure(uint8_t conn_idx, uint16_t esl_addr)
 {
+	if (conn_idx >= CONFIG_BT_MAX_CONN) {
+		LOG_ERR("conn_idx %d out of range", conn_idx);
+		return;
+	}
+
 	esl_ap_config_work.conn_idx = conn_idx;
 	esl_ap_config_work.param.esl_addr = esl_addr;
 	k_work_schedule_for_queue(&ap_config_work_q, &esl_ap_config_work.work, K_NO_WAIT);
@@ -2122,6 +2147,11 @@ int bt_esl_c_write_esl_addr(uint8_t conn_idx, uint16_t esl_addr)
 {
 	int err;
 	uint8_t data[ESL_ADDR_LEN];
+
+	if (conn_idx >= CONFIG_BT_MAX_CONN) {
+		LOG_ERR("conn_idx %d out of range", conn_idx);
+		return -EINVAL;
+	}
 
 	sys_put_le16(esl_addr, data);
 	LOG_DBG("0x%04x %s_rsp", esl_c_obj_l->gatt[conn_idx].esl_device.esl_addr,
@@ -2156,6 +2186,11 @@ static int bt_esl_c_ecp_command_send(struct bt_esl_client *esl_c, uint8_t *comma
 				     enum ESL_OP_CODE op_code, uint8_t conn_idx)
 {
 	int err = 0;
+
+	if (conn_idx >= CONFIG_BT_MAX_CONN) {
+		LOG_ERR("Invalid connection index");
+		return -EINVAL;
+	}
 
 	CHECKIF(!check_ble_connection(esl_c->conn[conn_idx])) {
 		LOG_ERR("no valid connection, quit send ecp command");
@@ -2462,8 +2497,9 @@ void pawr_request(struct bt_le_ext_adv *adv, const struct bt_le_per_adv_data_req
 static void pawr_response(struct bt_le_ext_adv *adv, struct bt_le_per_adv_response_info *info,
 			  struct net_buf_simple *buf)
 {
-	for (size_t idx = 0; idx < CONFIG_ESL_CLIENT_MAX_RESPONSE_SLOT_BUFFER; idx++) {
-		esl_c_obj_l->sync_buf[info->subevent].rsp_buffer[idx].rsp_len = 0;
+	if (buf->len == 0) {
+		LOG_WRN("Empty response");
+		return;
 	}
 
 	memcpy(esl_c_obj_l->sync_buf[info->subevent].rsp_buffer[info->response_slot].data,
@@ -2719,6 +2755,10 @@ int bt_c_esl_post_unassociate(uint8_t conn_idx)
 	int ret;
 
 	LOG_DBG("pending conn_idx %d", conn_idx);
+	if (conn_idx >= CONFIG_BT_MAX_CONN) {
+		LOG_ERR("conn_idx %d out of range", conn_idx);
+		return -EINVAL;
+	}
 
 	ret = bt_unpair(BT_ID_DEFAULT, &esl_c_obj_l->gatt[conn_idx].esl_device.ble_addr);
 	/* Manual unbond ESL if in PTS mode */
@@ -2780,7 +2820,7 @@ int esl_c_push_sync_buf(uint8_t *data, uint8_t data_len, uint8_t group_id)
 		esl_c_obj_l->sync_buf[group_id].data_len =
 			esl_compose_ad_data((esl_c_obj_l->sync_buf[group_id].data), data, data_len,
 					    esl_c_obj_l->esl_randomizer, esl_c_obj_l->esl_ap_key);
-		k_work_submit(&esl_ap_sync_fill_buf_work.work);
+		(void)k_work_submit_to_queue(&pawr_work_q, &esl_ap_sync_fill_buf_work.work);
 	} else {
 		err = -EBUSY;
 	}
@@ -2814,12 +2854,15 @@ void esl_c_dump_resp_buf(uint8_t group_id)
 		LOG_HEXDUMP_INF(esl_c_obj_l->sync_buf[group_id].rsp_buffer[idx].rsp_key.key_v,
 				EAD_KEY_MATERIAL_LEN, "RSP_KEY");
 		if (esl_c_obj_l->sync_buf[group_id].rsp_buffer[idx].rsp_len != 0) {
-			printk("#RESPONSESLOT:%02d,0x", idx);
+			printk("#RESPONS:%03d#SLOT:%02d#ESL_ADDR:0x%04x 0x", group_id, esl_c_obj_l->sync_buf[group_id].rsp_buffer[idx].expect_esl_addr, idx);
 			print_hex(esl_c_obj_l->sync_buf[group_id].rsp_buffer[idx].data,
 				  esl_c_obj_l->sync_buf[group_id].rsp_buffer[idx].rsp_len);
-			esl_c_obj_l->sync_buf[group_id].status = SYNC_EMPTY;
+			esl_c_obj_l->sync_buf[group_id].rsp_buffer[idx].rsp_len = 0;
+			esl_c_obj_l->sync_buf[group_id].rsp_buffer[idx].status = SYNC_EMPTY;
 		}
 	}
+
+	esl_c_obj_l->sync_buf[group_id].status = SYNC_EMPTY;
 }
 
 void esl_c_scan(bool onoff, bool oneshot)
@@ -3159,6 +3202,11 @@ void esl_c_ap_key_update(uint8_t conn_idx)
 	int err;
 	struct bt_esl_key_material esl_ap_key;
 
+	if (conn_idx >= CONFIG_BT_MAX_CONN) {
+		LOG_ERR("conn_idx %d out of range", conn_idx);
+		return;
+	}
+
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.func = esl_c_write_attr;
 	memcpy(esl_ap_key.key_v, esl_c_obj_l->esl_ap_key.key_v, EAD_KEY_MATERIAL_LEN);
 	/* Change endiness of session key before send it out */
@@ -3185,6 +3233,11 @@ void esl_c_rsp_key_update(uint8_t conn_idx)
 {
 	int err;
 	uint8_t rsp_key[EAD_KEY_MATERIAL_LEN] = {0};
+
+	if (conn_idx >= CONFIG_BT_MAX_CONN) {
+		LOG_ERR("conn_idx %d out of range", conn_idx);
+		return;
+	}
 
 	if (memcmp(esl_c_obj_l->gatt[conn_idx].esl_device.esl_rsp_key.key_v, rsp_key,
 		   EAD_KEY_MATERIAL_LEN) == 0) {
@@ -3233,6 +3286,11 @@ void esl_c_tag_abs_timer_update(uint8_t conn_idx)
 {
 	int err;
 	uint32_t abs_time = esl_c_get_abs_time();
+
+	if (conn_idx >= CONFIG_BT_MAX_CONN) {
+		LOG_ERR("conn_idx %d out of range", conn_idx);
+		return;
+	}
 
 	esl_c_obj_l->gatt[conn_idx].esl_write_params.func = esl_c_write_attr;
 
@@ -3355,6 +3413,11 @@ int esl_c_past(uint8_t conn_idx)
 	bt_addr_le_t peer_addr;
 	char peer_addr_str[BT_ADDR_LE_STR_LEN];
 	char cur_peer_addr_str[BT_ADDR_LE_STR_LEN];
+
+	if (conn_idx >= CONFIG_BT_MAX_CONN) {
+		LOG_ERR("conn_idx %d out of range", conn_idx);
+		return -EINVAL;
+	}
 
 	bt_addr_le_copy(&peer_addr, bt_conn_get_dst(esl_c_obj_l->conn[conn_idx]));
 	bt_addr_le_to_str(&peer_addr, peer_addr_str, sizeof(peer_addr_str));
