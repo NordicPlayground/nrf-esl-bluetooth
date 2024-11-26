@@ -560,7 +560,7 @@ static void esl_ots_write_img_work_fn(struct k_work *work)
 	}
 past:
 	LOG_INF("Finish to send images. Let's PAST.");
-	ret = esl_c_past(qk_data.conn_idx);
+	ret = esl_c_past(0);
 	if (ret) {
 		LOG_ERR("Send PAST %02d (ret %d)", qk_data.conn_idx, ret);
 	}
