@@ -11,7 +11,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/check.h>
-#include <zephyr/net/buf.h>
+#include <zephyr/net_buf.h>
 #include <stdio.h>
 
 #include "esl.h"
@@ -430,16 +430,16 @@ void sm_unsynchronized_exit(void *obj)
 /* Populate state table */
 static const struct smf_state esl_states[] = {
 	[SM_UNASSOCIATED] =
-		SMF_CREATE_STATE(sm_unassociated_entry, sm_unassociated_run, sm_unassociated_exit),
+		SMF_CREATE_STATE(sm_unassociated_entry, sm_unassociated_run, sm_unassociated_exit, NULL, NULL),
 	[SM_CONFIGURING] =
-		SMF_CREATE_STATE(sm_configuring_entry, sm_configuring_run, sm_configuring_exit),
+		SMF_CREATE_STATE(sm_configuring_entry, sm_configuring_run, sm_configuring_exit, NULL, NULL),
 	[SM_CONFIGURED] =
-		SMF_CREATE_STATE(sm_configured_entry, sm_configured_run, sm_configured_exit),
+		SMF_CREATE_STATE(sm_configured_entry, sm_configured_run, sm_configured_exit, NULL, NULL),
 	[SM_SYNCHRONIZED] =
-		SMF_CREATE_STATE(sm_synchronized_entry, sm_synchronized_run, sm_synchronized_exit),
-	[SM_UPDATING] = SMF_CREATE_STATE(sm_updating_entry, sm_updating_run, sm_updating_exit),
+		SMF_CREATE_STATE(sm_synchronized_entry, sm_synchronized_run, sm_synchronized_exit, NULL, NULL),
+	[SM_UPDATING] = SMF_CREATE_STATE(sm_updating_entry, sm_updating_run, sm_updating_exit, NULL, NULL),
 	[SM_UNSYNCHRONIZED] = SMF_CREATE_STATE(sm_unsynchronized_entry, sm_unsynchronized_run,
-					       sm_unsynchronized_exit),
+					       sm_unsynchronized_exit, NULL, NULL),
 };
 void bt_esl_state_transition(uint8_t state)
 {
