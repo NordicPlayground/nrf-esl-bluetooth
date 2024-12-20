@@ -1,23 +1,39 @@
 / {
 	chosen {
-		zephyr,display = &ssd16xx;
+		zephyr,display = &ssd16xx_waveshare_epaper_gdey0213b74;
 	};
-};
 
+	mipi_dbi_waveshare_epaper {
+		compatible = "zephyr,mipi-dbi-spi";
+		spi-dev = <&arduino_spi>;
+		dc-gpios = <&arduino_header 15 GPIO_ACTIVE_HIGH>;	/* D9 */
+		reset-gpios = <&arduino_header 14 GPIO_ACTIVE_LOW>;	/* D8 */
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		ssd16xx_waveshare_epaper_gdey0213b74: ssd16xxfb@0 {
+			compatible = "gooddisplay,gdey0213b74", "solomon,ssd1680";
+			mipi-max-frequency = <4000000>;
+			reg = <0>;
+			width = <250>;
+			height = <122>;
+			busy-gpios = <&arduino_header 13 GPIO_ACTIVE_HIGH>;	/* D7 */
+
+			tssv = <0x80>;
+
+			full {
+				border-waveform = <0x05>;
+			};
+
+			partial {
+				border-waveform = <0x3c>;
+			};
+		};
+	};
+
+};
 &arduino_spi {
 	status = "okay";
-	cs-gpios = <&arduino_header 16 GPIO_ACTIVE_LOW>;	/* D10 */
-	ssd16xx: ssd16xxfb@0 {
-		compatible = "waveshare,HINK-E0213-G01",
-		             "solomon,ssd1680",
-		             "solomon,ssd16xxfb";
-		status = "okay";
-		spi-max-frequency = <8000000>;
-		reg = <0>;
-		width = <250>;
-		height = <122>;
-		dc-gpios = <&arduino_header 15 GPIO_ACTIVE_LOW>;        /* D9 */
-		reset-gpios = <&arduino_header 14 GPIO_ACTIVE_LOW>;                /* D8 */
-		busy-gpios = <&arduino_header 13 GPIO_ACTIVE_HIGH>;        /* D7 */
-	};
+	cs-gpios = <&arduino_header 16 GPIO_ACTIVE_LOW>,	/* D10 */
+		   <&arduino_header 12 GPIO_ACTIVE_LOW>;	/* D04 */
 };

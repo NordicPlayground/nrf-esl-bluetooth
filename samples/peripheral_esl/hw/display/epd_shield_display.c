@@ -3,7 +3,6 @@
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
-
 #include <zephyr/device.h>
 #include <zephyr/drivers/display.h>
 #include <zephyr/pm/device.h>
@@ -15,11 +14,7 @@
 #include "esl_hw_impl.h"
 
 LOG_MODULE_DECLARE(peripheral_esl);
-#if DT_HAS_COMPAT_STATUS_OKAY(solomon_ssd16xxfb)
-/* Choose this value according EPD datasheet */
 #define SSD16XX_FULL_UPDATE_TIME 3500
-#define DT_DRV_COMPAT solomon_ssd16xxfb
-#endif /* DT_HAS_COMPAT_STATUS_OKAY(solomon_ssd16xxfb) */
 
 #if defined(CONFIG_CHARACTER_FRAMEBUFFER)
 #include <zephyr/display/cfb.h>
@@ -37,9 +32,12 @@ const struct device *display_dev;
 #else
 #error "No SPI node found"
 #endif /* CONFIG_DT_HAS_ARDUINO_HEADER_R3_ENABLED */
+#define DT_DRV_COMPAT zephyr_mipi_dbi_spi
 const struct device *spi = DEVICE_DT_GET(SPI_NODE);
 const struct gpio_dt_spec reset_gpio = GPIO_DT_SPEC_INST_GET(0, reset_gpios);
 const struct gpio_dt_spec dc_gpio = GPIO_DT_SPEC_INST_GET(0, dc_gpios);
+#undef DT_DRV_COMPAT
+#define DT_DRV_COMPAT solomon_ssd1680
 const struct gpio_dt_spec busy_gpio = GPIO_DT_SPEC_INST_GET(0, busy_gpios);
 PINCTRL_DT_DEFINE(SPI_NODE);
 const struct pinctrl_dev_config *pcfg = PINCTRL_DT_DEV_CONFIG_GET(SPI_NODE);
@@ -68,9 +66,9 @@ int display_epd_onoff(uint8_t mode)
 		(void)pm_device_action_run(spi, PM_DEVICE_ACTION_RESUME);
 	} else if (mode == EPD_POWER_OFF || mode == EPD_POWER_OFF_IMMEDIATELY) {
 		(void)pm_device_action_run(spi, PM_DEVICE_ACTION_SUSPEND);
-		*(volatile uint32_t *)(DT_REG_ADDR(DT_NODELABEL(arduino_spi)) | 0xFFC) = 0;
-		*(volatile uint32_t *)(DT_REG_ADDR(DT_NODELABEL(arduino_spi)) | 0xFFC);
-		*(volatile uint32_t *)(DT_REG_ADDR(DT_NODELABEL(arduino_spi)) | 0xFFC) = 1;
+		*(volatile uint32_t *)(DT_REG_ADDR(SPI_NODE) | 0xFFC) = 0;
+		*(volatile uint32_t *)(DT_REG_ADDR(SPI_NODE) | 0xFFC);
+		*(volatile uint32_t *)(DT_REG_ADDR(SPI_NODE) | 0xFFC) = 1;
 
 		/* turn off EPD after full update otherwise immediately */
 		if (mode == EPD_POWER_OFF) {
@@ -133,14 +131,14 @@ int display_init(void)
 		return 0;
 	}
 
-#if DT_HAS_COMPAT_STATUS_OKAY(solomon_ssd16xxfb)
+#if IS_ENABLED(CONFIG_SSD16XX)
 	cfb_framebuffer_set_font(display_dev, 0);
 	cfb_get_font_size(display_dev, 0, &font_width, &font_height);
 
 	LOG_DBG("font width %d, font height %d rows %d, cols %d\n", font_width, font_height,
 		cfb_get_display_parameter(display_dev, CFB_DISPLAY_ROWS),
 		cfb_get_display_parameter(display_dev, CFB_DISPLAY_COLS));
-#endif /* DT_HAS_COMPAT_STATUS_OKAY(solomon_ssd16xxfb) */
+#endif /* IS_ENABLED(CONFIG_SSD16XX) */
 #endif /* CONFIG_CHARACTER_FRAMEBUFFER */
 
 	return 0;
@@ -156,13 +154,13 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 
 #if defined(CONFIG_ESL_POWER_PROFILE)
 	display_epd_onoff(EPD_POWER_ON);
-#if DT_HAS_COMPAT_STATUS_OKAY(solomon_ssd16xxfb)
+#if IS_ENABLED(CONFIG_SSD16XX)
 	/**
 	 * To optimize power remove static declaration of ssd16xx_init in
 	 * zephyr/drivers/display/ssd16xx.c
 	 **/
 	ssd16xx_init(display_dev);
-#endif /* DT_HAS_COMPAT_STATUS_OKAY(solomon_ssd16xxfb) */
+#endif /* IS_ENABLED(CONFIG_SSD16XX)) */
 #endif /* ESL_POWER_PROFILE */
 
 	LOG_DBG("display %d img %d on/off %d", disp_idx, img_idx, enable);
@@ -291,13 +289,13 @@ void display_unassociated(uint8_t disp_idx)
 	bt_addr_to_str(&oob.addr.a, tag_str, sizeof(tag_str));
 #if defined(CONFIG_ESL_POWER_PROFILE)
 	display_epd_onoff(EPD_POWER_ON);
-#if DT_HAS_COMPAT_STATUS_OKAY(solomon_ssd16xxfb)
+#if IS_ENABLED(CONFIG_SSD16XX)
 	/**
 	 * To optimize power remove static declaration of ssd16xx_init in
 	 * zephyr/drivers/display/ssd16xx.c
 	 **/
 	ssd16xx_init(display_dev);
-#endif /* DT_HAS_COMPAT_STATUS_OKAY(solomon_ssd16xxfb) */
+#endif /* IS_ENABLED(CONFIG_SSD16XX) */
 #endif /* ESL_POWER_PROFILE */
 
 	/* Use Character Frame Buffer to draw text */
@@ -329,13 +327,13 @@ void display_associated(uint8_t disp_idx)
 
 #if defined(CONFIG_ESL_POWER_PROFILE)
 	display_epd_onoff(EPD_POWER_ON);
-#if DT_HAS_COMPAT_STATUS_OKAY(solomon_ssd16xxfb)
+#if IS_ENABLED(CONFIG_SSD16XX)
 	/**
 	 * To optimize power remove static declaration of ssd16xx_init in
 	 * zephyr/drivers/display/ssd16xx.c
 	 **/
 	ssd16xx_init(display_dev);
-#endif /* DT_HAS_COMPAT_STATUS_OKAY(solomon_ssd16xxfb) */
+#endif /* IS_ENABLED(CONFIG_SSD16XX) */
 #endif /* ESL_POWER_PROFILE */
 
 	/* Use Character Frame Buffer to draw text */
