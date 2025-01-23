@@ -135,6 +135,8 @@ choice BT_ESL_STORAGE_BACKEND
 		bool "Use Littlefs with external flash to store Image"
 		select FILE_SYSTEM
 		select FILE_SYSTEM_LITTLEFS
+	config ESL_OTS_ZMS
+		bool "Use Zephyr Management Storage (ZMS) with external flash to store Image"
 
 endchoice # BT_ESL_STORAGE_BACKEND
 

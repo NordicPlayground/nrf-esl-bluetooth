@@ -1804,7 +1804,7 @@ static ssize_t ots_obj_write(struct bt_ots *ots, struct bt_conn *conn, uint64_t 
 	LOG_DBG("Object with %s ID %d obj_index is being written "
 		"Offset = %lu, Length = %zu, Remaining = %zu",
 		id_str, obj_index, (long)offset, len, rem);
-#if (CONFIG_ESL_OTS_NVS)
+#if (CONFIG_ESL_OTS_NVS || (CONFIG_ESL_OTS_ZMS))
 	if (esl_obj_l->cb.buffer_img) {
 		esl_obj_l->cb.buffer_img(data, len, offset);
 	} else {
@@ -1834,7 +1834,7 @@ static ssize_t ots_obj_write(struct bt_ots *ots, struct bt_conn *conn, uint64_t 
 	if (rem == 0) {
 		LOG_INF("ots_obj_write %d done %ld", obj_index, offset + len);
 		esl_obj_l->stored_image_size[obj_index] = offset + len;
-#if (CONFIG_ESL_OTS_NVS)
+#if (CONFIG_ESL_OTS_NVS) || (CONFIG_ESL_OTS_ZMS)
 #ifndef CONFIG_BT_ESL_UNSYNCHRONIZED_IMMEIDATELY
 
 		if (esl_obj_l->cb.write_img_to_storage) {
