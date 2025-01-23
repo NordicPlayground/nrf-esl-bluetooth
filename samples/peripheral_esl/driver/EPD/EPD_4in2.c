@@ -263,7 +263,6 @@ void EPD_4IN2_ReadBusy(void)
 	LOG_DBG("e-Paper busy\r\n");
 	EPD_4IN2_SendCommand(0x71);
 	while (DEV_Digital_Read(EPD_BUSY_PIN) == 0) { /* LOW: idle, HIGH: busy */
-		LOG_INF("w");
 		EPD_4IN2_SendCommand(0x71);
 		DEV_Delay_ms(100);
 	}

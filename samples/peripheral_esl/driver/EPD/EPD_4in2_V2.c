@@ -318,6 +318,8 @@ void EPD_4IN2_V2_Clear(void)
 	Width = (EPD_4IN2_V2_WIDTH % 8 == 0) ? (EPD_4IN2_V2_WIDTH / 8)
 					     : (EPD_4IN2_V2_WIDTH / 8 + 1);
 	Height = EPD_4IN2_V2_HEIGHT;
+	LOG_INF("EPD_4IN2_V2_Clear\r\n");
+	EPD_4IN2_V2_SetWindows(0, 0, EPD_4IN2_V2_WIDTH - 1, EPD_4IN2_V2_HEIGHT - 1);
 
 	EPD_4IN2_V2_SendCommand(0x24);
 	for (UWORD j = 0; j < Height; j++) {

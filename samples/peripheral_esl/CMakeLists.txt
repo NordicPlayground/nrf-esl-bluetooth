@@ -6,7 +6,7 @@
 cmake_minimum_required(VERSION 3.20.0)
 
 # The application uses the conf/<board> scheme for configuration files.
-set(APPLICATION_CONFIG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/conf/\${BOARD}")
+set(APPLICATION_CONFIG_DIR "${CMAKE_CURRENT_LIST_DIR}/conf/\${NORMALIZED_BOARD_TARGET}")
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(peripheral_esl)
@@ -48,7 +48,7 @@ if (CONFIG_BT_ESL_DISPLAY_MAX EQUAL 0)
   target_sources(app PRIVATE hw/display/dummy_display.c)
 endif()
 
-if ((CONFIG_EPD_4IN2_V1) OR (CONFIG_EPD_4IN2_V2) OR (CONFIG_EPD_1IN54B_V2) OR (CONFIG_EPD_2IN9B_V3) OR (CONFIG_EPD_2IN13B_V3))
+if (CONFIG_EPD_GENERAL)
   add_subdirectory(driver/EPD)
   target_sources(app PRIVATE hw/display/epd_display.c)
 endif()

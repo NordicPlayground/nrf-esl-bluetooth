@@ -1,0 +1,34 @@
+/delete-node/ &slot1_ns_partition;
+/delete-node/ &storage_partition;
+/ {
+	fstab {
+		compatible = "zephyr,fstab";
+		lfs1: lfs1 {
+			compatible = "zephyr,fstab,littlefs";
+			mount-point = "/ots_image";
+			partition = <&lfs1_part>;
+			read-size = <16>;
+			prog-size = <16>;
+			cache-size = <64>;
+			lookahead-size = <32>;
+			block-cycles = <512>;
+		};
+	};
+};
+
+
+&cpuapp_rram {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		storage_partition: partition@150000 {
+			label = "storage";
+			reg = <0x150000 0x2000>;
+		};
+		lfs1_part: partition@152000 {
+			label = "littlefs_storage";
+			reg = <0x152000 0xe000>;
+		};
+	};
+};

@@ -83,9 +83,9 @@ int display_epd_onoff(uint8_t mode)
 		(void)pm_device_action_run(spi, PM_DEVICE_ACTION_RESUME);
 	} else if (mode == EPD_POWER_OFF || mode == EPD_POWER_OFF_IMMEDIATELY) {
 		(void)pm_device_action_run(spi, PM_DEVICE_ACTION_SUSPEND);
-		*(volatile uint32_t *)(DT_REG_ADDR(DT_NODELABEL(arduino_spi)) | 0xFFC) = 0;
-		*(volatile uint32_t *)(DT_REG_ADDR(DT_NODELABEL(arduino_spi)) | 0xFFC);
-		*(volatile uint32_t *)(DT_REG_ADDR(DT_NODELABEL(arduino_spi)) | 0xFFC) = 1;
+		*(volatile uint32_t *)(DT_REG_ADDR(SPI_NODE) | 0xFFC) = 0;
+		*(volatile uint32_t *)(DT_REG_ADDR(SPI_NODE) | 0xFFC);
+		*(volatile uint32_t *)(DT_REG_ADDR(SPI_NODE) | 0xFFC) = 1;
 
 		/* turn off EPD after full update otherwise immediately */
 		if (mode == EPD_POWER_OFF) {
@@ -307,6 +307,9 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 		epd_display_fn.epd_turn_on_display();
 	}
 #endif /* CONFIG_ESL_OTS_NVS */
+	if (esl_obj->cb.close_image_from_storage) {
+		esl_obj->cb.close_image_from_storage();
+	}
 
 	LOG_DBG("Use Raw display interface API");
 #if defined(CONFIG_ESL_POWER_PROFILE)
