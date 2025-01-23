@@ -3,40 +3,49 @@
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
-
 #include <zephyr/device.h>
 #include <zephyr/drivers/display.h>
 #include <zephyr/pm/device.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/pinctrl.h>
-#if (CONFIG_BT_ESL_JF_PAINT_LIB)
-#include <jfpaint.h>
-// uint8_t wb_data[CONFIG_ESL_DISPLAY_WIDTH / 8 * CONFIG_ESL_DISPLAY_HEIGHT];
-uint8_t wb_data[CONFIG_ESL_DISPLAY_WIDTH / 8 * CONFIG_ESL_DISPLAY_HEIGHT];
-uint8_t rw_data[0];
-#endif /* CONFIG_BT_ESL_JF_PAINT_LIB */
 #include <zephyr/logging/log.h>
 
 #include "esl.h"
 #include "esl_hw_impl.h"
 
 LOG_MODULE_DECLARE(peripheral_esl);
+#if defined(CONFIG_BT_ESL_JF_PAINT_LIB)
+#include <paint.h>
+static paint_obj_t paint_obj;
+
+uint8_t wb_data[CONFIG_ESL_DISPLAY_WIDTH / 8 * CONFIG_ESL_DISPLAY_HEIGHT];
+uint8_t rw_data[0];
+#endif /* CONFIG_BT_ESL_JF_PAINT_LIB */
+
+const struct device *display_dev;
+#if IS_ENABLED(CONFIG_DT_HAS_ARDUINO_HEADER_R3_ENABLED)
+#define SPI_NODE DT_NODELABEL(arduino_spi)
+/* nRF54L Devkit uses SPI00 for now */
+#elif IS_ENABLED(CONFIG_NRFX_SPIM00)
+#define SPI_NODE DT_NODELABEL(spi00)
+#else
+#error "No SPI node found"
+#endif /* CONFIG_DT_HAS_ARDUINO_HEADER_R3_ENABLED */
+#define DT_DRV_COMPAT zephyr_mipi_dbi_spi
+const struct device *spi = DEVICE_DT_GET(SPI_NODE);
+const struct gpio_dt_spec reset_gpio = GPIO_DT_SPEC_INST_GET(0, reset_gpios);
+const struct gpio_dt_spec dc_gpio = GPIO_DT_SPEC_INST_GET(0, dc_gpios);
+#undef DT_DRV_COMPAT
 #if DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8176)
 /* Choose this value according EPD datasheet */
 #define UC81XX_FULL_UPDATE_TIME 8000
-
 #define DT_DRV_COMPAT ultrachip_uc8176
 #elif DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8179)
 #define DT_DRV_COMPAT ultrachip_uc8179
 #endif
-
-const struct device *display_dev;
-const struct device *spi = DEVICE_DT_GET(DT_NODELABEL(arduino_spi));
-const struct gpio_dt_spec reset_gpio = GPIO_DT_SPEC_INST_GET(0, reset_gpios);
-const struct gpio_dt_spec dc_gpio = GPIO_DT_SPEC_INST_GET(0, dc_gpios);
 const struct gpio_dt_spec busy_gpio = GPIO_DT_SPEC_INST_GET(0, busy_gpios);
-PINCTRL_DT_DEFINE(DT_NODELABEL(arduino_spi));
-const struct pinctrl_dev_config *pcfg = PINCTRL_DT_DEV_CONFIG_GET(DT_NODELABEL(arduino_spi));
+PINCTRL_DT_DEFINE(SPI_NODE);
+const struct pinctrl_dev_config *pcfg = PINCTRL_DT_DEV_CONFIG_GET(SPI_NODE);
 static struct display_capabilities capabilities;
 static struct display_buffer_descriptor buf_desc;
 
@@ -62,9 +71,9 @@ int display_epd_onoff(uint8_t mode)
 		(void)pm_device_action_run(spi, PM_DEVICE_ACTION_RESUME);
 	} else if (mode == EPD_POWER_OFF || mode == EPD_POWER_OFF_IMMEDIATELY) {
 		(void)pm_device_action_run(spi, PM_DEVICE_ACTION_SUSPEND);
-		*(volatile uint32_t *)(DT_REG_ADDR(DT_NODELABEL(arduino_spi)) | 0xFFC) = 0;
-		*(volatile uint32_t *)(DT_REG_ADDR(DT_NODELABEL(arduino_spi)) | 0xFFC);
-		*(volatile uint32_t *)(DT_REG_ADDR(DT_NODELABEL(arduino_spi)) | 0xFFC) = 1;
+		*(volatile uint32_t *)(DT_REG_ADDR(SPI_NODE) | 0xFFC) = 0;
+		*(volatile uint32_t *)(DT_REG_ADDR(SPI_NODE) | 0xFFC);
+		*(volatile uint32_t *)(DT_REG_ADDR(SPI_NODE) | 0xFFC) = 1;
 
 		/* turn off EPD after full update otherwise immediately */
 		if (mode == EPD_POWER_OFF) {
@@ -111,8 +120,12 @@ int display_init(void)
 		return -ENODEV;
 	}
 #if defined(CONFIG_BT_ESL_JF_PAINT_LIB)
-	jfpaint_init((void *)wb_data, (void *)rw_data);
-	setscan(SCAN_NORMAL);
+	paint_obj.width = CONFIG_ESL_DISPLAY_WIDTH;
+	paint_obj.height = CONFIG_ESL_DISPLAY_HEIGHT;
+	paint_obj.wb_buffer = wb_data;
+	paint_obj.scanmode = PAINT_SCAN_MODE_1;
+	paint_Init(&paint_obj);
+
 #endif /* CONFIG_BT_ESL_JF_PAINT_LIB */
 	display_get_capabilities(display_dev, &capabilities);
 
@@ -288,13 +301,13 @@ void display_unassociated(uint8_t disp_idx)
 	buf_desc.buf_size = (buf_desc.width * buf_desc.height) / EPD_MONO_NUMOF_ROWS_PER_PAGE;
 
 	/* Use JF Paint lib to draw text */
-	fill(WHITE); // clear the screen with white
-	drawString("Hello Nordic", &Font16, BLACK, 10, 10);
-	drawString("UNAssociated", &Font16, BLACK, 10, 30);
-	drawString("ESL TAG", &Font16, BLACK, 10, 50);
-	drawString(tag_str, &Font16, BLACK, 10, 70);
-	drawString("APAC", &Font16, BLACK, 10, 90);
-	drawString(CONFIG_BT_DIS_MODEL, &Font16, BLACK, 10, 110);
+	paint_Fill(WHITE); // clear the screen with white
+	paint_DrawString("Hello Nordic", &Font16, BLACK, 10, 10);
+	paint_DrawString("UNAssociated", &Font16, BLACK, 10, 30);
+	paint_DrawString("ESL TAG", &Font16, BLACK, 10, 50);
+	paint_DrawString(tag_str, &Font16, BLACK, 10, 70);
+	paint_DrawString("APAC", &Font16, BLACK, 10, 90);
+	paint_DrawString(CONFIG_BT_DIS_MODEL, &Font16, BLACK, 10, 110);
 
 	display_blanking_on(display_dev);
 	err = display_write(display_dev, 0, 0, &buf_desc, wb_data);
@@ -336,12 +349,12 @@ void display_associated(uint8_t disp_idx)
 	buf_desc.pitch = capabilities.x_resolution;
 	buf_desc.buf_size = (buf_desc.width * buf_desc.height) / EPD_MONO_NUMOF_ROWS_PER_PAGE;
 	/* Use JF Paint lib to draw text */
-	fill(WHITE); // clear the screen with white
-	drawString("Hello Nordic", &Font16, BLACK, 10, 10);
-	drawString("Associated", &Font16, BLACK, 10, 30);
-	drawString(tag_str, &Font16, BLACK, 10, 50);
-	drawString("APAC", &Font16, BLACK, 10, 70);
-	drawString(CONFIG_BT_DIS_MODEL, &Font16, BLACK, 10, 90);
+	paint_Fill(WHITE); // clear the screen with white
+	paint_DrawString("Hello Nordic", &Font16, BLACK, 10, 10);
+	paint_DrawString("Associated", &Font16, BLACK, 10, 30);
+	paint_DrawString(tag_str, &Font16, BLACK, 10, 50);
+	paint_DrawString("APAC", &Font16, BLACK, 10, 70);
+	paint_DrawString(CONFIG_BT_DIS_MODEL, &Font16, BLACK, 10, 90);
 
 	display_blanking_on(display_dev);
 	err = display_write(display_dev, 0, 0, &buf_desc, wb_data);
@@ -372,7 +385,7 @@ int display_clear_paint(uint8_t disp_idx)
 	buf_desc.pitch = capabilities.x_resolution;
 	buf_desc.buf_size = (buf_desc.width * buf_desc.height) / EPD_MONO_NUMOF_ROWS_PER_PAGE;
 
-	fill(WHITE);
+	paint_Fill(WHITE);
 	display_blanking_on(display_dev);
 	err = display_write(display_dev, 0, 0, &buf_desc, wb_data);
 	if (err) {
@@ -391,7 +404,7 @@ int display_print_paint(uint8_t disp_idx, const char *text, uint16_t x, uint16_t
 {
 	ARG_UNUSED(disp_idx);
 	printk("%s x %d y %d\n", __func__, x, y);
-	drawString(text, &Font16, BLACK, x, y);
+	paint_DrawString(text, &Font16, BLACK, x, y);
 
 	return 0;
 }
