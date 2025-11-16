@@ -1,0 +1,91 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║                    WAVESHARE 2.9" E-PAPER PINOUT                         ║
+║                      nRF52840 DK Connection Guide                        ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────┐
+│  Waveshare 2.9" EPD     │
+│  ┌─────────────────┐    │
+│  │                 │    │
+│  │    128 x 296    │    │
+│  │     pixels      │    │
+│  │                 │    │
+│  └─────────────────┘    │
+│                         │
+│  Pin Header:            │
+│  ┌───┬───┬───┬───┬───┐ │
+│  │ V │ G │ D │ C │ C │ │  (Top row)
+│  │ C │ N │ I │ L │ S │ │
+│  │ C │ D │ N │ K │   │ │
+│  └─┬─┴─┬─┴─┬─┴─┬─┴─┬─┘ │
+│    │   │   │   │   │   │
+│  ┌─┴─┬─┴─┬─┴─┬─┴─┬─┴─┐ │
+│  │ D │ R │ B │   │   │ │  (Bottom row - may vary)
+│  │ C │ S │ U │   │   │ │
+│  │   │ T │ S │   │   │ │
+│  │   │   │ Y │   │   │ │
+│  └───┴───┴───┴───┴───┘ │
+└─────────────────────────┘
+
+CONNECTION TABLE:
+┌────────────┬──────────────┬─────────────────┬──────────────────┐
+│ EPD Pin    │ Function     │ nRF52840 Pin    │ Arduino Header   │
+├────────────┼──────────────┼─────────────────┼──────────────────┤
+│ VCC        │ Power 3.3V   │ 3.3V            │ 3.3V             │
+│ GND        │ Ground       │ GND             │ GND              │
+│ DIN        │ SPI MOSI     │ P1.03           │ D11              │
+│ CLK        │ SPI SCK      │ P1.05           │ D13              │
+│ CS         │ Chip Select  │ P1.02           │ D10              │
+│ DC         │ Data/Command │ P1.01           │ D9               │
+│ RST        │ Reset        │ P1.00           │ D8               │
+│ BUSY       │ Busy Signal  │ P0.31           │ D7               │
+└────────────┴──────────────┴─────────────────┴──────────────────┘
+
+nRF52840 DK ARDUINO HEADER (Top View):
+┌─────────────────────────────────────────────────────┐
+│                                                     │
+│  POWER       ANALOG              DIGITAL            │
+│  ┌──┐       ┌──────┐      ┌────────────────┐       │
+│  │··│       │······│      │················│       │
+│  └──┘       └──────┘      └────────────────┘       │
+│   ││         ││││││        │││││││││││││││││       │
+│   ││         ││││││        0123456789...   │       │
+│                                             │       │
+│                            ┌────────────────┘       │
+│                            │                        │
+│                         D7 D8 D9 D10 D11 D12 D13    │
+│                         └─ Connect EPD Here ──┘     │
+│                                                     │
+│  [USB]  [SEGGER J-LINK]  [nRF52840]  [RESET]       │
+└─────────────────────────────────────────────────────┘
+
+PHYSICAL WIRING EXAMPLE:
+
+EPD Cable       nRF52840 DK Arduino Header
+┌──────┐       ┌──────────────────────┐
+│ VCC  ├───────┤ 3.3V                 │
+│ GND  ├───────┤ GND                  │
+│ DIN  ├───────┤ D11 (MOSI)           │
+│ CLK  ├───────┤ D13 (SCK)            │
+│ CS   ├───────┤ D10                  │
+│ DC   ├───────┤ D9                   │
+│ RST  ├───────┤ D8                   │
+│ BUSY ├───────┤ D7                   │
+└──────┘       └──────────────────────┘
+
+NOTES:
+• Use female-to-female jumper wires for connections
+• Double-check VCC is connected to 3.3V (NOT 5V!)
+• GND must be connected for proper operation
+• Keep wires short (<20cm) for reliable SPI communication
+• BUSY pin is used to detect when display is ready
+
+SIGNAL DESCRIPTIONS:
+• VCC:  3.3V power supply (typically 3-10mA during refresh)
+• GND:  Ground reference
+• DIN:  Serial data input (MOSI) - MCU sends data to EPD
+• CLK:  Serial clock (SCK) - synchronizes data transfer
+• CS:   Chip select (active low) - enables SPI communication
+• DC:   Data/Command select (0=Command, 1=Data)
+• RST:  Reset (active low) - hardware reset of EPD controller
+• BUSY: Busy status output (HIGH during refresh/update)

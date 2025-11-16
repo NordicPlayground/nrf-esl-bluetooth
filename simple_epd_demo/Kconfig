@@ -1,0 +1,13 @@
+# Simple E-Paper Display Demo Configuration
+
+mainmenu "Simple EPD Demo Configuration"
+
+config PAINT_COLORS
+	int "Paint library color support"
+	default 3
+	help
+	  Number of colors supported by the paint library:
+	  2 = Black and White only
+	  3 = Black, White, and Red
+
+source "Kconfig.zephyr"
