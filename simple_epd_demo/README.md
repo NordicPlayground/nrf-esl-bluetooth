@@ -4,7 +4,7 @@ A simplified project to control a Waveshare 2.9" black and white e-paper display
 
 ## Hardware Requirements
 
-- **Board**: nRF52840 Development Kit (nRF52840 DK)
+- **Board**: nRF52840-preview-DK or nRF52840 Development Kit
 - **Display**: Waveshare 2.9" E-Paper Display (128x296 pixels)
   - Model: 2.9inch e-Paper Module (B) V3
   - Colors: Black and White (with optional Red layer support)
@@ -12,18 +12,29 @@ A simplified project to control a Waveshare 2.9" black and white e-paper display
 
 ## Wiring Connections
 
-Connect the e-paper display to the nRF52840 DK using the Arduino headers:
+Connect the e-paper display to the nRF52840-preview-DK using the Arduino headers:
 
-| EPD Pin | Function | nRF52840 DK Pin | Arduino Pin |
-|---------|----------|-----------------|-------------|
-| VCC     | Power    | 3.3V            | 3.3V        |
-| GND     | Ground   | GND             | GND         |
-| DIN     | MOSI     | P1.03           | D11         |
-| CLK     | SCK      | P1.05           | D13         |
-| CS      | Chip Sel | P1.02           | D10         |
-| DC      | Data/Cmd | P1.01           | D9          |
-| RST     | Reset    | P1.00           | D8          |
-| BUSY    | Busy     | P0.31           | D7          |
+| EPD Pin | Function | nRF52840 DK Pin | Arduino Pin | Notes |
+|---------|----------|-----------------|-------------|-------|
+| VCC     | Power    | 3.3V            | 3.3V        |       |
+| GND     | Ground   | GND             | GND         |       |
+| DIN     | MOSI     | P1.03           | D11         |       |
+| CLK     | SCK      | P1.05           | D13         |       |
+| CS      | Chip Sel | P1.02           | D10         |       |
+| DC      | Data/Cmd | P1.01           | D9          |       |
+| RST     | Reset    | P0.30           | D6          | * See note below |
+| BUSY    | Busy     | P0.31           | D7          |       |
+
+**\* RST Pin Note**: The RST pin has been configured to use **D6 (P0.30)** instead of
+the standard D8 (P1.00) because **D8 is not available on the nRF52840-preview-DK**.
+If D6 is not available on your board, you can use any other free digital pin
+(D5, D4, D3, or D2). To change it, edit `boards/nrf52840dk_nrf52840.overlay`
+and update the `reset-gpios` line with the appropriate `arduino_header` number:
+- D6 = arduino_header 12 (default - configured)
+- D5 = arduino_header 11
+- D4 = arduino_header 10
+- D3 = arduino_header 9
+- D2 = arduino_header 8
 
 ## Project Structure
 

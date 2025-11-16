@@ -1,16 +1,20 @@
 /*
  * Device Tree Overlay for Waveshare 2.9" E-Paper Display
- * Board: nRF52840 DK
+ * Board: nRF52840-preview-DK
  *
  * Pin connections using Arduino headers:
  *   CS (Chip Select)   = D10 (P1.02)
  *   DC (Data/Command)  = D9  (P1.01)
- *   RST (Reset)        = D8  (P1.00)
+ *   RST (Reset)        = D6  (P0.30) - Alternative pin (D8/P1.00 not available on preview DK)
  *   BUSY               = D7  (P0.31)
  *   DIN (MOSI)         = D11 (P1.03) - Arduino SPI MOSI
  *   CLK (SCK)          = D13 (P1.05) - Arduino SPI SCK
  *   VCC                = 3.3V
  *   GND                = GND
+ *
+ * Note: If D6 is not available on your board, you can use other free digital pins:
+ *   D5 (arduino_header 11), D4 (arduino_header 10), D3 (arduino_header 9), D2 (arduino_header 8)
+ *   Just change the reset-gpios line below to use the appropriate arduino_header number.
  */
 
 / {
@@ -31,7 +35,7 @@
 		width = <128>;
 		height = <296>;
 		dc-gpios = <&arduino_header 15 GPIO_ACTIVE_LOW>;      /* D9 */
-		reset-gpios = <&arduino_header 14 GPIO_ACTIVE_LOW>;   /* D8 */
+		reset-gpios = <&arduino_header 12 GPIO_ACTIVE_LOW>;   /* D6 - Alternative for preview DK */
 		busy-gpios = <&arduino_header 13 GPIO_ACTIVE_HIGH>;   /* D7 */
 	};
 };

@@ -1,6 +1,6 @@
 ╔══════════════════════════════════════════════════════════════════════════╗
 ║                    WAVESHARE 2.9" E-PAPER PINOUT                         ║
-║                      nRF52840 DK Connection Guide                        ║
+║                 nRF52840-preview-DK Connection Guide                     ║
 ╚══════════════════════════════════════════════════════════════════════════╝
 
 ┌─────────────────────────┐
@@ -27,7 +27,7 @@
 │  └───┴───┴───┴───┴───┘ │
 └─────────────────────────┘
 
-CONNECTION TABLE:
+CONNECTION TABLE (nRF52840-preview-DK):
 ┌────────────┬──────────────┬─────────────────┬──────────────────┐
 │ EPD Pin    │ Function     │ nRF52840 Pin    │ Arduino Header   │
 ├────────────┼──────────────┼─────────────────┼──────────────────┤
@@ -37,9 +37,12 @@ CONNECTION TABLE:
 │ CLK        │ SPI SCK      │ P1.05           │ D13              │
 │ CS         │ Chip Select  │ P1.02           │ D10              │
 │ DC         │ Data/Command │ P1.01           │ D9               │
-│ RST        │ Reset        │ P1.00           │ D8               │
+│ RST        │ Reset        │ P0.30           │ D6 *             │
 │ BUSY       │ Busy Signal  │ P0.31           │ D7               │
 └────────────┴──────────────┴─────────────────┴──────────────────┘
+
+* RST pin changed from D8 to D6 because D8 (P1.00) is not available
+  on nRF52840-preview-DK. Alternative free pins: D5, D4, D3, D2
 
 nRF52840 DK ARDUINO HEADER (Top View):
 ┌─────────────────────────────────────────────────────┐

@@ -4,20 +4,23 @@ Get your Waveshare 2.9" E-Paper display running in 5 minutes!
 
 ## Step 1: Hardware Setup
 
-Connect your e-paper display to the nRF52840 DK Arduino headers:
+Connect your e-paper display to the nRF52840-preview-DK Arduino headers:
 
 ```
-EPD Display          nRF52840 DK (Arduino)
------------          ---------------------
+EPD Display          nRF52840-preview-DK (Arduino)
+-----------          -----------------------------
 VCC         ------>  3.3V
 GND         ------>  GND
 DIN (MOSI)  ------>  D11
 CLK (SCK)   ------>  D13
 CS          ------>  D10
 DC          ------>  D9
-RST         ------>  D8
+RST         ------>  D6  (changed from D8 - not available on preview DK)
 BUSY        ------>  D7
 ```
+
+**Note**: If D6 is not available, you can use D5, D4, D3, or D2. Just update
+the `reset-gpios` line in `boards/nrf52840dk_nrf52840.overlay` accordingly.
 
 ## Step 2: Build and Flash
 
