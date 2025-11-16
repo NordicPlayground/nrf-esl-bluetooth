@@ -106,7 +106,13 @@ void DEV_SPI_WriteByte(uint8_t Value)
 
 void DEV_SPI_Write_nByte(uint8_t *pData, uint32_t Len)
 {
-	/* TODO: IMPLEMENT IT */
+	struct spi_buf tx_buf = {.buf = pData, .len = Len};
+	struct spi_buf_set tx_bufs = {.buffers = &tx_buf, .count = 1};
+	int spi_status = spi_write(epaper_spi, &epaper_spi_config, &tx_bufs);
+
+	if (spi_status < 0) {
+		LOG_ERR("SPI transceive error: %d\r\n", spi_status);
+	}
 }
 
 /**
