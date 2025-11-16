@@ -1,0 +1,53 @@
+description: |
+    E-Paper display controller for Waveshare displays
+
+    The origin is in the upper left corner when the FPC line is facing down.
+    Source = width = x, Gate = height = y.
+
+include: [spi-device.yaml]
+
+compatible: "zephyr,epd-waveshare"
+
+properties:
+    width:
+      type: int
+      required: true
+      description: Display width in pixels
+
+    height:
+      type: int
+      required: true
+      description: Display height in pixels
+
+    vcc-gpios:
+      type: phandle-array
+      description: |
+        VCC power control pin (optional).
+
+        The VCC pin of E-Paper is active high.
+
+    busy-gpios:
+      type: phandle-array
+      required: true
+      description: |
+        BUSY status pin.
+
+        The BUSY pin of E-Paper is active high.
+
+    reset-gpios:
+      type: phandle-array
+      required: true
+      description: |
+        RESET pin.
+
+        The RESET pin of E-Paper is active low.
+
+    dc-gpios:
+      type: phandle-array
+      required: true
+      description: |
+        DC (Data/Command) pin.
+
+        The DC pin of E-Paper is active low (command) / active high (data).
+
+on-bus: spi

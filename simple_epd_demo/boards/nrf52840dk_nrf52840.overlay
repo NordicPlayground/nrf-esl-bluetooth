@@ -24,7 +24,7 @@
 	cs-gpios = <&arduino_header 16 GPIO_ACTIVE_LOW>; /* D10 */
 
 	epd_2in9b_v3: epd_2in9b_v3@0 {
-		compatible = "generic,epd";
+		compatible = "zephyr,epd-waveshare";
 		status = "okay";
 		spi-max-frequency = <4000000>;
 		reg = <0>;

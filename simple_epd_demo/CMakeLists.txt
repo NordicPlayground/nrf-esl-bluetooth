@@ -2,7 +2,12 @@
 
 cmake_minimum_required(VERSION 3.20.0)
 
+# Set DTS_ROOT to include our custom device tree bindings
+# This must be set BEFORE find_package(Zephyr)
+list(APPEND DTS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/dts)
+
 # Find Zephyr package
+# The overlay will be auto-detected from boards/ directory
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 
 project(simple_epd_demo)
@@ -31,6 +36,3 @@ target_include_directories(app PRIVATE
     driver
     paint/include
 )
-
-# Device Tree Source overlay
-set(DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/boards/nrf52840dk_nrf52840.overlay")

@@ -40,7 +40,7 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(DEV_Config);
 
-#define DT_DRV_COMPAT generic_epd
+#define DT_DRV_COMPAT zephyr_epd_waveshare
 
 /* SPI */
 static const struct device *epaper_spi;
@@ -189,8 +189,7 @@ UBYTE DEV_Module_Init(void)
 		LOG_ERR("no epaper_spi");
 	}
 
-	epaper_spi_config.frequency = MIN(DT_PROP(DT_PARENT(DT_DRV_INST(0)), max_frequency),
-					  DT_PROP(DT_DRV_INST(0), spi_max_frequency));
+	epaper_spi_config.frequency = DT_PROP(DT_DRV_INST(0), spi_max_frequency);
 	epaper_spi_config.operation =
 		SPI_WORD_SET(8) | SPI_MODE_CPOL | SPI_MODE_CPHA | SPI_OP_MODE_MASTER;
 	epaper_spi_config.cs = epd_spi_cs_pin;

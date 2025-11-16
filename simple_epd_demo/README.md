@@ -62,9 +62,21 @@ simple_epd_demo/
 
 ### Prerequisites
 
-1. Install [nRF Connect SDK](https://www.nordicsemi.com/Products/Development-software/nRF-Connect-SDK) (v2.6.0 or later recommended)
+1. Install [nRF Connect SDK](https://www.nordicsemi.com/Products/Development-software/nRF-Connect-SDK) or standalone Zephyr
+   - **Tested with**: Zephyr 4.2.1 + Zephyr SDK 0.17.0
+   - Should work with Zephyr 3.5.0 and later
 2. Set up your Zephyr development environment
 3. Connect the nRF52840 DK to your computer via USB
+
+### Version Compatibility
+
+This project has been tested and verified with:
+- **Zephyr RTOS**: v4.2.1
+- **Zephyr SDK**: v0.17.0
+- **nRF52840 DK**: PCA10056
+- **Waveshare E-Paper**: 2.9" Module (B) V3
+
+It should work with Zephyr 3.5.0+ and nRF Connect SDK v2.4.0+
 
 ### Build Commands
 
