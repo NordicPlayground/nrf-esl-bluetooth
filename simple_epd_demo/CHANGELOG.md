@@ -2,6 +2,25 @@
 
 All notable changes to the Simple E-Paper Display Demo will be documented in this file.
 
+## [1.2.0] - 2025-01-16
+
+### Changed
+- **Updated pin configuration for nRF52840-preview-DK**
+  - Changed RST (Reset) pin from D8 (P1.00) to D6 (P0.30)
+  - D8/P1.00 is not available on nRF52840-preview-DK Arduino headers
+  - Updated device tree overlay reset-gpios to use arduino_header 12 (D6)
+
+### Added
+- Documentation for alternative RST pin options (D5, D4, D3, D2)
+- Instructions for changing RST pin in device tree overlay
+- nRF52840-preview-DK specific notes in all documentation
+
+### Updated
+- README.md: Updated wiring table and added RST pin configuration note
+- QUICK_START.md: Updated hardware setup with new pin mapping
+- PINOUT.txt: Updated connection table for preview DK
+- boards/nrf52840dk_nrf52840.overlay: Comments with alternative pin options
+
 ## [1.1.0] - 2025-01-16
 
 ### Changed
