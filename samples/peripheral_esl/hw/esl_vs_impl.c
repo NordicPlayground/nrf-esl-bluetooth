@@ -4,7 +4,7 @@
  * VS command handler and response handler functions.
  */
 
-#include <zephyr/net/buf.h>
+#include <zephyr/net_buf.h>
 #include <zephyr/logging/log.h>
 
 #include "esl.h"
