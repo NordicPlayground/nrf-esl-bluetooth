@@ -1,5 +1,5 @@
-/delete-node/ &slot1_ns_partition;
 /delete-node/ &storage_partition;
+/delete-node/ &slot1_partition;
 / {
 	fstab {
 		compatible = "zephyr,fstab";
@@ -22,6 +22,10 @@
 		compatible = "fixed-partitions";
 		#address-cells = <1>;
 		#size-cells = <1>;
+		slot1_partition: partition@b6000 {
+			label = "slot1";
+			reg = <0xb6000 0x9a000>;
+		};
 		storage_partition: partition@150000 {
 			label = "storage";
 			reg = <0x150000 0x2000>;
