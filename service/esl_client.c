@@ -901,7 +901,7 @@ static void esl_discovery_complete(struct bt_gatt_dm *dm, void *context)
 
 	bt_gatt_dm_data_release(dm);
 	esl_ap_disc_work.conn_idx = bt_conn_index(conn);
-	k_work_reschedule(&esl_ap_disc_work.work, K_NO_WAIT);
+	k_work_reschedule_for_queue(&ap_config_work_q, &esl_ap_disc_work.work, K_NO_WAIT);
 }
 
 static void ots_discovery_complete(struct bt_gatt_dm *dm, void *context)
@@ -921,7 +921,7 @@ static void ots_discovery_complete(struct bt_gatt_dm *dm, void *context)
 
 	bt_gatt_dm_data_release(dm);
 	esl_ap_disc_work.conn_idx = bt_conn_index(conn);
-	k_work_reschedule(&esl_ap_disc_work.work, K_NO_WAIT);
+	k_work_reschedule_for_queue(&ap_config_work_q, &esl_ap_disc_work.work, K_NO_WAIT);
 }
 
 #define VID_POS_IN_PNP_ID sizeof(uint8_t)
@@ -981,7 +981,7 @@ static void dis_discovery_complete(struct bt_gatt_dm *dm, void *context)
 
 	bt_gatt_dm_data_release(dm);
 	esl_ap_disc_work.conn_idx = conn_idx;
-	k_work_reschedule(&esl_ap_disc_work.work, K_NO_WAIT);
+	k_work_reschedule_for_queue(&ap_config_work_q, &esl_ap_disc_work.work, K_NO_WAIT);
 }
 
 static void discovery_service_not_found(struct bt_conn *conn, void *context)
@@ -993,7 +993,7 @@ static void discovery_service_not_found(struct bt_conn *conn, void *context)
 	} else {
 		LOG_INF("Service (%d) not found", disc_state);
 		esl_ap_disc_work.conn_idx = bt_conn_index(conn);
-		k_work_reschedule(&esl_ap_disc_work.work, K_NO_WAIT);
+		k_work_reschedule_for_queue(&ap_config_work_q, &esl_ap_disc_work.work, K_NO_WAIT);
 	}
 }
 
@@ -2458,7 +2458,7 @@ static void setup_pawr_adv(void)
 	 * when enable extended adv for sniffer.
 	 * 0x3700 = 10 * 1.76s = 10 * (128 * 11 subevent interval *1.25)
 	 **/
-	adv_param = BT_LE_ADV_PARAM(BT_LE_ADV_OPT_EXT_ADV | BT_LE_ADV_OPT_USE_NAME, 0x3700, 0x3700,
+	adv_param = BT_LE_ADV_PARAM(BT_LE_ADV_OPT_EXT_ADV, 0x3700, 0x3700,
 				    NULL);
 	adv_param->sid = ESL_AP_PA_SID;
 	err = bt_le_ext_adv_create(adv_param, &pawr_cbs, &adv_pawr);
