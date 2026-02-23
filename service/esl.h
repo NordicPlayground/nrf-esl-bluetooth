@@ -342,8 +342,7 @@ struct bt_esls {
 	struct bt_conn *conn;
 
 	/** control point cccd */
-	struct _bt_gatt_ccc ecp_ccc;
-
+	struct bt_gatt_ccc_managed_user_data ecp_ccc;
 	/** control point dummy attr*/
 	uint8_t cont_point;
 

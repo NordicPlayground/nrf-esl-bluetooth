@@ -259,12 +259,13 @@ void sm_unassociated_entry(void *obj)
 	bt_esl_adv_start(ESL_ADV_DEMO);
 }
 
-void sm_unassociated_run(void *obj)
+enum smf_state_result sm_unassociated_run(void *obj)
 {
 	LOG_DBG("%s", __func__);
 	/** retrieve esl state machine obj
 	 * struct esl_sm_object *o = ((struct esl_sm_object *)obj);
 	 */
+	return SMF_EVENT_HANDLED;
 }
 
 void sm_unassociated_exit(void *obj)
@@ -284,12 +285,13 @@ void sm_configuring_entry(void *obj)
 	 */
 }
 
-void sm_configuring_run(void *obj)
+enum smf_state_result sm_configuring_run(void *obj)
 {
 	LOG_DBG("%s", __func__);
 	/** retrieve esl state machine obj
 	 * struct esl_sm_object *o = ((struct esl_sm_object *)obj);
 	 */
+	return SMF_EVENT_HANDLED;
 }
 
 void sm_configuring_exit(void *obj)
@@ -310,12 +312,13 @@ void sm_configured_entry(void *obj)
 	esl_create_pawr_sync();
 }
 
-void sm_configured_run(void *obj)
+enum smf_state_result sm_configured_run(void *obj)
 {
 	LOG_DBG("%s", __func__);
 	/** retrieve esl state machine obj
 	 * struct esl_sm_object *o = ((struct esl_sm_object *)obj);
 	 */
+	return SMF_EVENT_HANDLED;
 }
 
 void sm_configured_exit(void *obj)
@@ -347,12 +350,13 @@ void sm_synchronized_entry(void *obj)
 	}
 }
 
-void sm_synchronized_run(void *obj)
+enum smf_state_result sm_synchronized_run(void *obj)
 {
 	LOG_DBG("%s", __func__);
 	/** retrieve esl state machine obj
 	 * struct esl_sm_object *o = ((struct esl_sm_object *)obj);
 	 */
+	return SMF_EVENT_HANDLED;
 }
 
 void sm_synchronized_exit(void *obj)
@@ -377,12 +381,13 @@ void sm_updating_entry(void *obj)
 	k_work_cancel_delayable(&esl_state_timeout_work.work);
 }
 
-void sm_updating_run(void *obj)
+enum smf_state_result sm_updating_run(void *obj)
 {
 	LOG_DBG("%s", __func__);
 	/** retrieve esl state machine obj
 	 * struct esl_sm_object *o = ((struct esl_sm_object *)obj);
 	 */
+	return SMF_EVENT_HANDLED;
 }
 
 void sm_updating_exit(void *obj)
@@ -411,12 +416,13 @@ void sm_unsynchronized_entry(void *obj)
 	}
 }
 
-void sm_unsynchronized_run(void *obj)
+enum smf_state_result sm_unsynchronized_run(void *obj)
 {
 	LOG_DBG("%s", __func__);
 	/** retrieve esl state machine obj
 	 * struct esl_sm_object *o = ((struct esl_sm_object *)obj);
 	 */
+	return SMF_EVENT_HANDLED;
 }
 
 void sm_unsynchronized_exit(void *obj)
@@ -2102,12 +2108,12 @@ static void esl_advertising_fn(struct k_work *work)
 	case ESL_ADV_DEFAULT:
 		/* Default slow advertising interval 10s duration 108 minutes */
 		LOG_DBG("ESL_ADV_DEFAULT");
-		adv_param = *BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME,
+		adv_param = *BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONN,
 					     0x1F20, 0x1F60, NULL);
 		break;
 	case ESL_ADV_UNSYNCED:
 		LOG_DBG("Directed adv");
-		adv_param = *BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME,
+		adv_param = *BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONN,
 					     BT_GAP_ADV_FAST_INT_MIN_2, BT_GAP_ADV_FAST_INT_MAX_2,
 					     &peer);
 		bt_addr_le_to_str(&peer, addr, sizeof(addr));
@@ -2117,7 +2123,7 @@ static void esl_advertising_fn(struct k_work *work)
 	default:
 		/* Less than 1 second */
 		LOG_DBG("Undirected adv");
-		adv_param = *BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME,
+		adv_param = *BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONN,
 					     720, 800, NULL);
 		break;
 	}
