@@ -27,7 +27,7 @@ const struct device *display_dev;
 #if IS_ENABLED(CONFIG_DT_HAS_ARDUINO_HEADER_R3_ENABLED)
 #define SPI_NODE DT_NODELABEL(arduino_spi)
 /* nRF54L Devkit uses SPI00 for now */
-#elif IS_ENABLED(CONFIG_NRFX_SPIM00)
+#elif IS_ENABLED(CONFIG_NRFX_SPIM)
 #define SPI_NODE DT_NODELABEL(spi00)
 #else
 #error "No SPI node found"
