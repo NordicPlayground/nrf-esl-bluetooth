@@ -131,6 +131,7 @@ int display_init(void)
 		return 0;
 	}
 
+	cfb_framebuffer_invert(display_dev);
 #if IS_ENABLED(CONFIG_SSD16XX)
 	cfb_framebuffer_set_font(display_dev, 0);
 	cfb_get_font_size(display_dev, 0, &font_width, &font_height);
@@ -303,7 +304,7 @@ void display_unassociated(uint8_t disp_idx)
 	int err;
 
 	display_blanking_on(display_dev);
-	cfb_framebuffer_clear(display_dev, true);
+	cfb_framebuffer_clear(display_dev, false);
 	cfb_print(display_dev, "Hello Nordic!", 0, 0 * font_height);
 	cfb_print(display_dev, "UNAssociated", 0, 1 * font_height);
 	cfb_print(display_dev, "ESL TAG", 0, 2 * font_height);
@@ -344,7 +345,7 @@ void display_associated(uint8_t disp_idx)
 
 	snprintk(tag_str, sizeof(tag_str), "ESL TAG 0x%04x", esl_obj->esl_chrc.esl_addr);
 	display_blanking_on(display_dev);
-	cfb_framebuffer_clear(display_dev, true);
+	cfb_framebuffer_clear(display_dev, false);
 	cfb_print(display_dev, "Hello Nordic!", 0, 0 * font_height);
 	cfb_print(display_dev, "Associated", 0, 1 * font_height);
 	cfb_print(display_dev, tag_str, 0, 2 * font_height);
@@ -368,6 +369,13 @@ int display_clear_cfb(uint8_t disp_idx)
 	int err;
 #if defined(CONFIG_ESL_POWER_PROFILE)
 	display_epd_onoff(EPD_POWER_ON);
+#if IS_ENABLED(CONFIG_SSD16XX)
+	/**
+	 * To optimize power remove static declaration of ssd16xx_init in
+	 * zephyr/drivers/display/ssd16xx.c
+	 **/
+	ssd16xx_init(display_dev);
+#endif
 #endif /* CONFIG_ESL_POWER_PROFILE */
 	ARG_UNUSED(disp_idx);
 	err = cfb_framebuffer_clear(display_dev, true);
@@ -398,12 +406,22 @@ int display_update_cfb(uint8_t disp_idx)
 	int err;
 #if defined(CONFIG_ESL_POWER_PROFILE)
 	display_epd_onoff(EPD_POWER_ON);
+#if IS_ENABLED(CONFIG_SSD16XX)
+	/**
+	 * To optimize power remove static declaration of ssd16xx_init in
+	 * zephyr/drivers/display/ssd16xx.c
+	 **/
+	ssd16xx_init(display_dev);
+#endif
 #endif /* CONFIG_ESL_POWER_PROFILE */
 	ARG_UNUSED(disp_idx);
+	display_blanking_on(display_dev);
+
 	err = cfb_framebuffer_finalize(display_dev);
 	if (err) {
 		LOG_ERR("cfb_framebuffer_finalize (rc %d)", err);
 	}
+	display_blanking_off(display_dev);
 
 #if defined(CONFIG_ESL_POWER_PROFILE)
 	display_epd_onoff(EPD_POWER_OFF);
