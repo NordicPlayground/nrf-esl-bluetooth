@@ -35,7 +35,7 @@ static void temp_handler(int32_t temperature)
 
 int sensor_init(void)
 {
-	nrfx_err_t status;
+	int status;
 	nrfx_temp_config_t config = NRFX_TEMP_DEFAULT_CONFIG;
 
 	status = nrfx_temp_init(&config, temp_handler);
@@ -55,7 +55,7 @@ int sensor_control(uint8_t sensor_idx, uint8_t *len, uint8_t *data)
 	*len = esl_obj->sensor_data[sensor_idx].size;
 	/* Temperature sensor */
 	if (sensor_idx == 0) {
-		nrfx_err_t status;
+		int status;
 		(void)status;
 #if defined(CONFIG_BT_ESL_PTS)
 		status = nrfx_temp_measure();
@@ -67,7 +67,7 @@ int sensor_control(uint8_t sensor_idx, uint8_t *len, uint8_t *data)
 			esl_obj->sensor_data[0].data_available = false;
 		} else {
 			status = nrfx_temp_measure();
-			LOG_INF("nrfx_temp_measure status %d", (status - NRFX_ERROR_BASE_NUM));
+			LOG_INF("nrfx_temp_measure status %d", status);
 			return -EBUSY;
 		}
 #endif /* CONFIG_BT_ESL_PTS */
