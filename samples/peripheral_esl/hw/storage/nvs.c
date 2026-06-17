@@ -6,7 +6,7 @@
 
 #include <zephyr/drivers/flash.h>
 #include <zephyr/storage/flash_map.h>
-#include <zephyr/fs/nvs.h>
+#include <zephyr/fs/zms.h>
 #include <zephyr/settings/settings.h>
 #include <zephyr/logging/log.h>
 
@@ -15,7 +15,7 @@
 LOG_MODULE_DECLARE(peripheral_esl);
 
 #define IMG_SIZE_OFFSET 0x100
-static struct nvs_fs *fs;
+static struct zms_fs *fs;
 
 int open_image_from_storage(uint8_t img_idx)
 {
@@ -34,17 +34,17 @@ int write_img_to_storage(uint8_t img_idx, size_t len, off_t offset)
 
 	ARG_UNUSED(offset);
 	LOG_DBG("%s img %d len %d offset %ld", __func__, img_idx, len, offset);
-	rc = nvs_write(fs, img_idx, esl_obj->img_obj_buf, len);
+	rc = zms_write(fs, img_idx, esl_obj->img_obj_buf, len);
 	if (rc < 0) {
-		LOG_ERR("nvs_write img content len %d failed %d", len, rc);
+		LOG_ERR("zms_write img content len %d failed %d", len, rc);
 		return rc;
 	}
 
-	rc = nvs_write(fs, img_idx + IMG_SIZE_OFFSET, &len, sizeof(size_t));
-	LOG_DBG("nvs_write img size rc %d", rc);
+	rc = zms_write(fs, img_idx + IMG_SIZE_OFFSET, &len, sizeof(size_t));
+	LOG_DBG("zms_write img size rc %d", rc);
 
 	if (rc < 0) {
-		LOG_ERR("nvs_write img size failed %d", rc);
+		LOG_ERR("zms_write img size failed %d", rc);
 	}
 
 	return rc;
@@ -61,9 +61,9 @@ int read_img_from_storage(uint8_t img_idx, void *data, size_t len, off_t offset)
 
 	LOG_DBG("%s img %d len %d offset %ld", __func__, img_idx, len, offset);
 
-	rc = nvs_read(fs, img_idx, data, len);
+	rc = zms_read(fs, img_idx, data, len);
 	if (rc < 0) {
-		LOG_ERR("nvs_read len %d failed %d", len, rc);
+		LOG_ERR("zms_read len %d failed %d", len, rc);
 	}
 
 	return rc;
@@ -74,8 +74,8 @@ size_t read_img_size_from_storage(uint8_t img_idx)
 	size_t size;
 	int rc;
 
-	rc = nvs_read(fs, img_idx + IMG_SIZE_OFFSET, &size, sizeof(size_t));
-	LOG_DBG("nvs_read img_size %d from nvs id %d rc %d", img_idx, (img_idx + IMG_SIZE_OFFSET),
+	rc = zms_read(fs, img_idx + IMG_SIZE_OFFSET, &size, sizeof(size_t));
+	LOG_DBG("zms_read img_size %d from zms id %d rc %d", img_idx, (img_idx + IMG_SIZE_OFFSET),
 		rc);
 	if (rc < 0) {
 		LOG_ERR("size %d", size);
@@ -92,15 +92,15 @@ int delete_imgs_from_storage(void)
 
 	LOG_DBG("%s", __func__);
 	for (size_t img_idx = 0; img_idx < CONFIG_BT_ESL_IMAGE_MAX; img_idx++) {
-		rc = nvs_delete(fs, img_idx);
+		rc = zms_delete(fs, img_idx);
 		if (rc) {
-			LOG_ERR("nvs_delete idx %d failed", img_idx);
+			LOG_ERR("zms_delete idx %d failed", img_idx);
 			return rc;
 		}
 
-		rc = nvs_delete(fs, img_idx + IMG_SIZE_OFFSET);
+		rc = zms_delete(fs, img_idx + IMG_SIZE_OFFSET);
 		if (rc) {
-			LOG_ERR("nvs_delete idx %d failed", (img_idx + IMG_SIZE_OFFSET));
+			LOG_ERR("zms_delete idx %d failed", (img_idx + IMG_SIZE_OFFSET));
 			return rc;
 		}
 	}

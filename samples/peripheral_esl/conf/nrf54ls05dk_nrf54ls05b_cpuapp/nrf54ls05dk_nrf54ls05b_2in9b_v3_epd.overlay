@@ -1,0 +1,19 @@
+/*
+ * Copyright (c) 2026 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+#include "nrf54ls05dk_nrf54ls05b_general.overlay"
+#include "nrf54ls05dk_nrf54ls05b_memory.dtsi"
+
+/* Remove LittleFS fstab entry and partition — not needed for ESL_OTS_NVS */
+/delete-node/ &lfs1;
+/delete-node/ &lfs1_part;
+
+/* Expand ZMS storage partition to full remaining RRAM (0x76000..0x7F000 = 36KB).
+ * With SETTINGS_ZMS_SECTOR_SIZE_MULT=2, sector_size=8192 bytes, giving 4 sectors.
+ * Max ZMS entry ≈ 8192-80 = 8112 bytes, which is > 4742 bytes image size.
+ */
+&storage_partition {
+	reg = <0x76000 0x9000>;
+};

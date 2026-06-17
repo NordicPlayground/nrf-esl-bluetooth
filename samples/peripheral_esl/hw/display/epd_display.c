@@ -58,7 +58,11 @@ LOG_MODULE_DECLARE(peripheral_esl);
 #define SPI_NODE DT_NODELABEL(spi1)
 /* nRF54L Devkit uses SPI00 for now */
 #elif IS_ENABLED(CONFIG_NRFX_SPIM)
-#define SPI_NODE DT_NODELABEL(spi00)
+	#if IS_ENABLED(CONFIG_SOC_NRF54LS05B)
+	#define SPI_NODE DT_NODELABEL(spi21)
+	#else
+	#define SPI_NODE DT_NODELABEL(spi00)
+	#endif
 #else
 #error "No SPI node found"
 #endif /* CONFIG_DT_HAS_ARDUINO_HEADER_R3_ENABLED */
@@ -238,10 +242,6 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 		return -EINVAL;
 	}
 
-	if (epd_display_fn.epd_clear) {
-		epd_display_fn.epd_clear();
-	}
-
 #if defined(CONFIG_ESL_OTS_NVS)
 	err = esl_obj->cb.read_img_from_storage(img_idx, esl_obj->img_obj_buf, img_size, 0);
 	if (err < 0) {
@@ -249,8 +249,18 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 	}
 
 	if (epd_display_fn.epd_display_full) {
+#if (CONFIG_ESL_DISPLAY_TYPE == 6)
+		paint_Fill(WHITE);
+		epd_display_fn.epd_display_full(
+			(esl_obj->img_obj_buf + sizeof(struct waveshare_gray_head)), rw_data);
+			// wb_data, rw_data);
+#else
+		if (epd_display_fn.epd_clear) {
+			epd_display_fn.epd_clear();
+		}
 		epd_display_fn.epd_display_full(
 			(esl_obj->img_obj_buf + sizeof(struct waveshare_gray_head)));
+#endif
 	}
 
 #elif defined(CONFIG_ESL_OTS_LFS)
@@ -282,7 +292,12 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 			epd_display_fn.epd_write_display(0, cur_y, chunk_size, buf_desc.height,
 							 esl_obj->img_obj_buf);
 		} else {
-			epd_display_fn.epd_display_full(esl_obj->img_obj_buf);
+
+			epd_display_fn.epd_display_full(esl_obj->img_obj_buf
+#if CONFIG_ESL_DISPLAY_TYPE == 6
+			, rw_data
+#endif
+			);
 		}
 
 		/**
@@ -294,6 +309,7 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 		 */
 		img_size -= chunk_size;
 		cur_pos += chunk_size;
+		LOG_INF("cur_pos %d, chunk_size %d, img_size left %d", cur_pos, chunk_size, img_size);
 		if (img_size < chunk_size) {
 			chunk_size = img_size;
 			buf_desc.height =

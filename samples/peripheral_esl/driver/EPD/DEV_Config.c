@@ -194,6 +194,7 @@ UBYTE DEV_Module_Init(void)
 	epaper_spi_config.operation =
 		SPI_WORD_SET(8) | SPI_MODE_CPOL | SPI_MODE_CPHA | SPI_OP_MODE_MASTER;
 	epaper_spi_config.cs = epd_spi_cs_pin;
+	epaper_spi_config.cs.cs_is_gpio = true;
 
 	printk("epaper_spi_config.frequency %d \r\n", epaper_spi_config.frequency);
 	printk("/***********************************/ end\r\n");

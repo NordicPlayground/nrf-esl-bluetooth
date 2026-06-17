@@ -1,0 +1,65 @@
+#include "nrf54ls05dk_nrf54ls05b_memory.dtsi"
+
+/ {
+	chosen {
+		zephyr,display = &ssd16xx;
+	};
+
+	mipi_dbi_waveshare_epaper {
+		compatible = "zephyr,mipi-dbi-spi";
+		spi-dev = <&spi21>;
+		dc-gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio1 3 GPIO_ACTIVE_LOW>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		ssd16xx: ssd16xxfb@0 {
+			compatible = "gooddisplay,gdey0213b74", "solomon,ssd1680";
+			mipi-max-frequency = <4000000>;
+			reg = <0>;
+			width = <250>;
+			height = <122>;
+			busy-gpios = <&gpio1 21 GPIO_ACTIVE_HIGH>;
+
+			tssv = <0x80>;
+
+			full {
+				border-waveform = <0x05>;
+			};
+
+			partial {
+				border-waveform = <0x3c>;
+			};
+		};
+	};
+
+};
+
+&pinctrl {
+	spi21_default: spi21_default {
+		group1 {
+			// nordic,drive-mode = <NRF_DRIVE_H0H1>;
+			psels = <NRF_PSEL(SPIM_SCK, 1, 22)>,
+			        <NRF_PSEL(SPIM_MISO, 1, 25)>,
+			        <NRF_PSEL(SPIM_MOSI, 1, 24)>;
+		};
+	};
+
+	spi21_sleep: spi21_sleep {
+		group1 {
+			psels = <NRF_PSEL(SPIM_SCK, 1, 22)>,
+			        <NRF_PSEL(SPIM_MISO, 1, 25)>,
+			        <NRF_PSEL(SPIM_MOSI, 1, 24)>;
+			low-power-enable;
+		};
+	};
+
+};
+
+&spi21 {
+	status = "okay";
+	cs-gpios = <&gpio1 20 GPIO_ACTIVE_LOW>;
+	pinctrl-0 = <&spi21_default>;
+	pinctrl-1 = <&spi21_sleep>;
+	pinctrl-names = "default", "sleep";
+};

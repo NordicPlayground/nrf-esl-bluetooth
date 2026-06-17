@@ -28,7 +28,11 @@ const struct device *display_dev;
 #define SPI_NODE DT_NODELABEL(arduino_spi)
 /* nRF54L Devkit uses SPI00 for now */
 #elif IS_ENABLED(CONFIG_NRFX_SPIM)
-#define SPI_NODE DT_NODELABEL(spi00)
+	#if IS_ENABLED(CONFIG_SOC_NRF54LS05B)
+	#define SPI_NODE DT_NODELABEL(spi21)
+	#else
+	#define SPI_NODE DT_NODELABEL(spi00)
+	#endif
 #else
 #error "No SPI node found"
 #endif /* CONFIG_DT_HAS_ARDUINO_HEADER_R3_ENABLED */
@@ -60,6 +64,12 @@ int display_epd_onoff(uint8_t mode)
 		err = gpio_pin_configure_dt(&dc_gpio, GPIO_OUTPUT_INACTIVE);
 		if (err < 0) {
 			LOG_ERR("Failed to configure DC GPIO");
+			return err;
+		}
+
+		err = gpio_pin_configure_dt(&busy_gpio, GPIO_INPUT);
+		if (err < 0) {
+			LOG_ERR("Failed to configure busy GPIO");
 			return err;
 		}
 
@@ -240,6 +250,7 @@ int display_control(uint8_t disp_idx, uint8_t img_idx, bool enable)
 		err = display_write(display_dev, 0, cur_y, &buf_desc, esl_obj->img_obj_buf);
 		if (err) {
 			LOG_ERR("display_write (err %d)", err);
+			display_blanking_off(display_dev);
 			goto end;
 		}
 
@@ -378,10 +389,15 @@ int display_clear_cfb(uint8_t disp_idx)
 #endif
 #endif /* CONFIG_ESL_POWER_PROFILE */
 	ARG_UNUSED(disp_idx);
-	err = cfb_framebuffer_clear(display_dev, true);
+	/* Force full refresh: blanking_on buffers writes; blanking_off triggers full LUT update */
+	display_blanking_on(display_dev);
+	cfb_framebuffer_clear(display_dev, false);
+	err = cfb_framebuffer_finalize(display_dev);
 	if (err) {
-		LOG_ERR("cfb_framebuffer_clear (rc %d)", err);
+		LOG_ERR("cfb_framebuffer_finalize (rc %d)", err);
 	}
+
+	display_blanking_off(display_dev);
 #if defined(CONFIG_ESL_POWER_PROFILE)
 	display_epd_onoff(EPD_POWER_OFF);
 #endif /* CONFIG_ESL_POWER_PROFILE */
