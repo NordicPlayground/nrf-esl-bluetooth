@@ -16,18 +16,33 @@
 LOG_MODULE_DECLARE(peripheral_esl);
 #if defined(CONFIG_BT_ESL_JF_PAINT_LIB)
 #include <paint.h>
-static paint_obj_t paint_obj;
 
-uint8_t wb_data[CONFIG_ESL_DISPLAY_WIDTH / 8 * CONFIG_ESL_DISPLAY_HEIGHT];
-uint8_t rw_data[0];
+#define PAINT_BAND_ROWS 16
+#define PAINT_CMD_MAX   8
+
+static paint_obj_t paint_obj;
+static uint8_t wb_data[CONFIG_ESL_DISPLAY_WIDTH / 8 * PAINT_BAND_ROWS];
+
+struct paint_cmd {
+	char text[64];
+	uint16_t x;
+	uint16_t y;
+};
+
+static struct paint_cmd paint_cmds[PAINT_CMD_MAX];
+static int paint_cmd_count;
 #endif /* CONFIG_BT_ESL_JF_PAINT_LIB */
 
 const struct device *display_dev;
 #if IS_ENABLED(CONFIG_DT_HAS_ARDUINO_HEADER_R3_ENABLED)
 #define SPI_NODE DT_NODELABEL(arduino_spi)
 /* nRF54L Devkit uses SPI00 for now */
-#elif IS_ENABLED(CONFIG_NRFX_SPIM00)
-#define SPI_NODE DT_NODELABEL(spi00)
+#elif IS_ENABLED(CONFIG_NRFX_SPIM)
+	#if IS_ENABLED(CONFIG_SOC_NRF54LS05B)
+	#define SPI_NODE DT_NODELABEL(spi21)
+	#else
+	#define SPI_NODE DT_NODELABEL(spi00)
+	#endif
 #else
 #error "No SPI node found"
 #endif /* CONFIG_DT_HAS_ARDUINO_HEADER_R3_ENABLED */
@@ -65,6 +80,18 @@ int display_epd_onoff(uint8_t mode)
 		err = gpio_pin_configure_dt(&dc_gpio, GPIO_OUTPUT_INACTIVE);
 		if (err < 0) {
 			LOG_ERR("Failed to configure DC GPIO");
+			return err;
+		}
+
+		/* Restore SPI pins to default state — symmetric with the explicit
+		 * SLEEP pinctrl applied in EPD_POWER_OFF.  Some SPI PM drivers
+		 * (e.g. SPI21 on nRF54Ls05) do not restore pinctrl internally on
+		 * PM_DEVICE_ACTION_RESUME, leaving SCK/MOSI/CS tri-stated and
+		 * causing uc81xx_busy_wait to hang because the display never
+		 * receives valid SPI commands. */
+		err = pinctrl_apply_state(pcfg, PINCTRL_STATE_DEFAULT);
+		if (err < 0) {
+			LOG_ERR("Failed to restore SPI pinctrl default state");
 			return err;
 		}
 
@@ -124,6 +151,8 @@ int display_init(void)
 	paint_obj.height = CONFIG_ESL_DISPLAY_HEIGHT;
 	paint_obj.wb_buffer = wb_data;
 	paint_obj.scanmode = PAINT_SCAN_MODE_1;
+	paint_obj.band_height = PAINT_BAND_ROWS;
+	printk("CONFIG_ESL_DISPLAY_WIDTH / 8 * PAINT_BAND_ROWS %d\n", CONFIG_ESL_DISPLAY_WIDTH / 8 * PAINT_BAND_ROWS);
 	paint_Init(&paint_obj);
 
 #endif /* CONFIG_BT_ESL_JF_PAINT_LIB */
@@ -294,25 +323,33 @@ void display_unassociated(uint8_t disp_idx)
 
 #if defined(CONFIG_BT_ESL_JF_PAINT_LIB)
 	int err;
+	uint16_t height = capabilities.y_resolution;
+	uint16_t width = capabilities.x_resolution;
 
-	buf_desc.width = capabilities.x_resolution;
-	buf_desc.height = capabilities.y_resolution;
-	buf_desc.pitch = capabilities.x_resolution;
-	buf_desc.buf_size = (buf_desc.width * buf_desc.height) / EPD_MONO_NUMOF_ROWS_PER_PAGE;
-
-	/* Use JF Paint lib to draw text */
-	paint_Fill(WHITE); // clear the screen with white
-	paint_DrawString("Hello Nordic", &Font16, BLACK, 10, 10);
-	paint_DrawString("UNAssociated", &Font16, BLACK, 10, 30);
-	paint_DrawString("ESL TAG", &Font16, BLACK, 10, 50);
-	paint_DrawString(tag_str, &Font16, BLACK, 10, 70);
-	paint_DrawString("APAC", &Font16, BLACK, 10, 90);
-	paint_DrawString(CONFIG_BT_DIS_MODEL, &Font16, BLACK, 10, 110);
+	buf_desc.width = width;
+	buf_desc.pitch = width;
 
 	display_blanking_on(display_dev);
-	err = display_write(display_dev, 0, 0, &buf_desc, wb_data);
-	if (err) {
-		LOG_ERR("display_write (rc %d)", err);
+	for (uint16_t band_y = 0; band_y < height; band_y += PAINT_BAND_ROWS) {
+		uint16_t rows = (band_y + PAINT_BAND_ROWS <= height) ?
+				PAINT_BAND_ROWS : (height - band_y);
+
+		paint_SetBand(band_y);
+		paint_Fill(WHITE);
+		paint_DrawString("Hello Nordic", &Font16, BLACK, 10, 10);
+		paint_DrawString("UNAssociated", &Font16, BLACK, 10, 30);
+		paint_DrawString("ESL TAG", &Font16, BLACK, 10, 50);
+		paint_DrawString(tag_str, &Font16, BLACK, 10, 70);
+		paint_DrawString("APAC", &Font16, BLACK, 10, 90);
+		paint_DrawString(CONFIG_BT_DIS_MODEL, &Font16, BLACK, 10, 110);
+
+		buf_desc.height = rows;
+		buf_desc.buf_size = width * rows / EPD_MONO_NUMOF_ROWS_PER_PAGE;
+		err = display_write(display_dev, 0, band_y, &buf_desc, wb_data);
+		if (err) {
+			LOG_ERR("display_write (rc %d)", err);
+			break;
+		}
 	}
 
 	display_blanking_off(display_dev);
@@ -344,22 +381,32 @@ void display_associated(uint8_t disp_idx)
 #if defined(CONFIG_BT_ESL_JF_PAINT_LIB)
 	int err;
 
-	buf_desc.width = capabilities.x_resolution;
-	buf_desc.height = capabilities.y_resolution;
-	buf_desc.pitch = capabilities.x_resolution;
-	buf_desc.buf_size = (buf_desc.width * buf_desc.height) / EPD_MONO_NUMOF_ROWS_PER_PAGE;
-	/* Use JF Paint lib to draw text */
-	paint_Fill(WHITE); // clear the screen with white
-	paint_DrawString("Hello Nordic", &Font16, BLACK, 10, 10);
-	paint_DrawString("Associated", &Font16, BLACK, 10, 30);
-	paint_DrawString(tag_str, &Font16, BLACK, 10, 50);
-	paint_DrawString("APAC", &Font16, BLACK, 10, 70);
-	paint_DrawString(CONFIG_BT_DIS_MODEL, &Font16, BLACK, 10, 90);
+	uint16_t height = capabilities.y_resolution;
+	uint16_t width = capabilities.x_resolution;
+
+	buf_desc.width = width;
+	buf_desc.pitch = width;
 
 	display_blanking_on(display_dev);
-	err = display_write(display_dev, 0, 0, &buf_desc, wb_data);
-	if (err) {
-		LOG_ERR("display_write (rc %d)", err);
+	for (uint16_t band_y = 0; band_y < height; band_y += PAINT_BAND_ROWS) {
+		uint16_t rows = (band_y + PAINT_BAND_ROWS <= height) ?
+				PAINT_BAND_ROWS : (height - band_y);
+
+		paint_SetBand(band_y);
+		paint_Fill(WHITE);
+		paint_DrawString("Hello Nordic", &Font16, BLACK, 10, 10);
+		paint_DrawString("Associated", &Font16, BLACK, 10, 30);
+		paint_DrawString(tag_str, &Font16, BLACK, 10, 50);
+		paint_DrawString("APAC", &Font16, BLACK, 10, 70);
+		paint_DrawString(CONFIG_BT_DIS_MODEL, &Font16, BLACK, 10, 90);
+
+		buf_desc.height = rows;
+		buf_desc.buf_size = width * rows / EPD_MONO_NUMOF_ROWS_PER_PAGE;
+		err = display_write(display_dev, 0, band_y, &buf_desc, wb_data);
+		if (err) {
+			LOG_ERR("display_write (rc %d)", err);
+			break;
+		}
 	}
 
 	display_blanking_off(display_dev);
@@ -373,23 +420,37 @@ void display_associated(uint8_t disp_idx)
 #if defined(CONFIG_BT_ESL_JF_PAINT_LIB)
 int display_clear_paint(uint8_t disp_idx)
 {
-	int err;
+	int err = 0;
+	uint16_t height = capabilities.y_resolution;
+	uint16_t width = capabilities.x_resolution;
 
 #if defined(CONFIG_ESL_POWER_PROFILE)
 	display_epd_onoff(EPD_POWER_ON);
+#if DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8176) || DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8179)
+	uc81xx_init(display_dev);
+#endif
 #endif /* CONFIG_ESL_POWER_PROFILE */
 	ARG_UNUSED(disp_idx);
 
-	buf_desc.width = capabilities.x_resolution;
-	buf_desc.height = capabilities.y_resolution;
-	buf_desc.pitch = capabilities.x_resolution;
-	buf_desc.buf_size = (buf_desc.width * buf_desc.height) / EPD_MONO_NUMOF_ROWS_PER_PAGE;
+	paint_cmd_count = 0;
 
-	paint_Fill(WHITE);
+	buf_desc.width = width;
+	buf_desc.pitch = width;
+
 	display_blanking_on(display_dev);
-	err = display_write(display_dev, 0, 0, &buf_desc, wb_data);
-	if (err) {
-		LOG_ERR("display_write (rc %d)", err);
+	for (uint16_t band_y = 0; band_y < height; band_y += PAINT_BAND_ROWS) {
+		uint16_t rows = (band_y + PAINT_BAND_ROWS <= height) ?
+				PAINT_BAND_ROWS : (height - band_y);
+
+		paint_SetBand(band_y);
+		paint_Fill(WHITE);
+		buf_desc.height = rows;
+		buf_desc.buf_size = width * rows / EPD_MONO_NUMOF_ROWS_PER_PAGE;
+		err = display_write(display_dev, 0, band_y, &buf_desc, wb_data);
+		if (err) {
+			LOG_ERR("display_write (rc %d)", err);
+			break;
+		}
 	}
 
 	display_blanking_off(display_dev);
@@ -404,27 +465,58 @@ int display_print_paint(uint8_t disp_idx, const char *text, uint16_t x, uint16_t
 {
 	ARG_UNUSED(disp_idx);
 	printk("%s x %d y %d\n", __func__, x, y);
-	paint_DrawString(text, &Font16, BLACK, x, y);
+
+	if (paint_cmd_count >= PAINT_CMD_MAX) {
+		LOG_WRN("paint cmd queue full (%d)", PAINT_CMD_MAX);
+		return -ENOMEM;
+	}
+
+	strncpy(paint_cmds[paint_cmd_count].text, text,
+		sizeof(paint_cmds[0].text) - 1);
+	paint_cmds[paint_cmd_count].text[sizeof(paint_cmds[0].text) - 1] = '\0';
+	paint_cmds[paint_cmd_count].x = x;
+	paint_cmds[paint_cmd_count].y = y;
+	paint_cmd_count++;
 
 	return 0;
 }
 
 int display_update_paint(uint8_t disp_idx)
 {
-	int err;
+	int err = 0;
+	uint16_t height = capabilities.y_resolution;
+	uint16_t width = capabilities.x_resolution;
+
 #if defined(CONFIG_ESL_POWER_PROFILE)
 	display_epd_onoff(EPD_POWER_ON);
+#if DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8176) || DT_HAS_COMPAT_STATUS_OKAY(ultrachip_uc8179)
+	uc81xx_init(display_dev);
+#endif
 #endif /* CONFIG_ESL_POWER_PROFILE */
 	ARG_UNUSED(disp_idx);
-	buf_desc.width = capabilities.x_resolution;
-	buf_desc.height = capabilities.y_resolution;
-	buf_desc.pitch = capabilities.x_resolution;
-	buf_desc.buf_size = (buf_desc.width * buf_desc.height) / EPD_MONO_NUMOF_ROWS_PER_PAGE;
+
+	buf_desc.width = width;
+	buf_desc.pitch = width;
 
 	display_blanking_on(display_dev);
-	err = display_write(display_dev, 0, 0, &buf_desc, wb_data);
-	if (err) {
-		LOG_ERR("display_write (rc %d)", err);
+	for (uint16_t band_y = 0; band_y < height; band_y += PAINT_BAND_ROWS) {
+		uint16_t rows = (band_y + PAINT_BAND_ROWS <= height) ?
+				PAINT_BAND_ROWS : (height - band_y);
+
+		paint_SetBand(band_y);
+		paint_Fill(WHITE);
+		for (int i = 0; i < paint_cmd_count; i++) {
+			paint_DrawString(paint_cmds[i].text, &Font16, BLACK,
+					 paint_cmds[i].x, paint_cmds[i].y);
+		}
+
+		buf_desc.height = rows;
+		buf_desc.buf_size = width * rows / EPD_MONO_NUMOF_ROWS_PER_PAGE;
+		err = display_write(display_dev, 0, band_y, &buf_desc, wb_data);
+		if (err) {
+			LOG_ERR("display_write (rc %d)", err);
+			break;
+		}
 	}
 
 	display_blanking_off(display_dev);
@@ -432,6 +524,6 @@ int display_update_paint(uint8_t disp_idx)
 #if defined(CONFIG_ESL_POWER_PROFILE)
 	display_epd_onoff(EPD_POWER_OFF);
 #endif /* CONFIG_ESL_POWER_PROFILE */
-	return 0;
+	return err;
 }
 #endif /* CONFIG_BT_ESL_JF_PAINT_LIB */

@@ -53,6 +53,8 @@ typedef struct paint_obj_s {
 	uint8_t *rw_buffer;
 #endif
 	uint32_t buffer_size;
+	uint32_t band_height;  /* rows per band; 0 = full-frame (backward-compatible) */
+	uint32_t band_y_start; /* physical Y offset of the current band */
 } paint_obj_t;
 
 typedef struct paint_rect_s {
@@ -67,6 +69,7 @@ typedef struct paint_rect_s {
 /* Exported functions --------------------------------------------------------*/
 void paint_Init(paint_obj_t *paint_obj);
 void paint_SetDirection(paint_direction_t direction);
+void paint_SetBand(uint32_t y_start);
 
 void paint_Fill(paint_color_t color);
 void paint_DrawPoint(paint_color_t color, uint32_t x, uint32_t y);

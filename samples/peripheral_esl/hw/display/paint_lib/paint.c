@@ -76,7 +76,15 @@ void paint_Init(paint_obj_t *paint_obj)
 		break;
 	}
 
-	p_Paint->buffer_size = p_Paint->height * (p_Paint->width / 8);
+	p_Paint->band_y_start = 0;
+	p_Paint->buffer_size =
+		(p_Paint->band_height ? p_Paint->band_height : p_Paint->height) *
+		(p_Paint->width / 8);
+}
+
+void paint_SetBand(uint32_t y_start)
+{
+	p_Paint->band_y_start = y_start;
 }
 
 void paint_SetDirection(paint_direction_t direction)
@@ -164,6 +172,13 @@ void paint_DrawPoint(paint_color_t color, uint32_t x, uint32_t y)
 	}
 	if (p_Paint->scanmode == PAINT_SCAN_MODE_2) {
 		y = p_Paint->height - y - 1;
+	}
+	if (p_Paint->band_height) {
+		if (y < p_Paint->band_y_start ||
+		    y >= p_Paint->band_y_start + p_Paint->band_height) {
+			return;
+		}
+		y -= p_Paint->band_y_start;
 	}
 #ifdef CONFIG_PAINT_MSB_FIRST
 	mask = 1 << (7 - x % 8);
@@ -296,6 +311,13 @@ static void drawHline(paint_color_t color, uint32_t x, uint32_t y, uint32_t w)
 
 	if (p_Paint->scanmode == PAINT_SCAN_MODE_2) {
 		y = p_Paint->height - y - 1;
+	}
+	if (p_Paint->band_height) {
+		if (y < p_Paint->band_y_start ||
+		    y >= p_Paint->band_y_start + p_Paint->band_height) {
+			return;
+		}
+		y -= p_Paint->band_y_start;
 	}
 
 	for (i = x; i < 8 + (x & (~0x7)); i++) {
