@@ -1,3 +1,6 @@
+/delete-node/ &boot_partition;
+/delete-node/ &slot0_partition;
+/delete-node/ &slot1_partition;
 /delete-node/ &storage_partition;
 
 / {
@@ -22,13 +25,25 @@
 		compatible = "fixed-partitions";
 		#address-cells = <1>;
 		#size-cells = <1>;
-		storage_partition: partition@76000 {
-			label = "storage";
-			reg = <0x76000 0x2000>;
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x0 DT_SIZE_K(30)>;
 		};
-		lfs1_part: partition@78000 {
+		slot0_partition: partition@7800 {
+			label = "image-0";
+			reg = <0x7800 DT_SIZE_K(316)>;
+		};
+		slot1_partition: partition@56800 {
+			label = "image-1";
+			reg = <0x56800 DT_SIZE_K(110)>;
+		};
+		storage_partition: partition@72000 {
+			label = "storage";
+			reg = <0x72000 DT_SIZE_K(16)>;
+		};
+		lfs1_part: partition@76000 {
 			label = "littlefs_storage";
-			reg = <0x78000 0x7000>;
+			reg = <0x76000 DT_SIZE_K(36)>;
 		};
 	};
 };
