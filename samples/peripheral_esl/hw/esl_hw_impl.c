@@ -74,6 +74,15 @@ void buffer_img(const void *data, size_t len, off_t offset)
 
 	LOG_DBG("buffering len %d offset %ld", len, offset);
 #if defined(CONFIG_BT_ESL_IMAGE_AVAILABLE)
+    size_t buffer_size = (size_t)CONFIG_ESL_IMAGE_BUFFER_SIZE;
+
+	if (offset < 0 ||
+		(size_t)offset > buffer_size ||
+		len > buffer_size - (size_t)offset) {
+		LOG_ERR("image write out of range (offset %ld len %zu, buffer %zu), dropped",
+		(long)offset, len, buffer_size);
+		return;
+	}
 	memcpy((esl_obj->img_obj_buf + offset), data, len);
 #endif
 }
