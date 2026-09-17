@@ -16,6 +16,21 @@ menuconfig BT_ESL
 if BT_ESL
 rsource "Kconfig.esl.defaults"
 
+config BT_ESL_PAST_SKIP
+	int "Periodic advertising sync transfer skip"
+	default 0
+	range 0 499
+	help
+		Maximum number of periodic advertising events to skip when receiving a
+		periodic advertising sync transfer.
+
+config BT_ESL_PAST_TIMEOUT
+	int "Periodic advertising sync transfer timeout"
+	default 2000
+	range 10 16384
+	help
+		Periodic advertising sync transfer timeout in 10 ms units.
+
 config BT_ESL_DISPLAY_MAX
 	int "Maximum number of display elements"
 	default 0

@@ -624,9 +624,8 @@ static void esl_create_pawr_sync(void)
 {
 	int err;
 
-	/* Use maximun value to keep sync as long as possible */
-	past_param.skip = 5;	   /* BT_GAP_PER_ADV_MAX_SKIP */
-	past_param.timeout = 2000; /* BT_GAP_PER_ADV_MAX_TIMEOUT; 183.84 seconds */
+	past_param.skip = CONFIG_BT_ESL_PAST_SKIP;
+	past_param.timeout = CONFIG_BT_ESL_PAST_TIMEOUT;
 	err = bt_le_per_adv_sync_transfer_subscribe(esl_obj_l->conn, &past_param);
 	if (err != 0) {
 		LOG_ERR("PAST subscribe failed (err %d)", err);
